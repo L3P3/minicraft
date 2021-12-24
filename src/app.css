@@ -1,0 +1,56 @@
+html {
+	height: 100%;
+}
+body {
+	margin: 0;
+	height: 100%;
+
+	font-family: sans-serif;
+	background: #333;
+	color: #ddd;
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	cursor: default;
+}
+div {
+	box-sizing: border-box;
+}
+.game {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	cursor: none;
+}
+.game > canvas {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	
+	image-rendering: optimizeSpeed;
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: optimize-contrast;
+	image-rendering: crisp-edges;
+	image-rendering: pixelated;
+}
+.game > .diagnostics {
+	position: absolute;
+	font-family: monospace;
+	color: #fff;
+}
+.game > .menu {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, .7);
+	text-align: center;
+	cursor: default;
+}
+.game > .menu > .settings {
+	margin: 1rem;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+	grid-template-rows: 3rem;
+	grid-gap: 1rem;
+}

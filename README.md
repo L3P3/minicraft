@@ -1,17 +1,74 @@
 # Minicraft
 
-Minecraft, but based on ray tracing and written in JavaScript.
+Minecraft, but based on ray tracing and written in JavaScript. Yes, it is a game and I am not a gamer but this is also very educational.
 
-A game begun by early 2019 by @L3P3 after [proof of concept](https://l3p3.de/z/minicraft.html).
+A game begun by early 2019 by [@L3P3](https://github.com/L3P3) after [proof of concept](https://l3p3.de/z/minicraft.html).
 
-Heavily inspired by and somewhat based on the work of @xNotch.
+Heavily inspired by and somewhat based on the work of [@xNotch](https://github.com/xNotch).
 
-Written for [bake.js](https://l3p3.de/dok/bake.html) but will be ported to normal ES module syntax. Hopefully soon, to get this thing working!
+Originally written for [bake.js](https://l3p3.de/dok/bake.html) but it is getting ported to normal ES module syntax and my web framework [lui](https://github.com/L3P3/lui), in order to get this thing working!
+
+## TODOs
+
+[x] steal idea from [@xNotch](https://github.com/xNotch)
+[x] proof of concept
+[x] tell everybody about this project
+[x] annoy everybody with this project
+[x] new file structure
+[x] basic component tree
+[x] basic models
+[x] basic rasterization
+[x] key handling
+[x] settings menu
+[x] comprehensive readme
+[] solve wrong-fps issue
+[] chunk model
+[] actual raytracing
+[] build/destroy
+[] texturing
+[] world/entity models
+[] collision
+[] load/save worlds
+[] themed ui
+[] production build
+[] migrate to typescript?
+[] backwards compatiblity
+[] items/inventory
+[] use separate threads?
+[] multiplayer?
+[] sky elements
+[] visible entities
+[] particles
+[] use gpu?
+[] sound?
+[] get a lawyer against Mojang?
+
+## How to use
+
+I highly recommend using Visual Studio Code and the extension "Live Server". Then open "app-dev.html" to see the result.
+
+| Key | Effect |
+| --- | ------ |
+| Esc | Open/Close menu |
+| F3 | Show/Hide diagnostic numbers |
+| P | Pause/Start game clock |
 
 ## Build instructions
 
-```shell
-bake mc.cjs
-```
+No bundling set up yet.
 
-But the game did not work anyway. And bake was never released so there is no real point in this section.
+## My tools
+
+- Windows XP
+- Mypal browser + its devtools
+- VS Code via [code-server](https://github.com/cdr/code-server)
+- Live Server extension
+- [lui web framework](https://github.com/L3P3/lui)
+
+## Contribution
+
+This is not really supposed to be a community project, do not assume it would be easy to get pull requests merged by me. But I am really happy to answer any questions or getting any kind of feedback. Feel free to open issues or suggest changes by opening a pull request!
+
+## License
+
+Do whatever you want with that code as long as you visibly reference [this repository](https://github.com/L3P3/minicraft) anywhere that code is used. That reference may be hidden in an accessible menu.
