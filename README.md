@@ -23,27 +23,27 @@ Originally written for [bake.js](https://l3p3.de/dok/bake.html) but it is gettin
 - [x] key handling
 - [x] settings menu
 - [x] comprehensive readme
-- [] solve wrong-fps issue
-- [] chunk model
-- [] actual raytracing
-- [] build/destroy
-- [] texturing
-- [] world/entity models
-- [] collision
-- [] load/save worlds
-- [] themed ui
-- [] production build
-- [] migrate to typescript?
-- [] backwards compatiblity
-- [] items/inventory
-- [] use separate threads?
-- [] multiplayer?
-- [] sky elements
-- [] visible entities
-- [] particles
-- [] use gpu?
-- [] sound?
-- [] get a lawyer against Mojang?
+- [ ] solve wrong-fps issue
+- [ ] chunk model
+- [ ] actual raytracing
+- [ ] build/destroy
+- [ ] texturing
+- [ ] world/entity models
+- [ ] collision
+- [ ] load/save worlds
+- [ ] themed ui
+- [ ] production build
+- [ ] migrate to typescript?
+- [ ] backwards compatiblity
+- [ ] items/inventory
+- [ ] use separate threads?
+- [ ] multiplayer?
+- [ ] sky elements
+- [ ] visible entities
+- [ ] particles
+- [ ] use gpu?
+- [ ] sound?
+- [ ] get a lawyer against Mojang?
 
 ## How to use
 
