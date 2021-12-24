@@ -10,38 +10,40 @@ Originally written for [bake.js](https://l3p3.de/dok/bake.html) but it is gettin
 
 ## TODOs
 
-[x] steal idea from [@xNotch](https://github.com/xNotch)
-[x] proof of concept
-[x] tell everybody about this project
-[x] annoy everybody with this project
-[x] new file structure
-[x] basic component tree
-[x] basic models
-[x] basic rasterization
-[x] key handling
-[x] settings menu
-[x] comprehensive readme
-[] solve wrong-fps issue
-[] chunk model
-[] actual raytracing
-[] build/destroy
-[] texturing
-[] world/entity models
-[] collision
-[] load/save worlds
-[] themed ui
-[] production build
-[] migrate to typescript?
-[] backwards compatiblity
-[] items/inventory
-[] use separate threads?
-[] multiplayer?
-[] sky elements
-[] visible entities
-[] particles
-[] use gpu?
-[] sound?
-[] get a lawyer against Mojang?
+- [x] study computer science and math
+- [x] steal idea from [@xNotch](https://github.com/xNotch)
+- [x] proof of concept
+- [x] tell everybody about this project
+- [x] get rich
+- [x] annoy everybody with this project
+- [x] new file structure
+- [x] basic component tree
+- [x] basic models
+- [x] basic rasterization
+- [x] key handling
+- [x] settings menu
+- [x] comprehensive readme
+- [] solve wrong-fps issue
+- [] chunk model
+- [] actual raytracing
+- [] build/destroy
+- [] texturing
+- [] world/entity models
+- [] collision
+- [] load/save worlds
+- [] themed ui
+- [] production build
+- [] migrate to typescript?
+- [] backwards compatiblity
+- [] items/inventory
+- [] use separate threads?
+- [] multiplayer?
+- [] sky elements
+- [] visible entities
+- [] particles
+- [] use gpu?
+- [] sound?
+- [] get a lawyer against Mojang?
 
 ## How to use
 
