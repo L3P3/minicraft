@@ -60,6 +60,8 @@ export default function Game({
 		model.flag_menu &&
 		node(Menu, {
 			game: model,
+			_1: model.flag_autoscaling,
+			_2: model.resolution_scaling,
 		}),
 	];
 }

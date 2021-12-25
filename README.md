@@ -23,7 +23,7 @@ Originally written for [bake.js](https://l3p3.de/dok/bake.html) but it is gettin
 - [x] key handling
 - [x] settings menu
 - [x] comprehensive readme
-- [ ] solve wrong-fps issue
+- [x] solve wrong-fps issue
 - [ ] chunk model
 - [ ] actual raytracing
 - [ ] build/destroy

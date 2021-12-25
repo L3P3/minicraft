@@ -94,5 +94,5 @@ export const renderer_canvas_init = model => {
 	).data;
 	const data_length = data.length;
 	for (let i = 3; i < data_length; i += 4)
-		data[i] = 255;
+		data[i] = 0xff;
 };

@@ -1,6 +1,6 @@
 import {
 	hook_dom,
-	hook_state,
+	hook_static,
 	node_dom,
 } from '../etc/lui.js';
 
@@ -11,9 +11,6 @@ import {
 export default function Menu({
 	game,
 }) {
-	const [autoscaling, autoscaling_set] = hook_state(game.flag_autoscaling);
-	const [scaling, scaling_set] = hook_state(game.resolution_scaling);
-
 	hook_dom('div[className=menu]');
 
 	return [
@@ -21,33 +18,32 @@ export default function Menu({
 		node_dom('div[className=settings]', null, [
 			node_dom('button', {
 				innerText: `Bildskalierung: ${
-					autoscaling
+					game.flag_autoscaling
 					?	'Dynamisch'
 					:	'Statisch'
 				}`,
-				onclick: () => {
-					autoscaling_set(
-						game.flag_autoscaling = !autoscaling
-					);
-				},
+				onclick: hook_static(() => {
+					game.flag_autoscaling = !game.flag_autoscaling;
+				}),
 			}),
 			node_dom('label[innerText=Skalierung:]', null, [
 				node_dom('input[type=range][min=1][max=100][step=1]', {
-					value: 101 - scaling,
-					onchange: event => {
-						const value = 101 - Number(event.target.value);
-						game_scaling_set(game, value);
-						scaling_set(value);
-					},
+					value: 101 - game.resolution_scaling,
+					onchange: hook_static(event => {
+						game_scaling_set(
+							game,
+							101 - Number(event.target.value)
+						);
+					}),
 				}),
 			]),
 		]),
 		node_dom('div', null, [
 			node_dom('button[innerText=Zurück]', {
-				onclick: () => {
+				onclick: hook_static(() => {
 					game.flag_paused =
 					game.flag_menu = false;
-				},
+				}),
 			}),
 		]),
 	];
