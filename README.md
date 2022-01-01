@@ -24,11 +24,13 @@ Originally written for [bake.js](https://l3p3.de/dok/bake.html) but it is gettin
 - [x] settings menu
 - [x] comprehensive readme
 - [x] solve wrong-fps issue
-- [ ] chunk model
-- [ ] actual raytracing
+- [x] world/chunk/player model
+- [x] actual raytracing
+- [ ] correct raytracing
 - [ ] build/destroy
 - [ ] texturing
-- [ ] world/entity models
+- [ ] entity models
+- [ ] multiple chunks
 - [ ] collision
 - [ ] load/save worlds
 - [ ] themed ui

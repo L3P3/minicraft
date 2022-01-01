@@ -1,16 +1,23 @@
 import {
+	player_create,
+} from './m_player.js';
+import {
 	renderer_canvas_init,
 	renderer_create,
 	renderer_destroy,
 } from './m_renderer.js';
+import {
+	world_create,
+} from './m_world.js';
 
 export const game_create = () => ({
-	flag_autoscaling: true,
+	flag_autoscaling: false,
 	flag_diagnostics: true,
 	flag_menu: false,
 	flag_paused: false,
+	player: player_create(),
 	renderer: null,
-	resolution_scaling: 20.0,
+	resolution_scaling: 10,
 	resolution_raw_x: 0,
 	resolution_raw_y: 0,
 	resolution_x: 0,
@@ -18,6 +25,7 @@ export const game_create = () => ({
 	tick_interval: null,
 	time: 0,
 	time_f: 0.0,
+	world: world_create(),
 });
 
 export const game_start = (model, canvas) => {
@@ -62,20 +70,50 @@ export const game_umount = model => {
 
 export const game_key = (model, code, state) => {
 	if (state) switch (code) {
-		case 27:
+		case 27: // ESC
 			model.flag_paused =
 			model.flag_menu = !model.flag_menu;
 			break;
-		case 80:
+		case 16: // SHIFT
+			model.player.accel_y = -.1;
+			break;
+		case 32: // SPACE
+			model.player.accel_y = .1;
+			break;
+		case 65: // A
+			model.player.accel_x = -.1;
+			break;
+		case 68: // D
+			model.player.accel_x = .1;
+			break;
+		case 80: // P
 			model.flag_paused = !model.flag_paused;
 			break;
-		case 114:
+		case 83: // S
+			model.player.accel_z = -.1;
+			break;
+		case 87: // W
+			model.player.accel_z = .1;
+			break;
+		case 114: // F3
 			model.flag_diagnostics = !model.flag_diagnostics;
 			break;
 		default:
 			return true;
 	}
 	else switch (code) {
+		case 16: // SHIFT
+		case 32: // SPACE
+			model.player.accel_y = 0;
+			break;
+		case 65: // A
+		case 68: // D
+			model.player.accel_x = 0;
+			break;
+		case 83: // S
+		case 87: // W
+			model.player.accel_z = 0;
+			break;
 		default:
 			return true;
 	}
@@ -86,6 +124,20 @@ const game_tick = model => {
 	if (model.flag_paused) return;
 	model.time = (model.time + 1) % 24e3;
 	model.time_f = ((model.time + 6e3) * (1 / 24e3)) % 1;
+
+	const {player} = model;
+
+	player.speed_x *= .8;
+	player.speed_y *= .8;
+	player.speed_z *= .8;
+
+	player.speed_x += Math.cos(player.angle_h) * player.accel_x + Math.sin(player.angle_h) * player.accel_z;
+	player.speed_y += player.accel_y;
+	player.speed_z += -Math.sin(player.angle_h) * player.accel_x + Math.cos(player.angle_h) * player.accel_z;
+
+	player.position_x += player.speed_x;
+	player.position_y += player.speed_y;
+	player.position_z += player.speed_z;
 
 	if (
 		model.flag_autoscaling &&

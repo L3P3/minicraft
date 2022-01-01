@@ -1,6 +1,12 @@
 import {
+	BLOCK_AIR,
+	BLOCK_COLORS,
+	SKY_COLOR,
 	VERSION,
 } from '../etc/constants.js';
+import {
+	world_block_get,
+} from './m_world.js';
 
 export const renderer_create = (game, canvas) => {
 	const model = {
@@ -32,6 +38,10 @@ export const renderer_render = (model, now) => {
 		canvas_surface,
 		game,
 	} = model;
+	const {
+		player,
+		world,
+	} = game;
 
 	model.diagnostics = (
 		game.flag_diagnostics
@@ -54,7 +64,8 @@ ${
 R: ${game.resolution_x}x${game.resolution_y} (x${game.resolution_scaling}), C: 0, D: INF
 E: 0/0
 
-X/Y/Z: 0.0 0.0 0.0
+Position: ${player.position_x.toFixed(2)} ${player.position_y.toFixed(2)} ${player.position_z.toFixed(2)}
+Angle: ${(player.angle_h * 180 / Math.PI).toFixed(2)} ${(player.angle_v * 180 / Math.PI).toFixed(2)}
 Block: 0 0 0
 Chunk: 0 0 0 in 0 0
 Facing: 0`
@@ -69,17 +80,47 @@ Facing: 0`
 	model.flag_dirty = false;
 
 	const pixels = canvas_surface.data;
+	const fov = (80 / 360) * Math.PI;
+	const fov_x = game.resolution_x < game.resolution_y ? fov * game.resolution_x / game.resolution_y : fov;
+	const fov_y = game.resolution_y < game.resolution_x ? fov * game.resolution_y / game.resolution_x : fov;
 
-	for (let y = 0; y < game.resolution_y; ++y)
-	for (let x = 0; x < game.resolution_x; ++x)
-		pixels[((y * game.resolution_x + x) << 2) + 2] = Math.round(
-			(
-				.5 * Math.sin(
-					(game.time % 50) / 50 * 2 * Math.PI +
-					(x/game.resolution_x + y/game.resolution_y) * 10 * Math.PI
-				) + .25
-			) * 200 + 55
-		);
+	let pixels_index = 0;
+
+	for (let canvas_y = 0; canvas_y < game.resolution_y; ++canvas_y)
+	for (let canvas_x = 0; canvas_x < game.resolution_x; ++canvas_x) {
+		const canvas_x_relative = (canvas_x - game.resolution_x / 2) / game.resolution_x;
+		const canvas_y_relative = (game.resolution_y / 2 - canvas_y) / game.resolution_y;
+		const angle_h = player.angle_h + canvas_x_relative * fov_x;
+		const angle_v = player.angle_v + canvas_y_relative * fov_y;
+
+		const step_x = Math.sin(angle_h) * Math.cos(angle_v);
+		const step_y = Math.sin(angle_v);
+		const step_z = Math.cos(angle_h) * Math.cos(angle_v);
+
+		let check_x = player.position_x;
+		let check_y = player.position_y;
+		let check_z = player.position_z;
+		let distance = 0;
+
+		let [pixel_r, pixel_g, pixel_b] = SKY_COLOR;
+
+		do {
+			const block = world_block_get(world, check_x, check_y, check_z);
+			if (block !== BLOCK_AIR) {
+				[pixel_r, pixel_g, pixel_b] = BLOCK_COLORS[block];
+				break;
+			}
+			check_x += step_x;
+			check_y += step_y;
+			check_z += step_z;
+		}
+		while(++distance < 100);
+
+		pixels[pixels_index] = pixel_r;
+		pixels[++pixels_index] = pixel_g;
+		pixels[++pixels_index] = pixel_b;
+		pixels_index += 2;
+	}
 
 	model.canvas_context.putImageData(canvas_surface, 0, 0);
 };

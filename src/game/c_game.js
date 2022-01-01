@@ -29,8 +29,14 @@ export default function Game({
 
 	hook_effect(() => {
 		ref.game = model;
+		onmousemove = event => {
+			if (model.flag_paused) return;
+			model.player.angle_h = (event.clientX / model.resolution_raw_x - .5) * 2 * Math.PI;
+			model.player.angle_v = (.5 - event.clientY / model.resolution_raw_y) * Math.PI;
+		};
 		return () => {
 			game_umount(model);
+			onmousemove = null;
 			ref.game = null;
 		};
 	});
