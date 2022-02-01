@@ -1,4 +1,4 @@
-export const VERSION = '0.1.1';
+export const VERSION = '0.1.2';
 
 export const CHUNK_WIDTH_L2 = 4;
 export const CHUNK_WIDTH_L2_T2 = CHUNK_WIDTH_L2 << 1;
@@ -19,17 +19,17 @@ export const BLOCK_BRICKS = 9;
 export const BLOCK_WOOL = 10;
 
 export const BLOCK_COLORS = [
-	[0, 0, 0], // AIR
-	[121, 121, 121], // STONE
-	[127, 183, 82], // GRASS
-	[120, 84, 57], // DIRT
-	[130, 130, 130], // COBBLE
-	[151, 123, 77], // PLANKS
-	[69, 69, 69], // BEDROCK
-	[96, 77, 47], // LOG
-	[47, 130, 34], // LEAVES
-	[184, 140, 128], // BRICKS
-	[215, 215, 215], // WOOL
+	0x000000, // VOID
+	0x797979, // STONE
+	0x7fb752, // GRASS
+	0x785439, // DIRT
+	0x828282, // COBBLE
+	0x977b4d, // PLANKS
+	0x454545, // BEDROCK
+	0x604d2f, // LOG
+	0x2f8222, // LEAVES
+	0xb88c80, // BRICKS
+	0xd7d7d7, // WOOL
 ];
 
-export const SKY_COLOR = [0x84, 0xB1, 0xFF];
+export const SKY_COLOR = 0x84B1FF;

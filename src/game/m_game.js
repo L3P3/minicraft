@@ -25,6 +25,8 @@ export const game_create = () => ({
 	tick_interval: null,
 	time: 0,
 	time_f: 0.0,
+	view_angle: 80,
+	view_distance: 64,
 	world: world_create(),
 });
 

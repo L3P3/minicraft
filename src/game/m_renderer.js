@@ -61,7 +61,7 @@ ${
 	?	''
 	:	game.time
 }
-R: ${game.resolution_x}x${game.resolution_y} (x${game.resolution_scaling}), C: 0, D: INF
+R: ${game.resolution_x}x${game.resolution_y} (x${game.resolution_scaling}), C: 1, D: ${game.view_distance}
 E: 0/0
 
 Position: ${player.position_x.toFixed(2)} ${player.position_y.toFixed(2)} ${player.position_z.toFixed(2)}
@@ -80,45 +80,95 @@ Facing: 0`
 	model.flag_dirty = false;
 
 	const pixels = canvas_surface.data;
-	const fov = (80 / 360) * Math.PI;
-	const fov_x = game.resolution_x < game.resolution_y ? fov * game.resolution_x / game.resolution_y : fov;
-	const fov_y = game.resolution_y < game.resolution_x ? fov * game.resolution_y / game.resolution_x : fov;
+
+	const {resolution_x, resolution_y, view_distance} = game;
+	const resolution_x_h = resolution_x * .5;
+	const resolution_y_h = resolution_y * .5;
+	const resolution_x_1d = 1 / resolution_x;
+	const resolution_y_1d = 1 / resolution_y;
+	const {angle_h, angle_v, position_x, position_y, position_z} = player;
+	const angle_h_cos = Math.cos(angle_h);
+	const angle_h_sin = Math.sin(angle_h);
+	const angle_v_cos = Math.cos(-angle_v);
+	const angle_v_sin = Math.sin(-angle_v);
+	const fov = game.view_angle / 45;// TODO
+	const fov_x = resolution_x < resolution_y ? fov * resolution_x * resolution_y_1d : fov;
+	const fov_y = resolution_y < resolution_x ? fov * resolution_y * resolution_x_1d : fov;
 
 	let pixels_index = 0;
 
-	for (let canvas_y = 0; canvas_y < game.resolution_y; ++canvas_y)
-	for (let canvas_x = 0; canvas_x < game.resolution_x; ++canvas_x) {
-		const canvas_x_relative = (canvas_x - game.resolution_x / 2) / game.resolution_x;
-		const canvas_y_relative = (game.resolution_y / 2 - canvas_y) / game.resolution_y;
-		const angle_h = player.angle_h + canvas_x_relative * fov_x;
-		const angle_v = player.angle_v + canvas_y_relative * fov_y;
+	for (let canvas_y = 0; canvas_y < resolution_y; ++canvas_y)
+	for (let canvas_x = 0; canvas_x < resolution_x; ++canvas_x) {
+		const canvas_x_relative = (canvas_x - resolution_x_h) * resolution_x_1d * fov_x;
+		const canvas_y_relative = (resolution_y_h - canvas_y) * resolution_y_1d * fov_y;
 
-		const step_x = Math.sin(angle_h) * Math.cos(angle_v);
-		const step_y = Math.sin(angle_v);
-		const step_z = Math.cos(angle_h) * Math.cos(angle_v);
+		const step_y_raw = canvas_y_relative * angle_v_cos -                     angle_v_sin;
+		const step_z_rot =                     angle_v_cos + canvas_y_relative * angle_v_sin;
+		const step_x_raw = canvas_x_relative * angle_h_cos + step_z_rot        * angle_h_sin;
+		const step_z_raw = step_z_rot        * angle_h_cos - canvas_x_relative * angle_h_sin;
 
-		let check_x = player.position_x;
-		let check_y = player.position_y;
-		let check_z = player.position_z;
-		let distance = 0;
+		let pixel_color = SKY_COLOR;
+		let pixel_factor = 1.0;
 
-		let [pixel_r, pixel_g, pixel_b] = SKY_COLOR;
+		let check_distance_min = view_distance;
+		// step for each x, y, z
+		for (let dim = 0; dim < 3; ++dim) {
+			const step_dim = (
+				dim === 0
+				?	step_x_raw
+				: dim === 1
+				?	step_y_raw
+				:	step_z_raw
+			);
 
-		do {
-			const block = world_block_get(world, check_x, check_y, check_z);
-			if (block !== BLOCK_AIR) {
-				[pixel_r, pixel_g, pixel_b] = BLOCK_COLORS[block];
+			const step_normal = 1 / (step_dim < 0 ? -step_dim : step_dim);
+			const step_x = step_x_raw * step_normal;
+			const step_y = step_y_raw * step_normal;
+			const step_z = step_z_raw * step_normal;
+
+			// calculate distance to first intersection to then start on it
+			let offset = (
+				dim === 0
+				?	position_x % 1
+				: dim === 1
+				?	position_y % 1
+				:	position_z % 1
+			);
+			offset = offset < 0 ? -offset : offset;
+			offset = step_dim > 0 ? 1 - offset : offset;
+
+			let check_x = position_x + step_x * offset;
+			let check_y = position_y + step_y * offset;
+			let check_z = position_z + step_z * offset;
+			let check_distance = step_normal * offset;
+
+			// move into middle of block to prevent rounding errors causing flicker
+			if (dim === 0) check_x += step_dim < 0 ? -.5 : .5;
+			else if (dim === 1) check_y += step_dim < 0 ? -.5 : .5;
+			else check_z += step_dim < 0 ? -.5 : .5;
+
+			// add steps until collision or out of range
+			while (check_distance < check_distance_min) {
+				const block = world_block_get(world, check_x, check_y, check_z);
+				if (block === BLOCK_AIR) {
+					// no collision
+					check_x += step_x;
+					check_y += step_y;
+					check_z += step_z;
+					check_distance += step_normal;
+					continue;	
+				}
+				// collision
+				pixel_color = BLOCK_COLORS[block];
+				pixel_factor = 1 - ((dim + 2) % 3) * .2;
+				check_distance_min = check_distance;
 				break;
 			}
-			check_x += step_x;
-			check_y += step_y;
-			check_z += step_z;
 		}
-		while(++distance < 100);
 
-		pixels[pixels_index] = pixel_r;
-		pixels[++pixels_index] = pixel_g;
-		pixels[++pixels_index] = pixel_b;
+		pixels[pixels_index] = ((pixel_color >> 16) & 0xff) * pixel_factor;
+		pixels[++pixels_index] = ((pixel_color >> 8) & 0xff) * pixel_factor;
+		pixels[++pixels_index] = (pixel_color & 0xff) * pixel_factor;
 		pixels_index += 2;
 	}
 

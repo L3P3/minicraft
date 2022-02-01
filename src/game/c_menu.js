@@ -37,6 +37,24 @@ export default function Menu({
 					}),
 				}),
 			]),
+			node_dom('label[innerText=Blickwinkel:]', null, [
+				node_dom('input[type=range][min=1][max=180][step=1]', {
+					value: game.view_angle,
+					onchange: hook_static(event => {
+						game.view_angle = Number(event.target.value);
+						game.renderer.flag_dirty = true;
+					}),
+				}),
+			]),
+			node_dom('label[innerText=Sichtweite:]', null, [
+				node_dom('input[type=range][min=1][max=128][step=1]', {
+					value: game.view_distance,
+					onchange: hook_static(event => {
+						game.view_distance = Number(event.target.value);
+						game.renderer.flag_dirty = true;
+					}),
+				}),
+			]),
 		]),
 		node_dom('div', null, [
 			node_dom('button[innerText=Zurück]', {
