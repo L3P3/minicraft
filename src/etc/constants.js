@@ -1,5 +1,3 @@
-export const VERSION = '0.1.2';
-
 export const CHUNK_WIDTH_L2 = 4;
 export const CHUNK_WIDTH_L2_T2 = CHUNK_WIDTH_L2 << 1;
 export const CHUNK_WIDTH = 1 << CHUNK_WIDTH_L2;

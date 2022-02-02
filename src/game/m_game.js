@@ -1,4 +1,7 @@
 import {
+	DEBUG,
+} from '../etc/env.js';
+import {
 	player_create,
 } from './m_player.js';
 import {
@@ -12,7 +15,7 @@ import {
 
 export const game_create = () => ({
 	flag_autoscaling: false,
-	flag_diagnostics: true,
+	flag_diagnostics: DEBUG,
 	flag_menu: false,
 	flag_paused: false,
 	player: player_create(),

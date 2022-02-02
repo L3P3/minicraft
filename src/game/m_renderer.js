@@ -2,8 +2,10 @@ import {
 	BLOCK_AIR,
 	BLOCK_COLORS,
 	SKY_COLOR,
-	VERSION,
 } from '../etc/constants.js';
+import {
+	VERSION,
+} from '../etc/env.js';
 import {
 	world_block_get,
 } from './m_world.js';
