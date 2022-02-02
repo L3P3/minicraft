@@ -1,0 +1,46 @@
+name: Build and deploy
+
+on:
+  push:
+    branches-ignore:
+      - dist
+    paths:
+      - 'package.json'
+  pull_request:
+    branches-ignore:
+      - dist
+    paths:
+      - 'package.json'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup NodeJS
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run-script build
+      - name: Commit artifacts
+        if: github.ref == 'refs/heads/master'
+        run: |
+          export APPVERSION=$(echo "console.log(require('./package.json').version)" | node)
+          mv dist /tmp/app-dist
+          git fetch
+          git checkout dist
+          mv /tmp/app-dist/* ./
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git diff-index --quiet HEAD || git commit -m "v$APPVERSION"
+          git push
+      - name: Clear cache
+        if: github.ref == 'refs/heads/master'
+        run: |
+          for i in *.js; do curl -s "https://purge.jsdelivr.net/gh/L3P3/minicraft@dist/$i" > /dev/null; done

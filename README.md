@@ -2,6 +2,8 @@
 
 Minecraft, but based on ray tracing and written in JavaScript. Yes, it is a game and I am not a gamer but this is also very educational.
 
+[Try it out now!](https://l3p3.de/minicraft.html)
+
 A game begun by early 2019 by [@L3P3](https://github.com/L3P3) after [proof of concept](https://l3p3.de/z/minicraft.html).
 
 Heavily inspired by and somewhat based on the work of [@xNotch](https://github.com/xNotch).
@@ -26,6 +28,7 @@ Originally written for [bake.js](https://l3p3.de/dok/bake.html) but it is gettin
 - [x] solve wrong-fps issue
 - [x] world/chunk/player model
 - [x] actual raytracing
+- [x] production build
 - [ ] correct raytracing
 - [ ] build/destroy
 - [ ] texturing
@@ -34,7 +37,6 @@ Originally written for [bake.js](https://l3p3.de/dok/bake.html) but it is gettin
 - [ ] collision
 - [ ] load/save worlds
 - [ ] themed ui
-- [ ] production build
 - [ ] migrate to typescript?
 - [ ] backwards compatiblity
 - [ ] items/inventory

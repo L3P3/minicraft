@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"baseUrl": "./src",
+		"lib": ["ES2016", "DOM"],
+		"moduleResolution": "classic",
+		"target": "ES2016"
+	},
+	"include": [
+		"src/**/*"
+	],
+	"exclude": [
+		"src/externs.js",
+	],
+}

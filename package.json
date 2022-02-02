@@ -1,0 +1,30 @@
+{
+	"name": "minicraft",
+	"version": "0.1.3",
+	"description": "voxel-based 3d game",
+	"homepage": "https://l3p3.de/minicraft",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/l3p3/minicraft"
+	},
+	"bugs": {
+		"url": "https://github.com/l3p3/minicraft/issues"
+	},
+	"main": "./src/app.js",
+	"type": "module",
+	"scripts": {
+		"build": "node ./build.js"
+	},
+	"keywords": [
+		"minecraft",
+		"voxel",
+		"raytracing",
+		"3d",
+		"game"
+	],
+	"author": "L3P3 <dev@l3p3.de> (https://l3p3.de)",
+	"license": "Zlib",
+	"devDependencies": {
+		"google-closure-compiler": "latest"
+	}
+}
