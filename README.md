@@ -28,8 +28,8 @@ Originally written for [bake.js](https://l3p3.de/dok/bake.html) but it is gettin
 - [x] solve wrong-fps issue
 - [x] world/chunk/player model
 - [x] actual raytracing
+- [x] correct raytracing
 - [x] production build
-- [ ] correct raytracing
 - [ ] build/destroy
 - [ ] texturing
 - [ ] entity models
@@ -61,7 +61,10 @@ I highly recommend using Visual Studio Code and the extension "Live Server". The
 
 ## Build instructions
 
-No bundling set up yet.
+```
+npm install
+npm run build
+```
 
 ## My tools
 
@@ -77,4 +80,4 @@ This is not really supposed to be a community project, do not assume it would be
 
 ## License
 
-Do whatever you want with that code as long as you visibly reference [this repository](https://github.com/L3P3/minicraft) anywhere that code is used. That reference may be hidden in an accessible menu.
+Just ZLib license, I do not care too much about it.
