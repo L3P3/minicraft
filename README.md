@@ -2,7 +2,7 @@
 
 Minecraft, but based on ray tracing and written in JavaScript. Yes, it is a game and I am not a gamer but this is also very educational.
 
-[Try it out now!](https://l3p3.de/minicraft.html)
+[Try it out now!](https://l3p3.de/minicraft)
 
 A game begun by early 2019 by [@L3P3](https://github.com/L3P3) after [proof of concept](https://l3p3.de/z/minicraft.html).
 
