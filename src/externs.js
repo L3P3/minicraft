@@ -13,13 +13,11 @@ var TYPE_NODEDATA_ITEM;
 
 /**
 	@typedef {!Object<string, boolean>}
-	@dict
 */
 var TYPE_PROPS_F;
 
 /**
 	@typedef {!Object<string, string>}
-	@dict
 */
 var TYPE_PROPS_S;
 
@@ -31,7 +29,6 @@ var TYPE_PROPS_S;
 		S: (void|TYPE_PROPS_S),
 		I: (void|TYPE_NODEDATA),
 	}}
-	@dict
 */
 var TYPE_PROPS;
 
@@ -156,7 +153,7 @@ lui.hook_rerender = function(){}
 	@param {*} initial
 	@return {!Array}
 */
-lui.hook_state = function(){}
+lui.hook_state = function(initial){}
 
 /**
 	@template T
@@ -176,12 +173,12 @@ lui.hook_sub = function(getter, deps){}
 /**
 	@param {number} target
 	@param {number} msecs
-	@param {number}
+	@return {number}
 */
 lui.hook_transition = function(target, msecs){}
 
 /**
-	@param {function():[?TYPE_PROPS, ?TYPE_NODELIST]} root
+	@param {function():Array!} root
 	@return {void}
 */
 lui.init = function(root){}
@@ -223,12 +220,12 @@ var localStorage = {
 
 function addEventListener(
 	/** string */ eventName,
-	/** function */ handler,
+	/** function(Event) */ handler,
 	/** {passive: boolean} */ options
 ){}
 function removeEventListener(
 	/** string */ eventName,
-	/** function */ handler
+	/** function(Event) */ handler
 ){}
 
 /**
@@ -239,7 +236,13 @@ function open(url){}
 
 function onbeforeinstallprompt(){}
 function onbeforeunload(){}
-function onerror(){}
-function onkeydown(){}
-function onmousemove(){}
-function onmouseup(){}
+function onerror(error){}
+function onkeydown(event){}
+/**
+	@type {function(MouseEvent)?}
+*/
+var onmousemove;
+/**
+	@type {function(MouseEvent)?}
+*/
+var onmouseup;
