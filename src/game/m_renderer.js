@@ -7,6 +7,13 @@ import {
 	VERSION,
 } from '../etc/env.js';
 import {
+	Math_cos,
+	Math_PI_180d,
+	Math_sin,
+	number_padStart2,
+	number_toFixed2,
+} from '../etc/helpers.js';
+import {
 	world_block_get,
 } from './m_world.js';
 
@@ -47,30 +54,46 @@ export const renderer_render = (model, now) => {
 
 	model.diagnostics = (
 		game.flag_diagnostics
-		?	`Minicraft ${VERSION}
-${
-	model.fps
-	.toString().padStart(2, '\xa0')
-} fps, T: ${
-	Math.floor(game.time_f * 24)
-	.toString().padStart(2, '0')
-}:${
-	Math.floor(((game.time_f * 24) % 1) * 60)
-	.toString().padStart(2, '0')
-}; ${
-	game.flag_paused &&
-	now % 1e3 < 500
-	?	''
-	:	game.time
-}
-R: ${game.resolution_x}x${game.resolution_y} (x${game.resolution_scaling}), C: 1, D: ${game.view_distance}
-E: 0/0
+		?	'Minicraft ' + VERSION + ' ' + (
+				number_padStart2(model.fps, '\xa0')
+			) + ' fps, T: ' + (
+				number_padStart2(game.time_f * 24, '0')
+			) + ':' + (
+				number_padStart2((((game.time_f * 24) % 1) * 60), '0')
+			) + '; ' + (
+				game.flag_paused &&
+				now % 1e3 < 500
+				?	''
+				:	game.time
+			) + '\n' +
 
-Position: ${player.position_x.toFixed(2)} ${player.position_y.toFixed(2)} ${player.position_z.toFixed(2)}
-Angle: ${(player.angle_h * 180 / Math.PI).toFixed(2)} ${(player.angle_v * 180 / Math.PI).toFixed(2)}
-Block: 0 0 0
-Chunk: 0 0 0 in 0 0
-Facing: 0`
+			'R: ' + (
+				game.resolution_x
+			) + 'x' + (
+				game.resolution_y
+			) + ' (x' + (
+				game.resolution_scaling
+			) + '), C: 1, D: ' + (
+				game.view_distance
+			) + '\n' +
+			'E: 0/0\n\n' +
+
+			'Position: ' + (
+				number_toFixed2(player.position_x)
+			) + ' ' + (
+				number_toFixed2(player.position_y)
+			) + ' ' + (
+				number_toFixed2(player.position_z)
+			) + '\n' +
+
+			'Angle: ' + (
+				number_toFixed2(player.angle_h * Math_PI_180d)
+			) + ' ' + (
+				number_toFixed2(player.angle_v * Math_PI_180d)
+			) + '\n' +
+			'Block: 0 0 0\n' +
+			'Chunk: 0 0 0 in 0 0\n' +
+			'Facing: 0'
 		:	''
 	);
 
@@ -89,10 +112,10 @@ Facing: 0`
 	const resolution_x_1d = 1 / resolution_x;
 	const resolution_y_1d = 1 / resolution_y;
 	const {angle_h, angle_v, position_x, position_y, position_z} = player;
-	const angle_h_cos = Math.cos(angle_h);
-	const angle_h_sin = Math.sin(angle_h);
-	const angle_v_cos = Math.cos(-angle_v);
-	const angle_v_sin = Math.sin(-angle_v);
+	const angle_h_cos = Math_cos(angle_h);
+	const angle_h_sin = Math_sin(angle_h);
+	const angle_v_cos = Math_cos(-angle_v);
+	const angle_v_sin = Math_sin(-angle_v);
 	const fov = game.view_angle / 45;// TODO
 	const fov_x = resolution_x < resolution_y ? fov * resolution_x * resolution_y_1d : fov;
 	const fov_y = resolution_y < resolution_x ? fov * resolution_y * resolution_x_1d : fov;

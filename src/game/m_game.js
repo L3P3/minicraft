@@ -2,6 +2,12 @@ import {
 	DEBUG,
 } from '../etc/env.js';
 import {
+	Math_cos,
+	Math_max,
+	Math_round,
+	Math_sin,
+} from '../etc/helpers.js';
+import {
 	player_create,
 } from './m_player.js';
 import {
@@ -52,8 +58,8 @@ export const game_scaling_set = (model, scaling) => (
 );
 
 const game_resolution_update = model => {
-	const x = Math.max(1, Math.round(model.resolution_raw_x / model.resolution_scaling));
-	const y = Math.max(1, Math.round(model.resolution_raw_y / model.resolution_scaling));
+	const x = Math_max(1, Math_round(model.resolution_raw_x / model.resolution_scaling));
+	const y = Math_max(1, Math_round(model.resolution_raw_y / model.resolution_scaling));
 
 	if (
 		x === model.resolution_x &&
@@ -136,9 +142,9 @@ const game_tick = model => {
 	player.speed_y *= .8;
 	player.speed_z *= .8;
 
-	player.speed_x += Math.cos(player.angle_h) * player.accel_x + Math.sin(player.angle_h) * player.accel_z;
+	player.speed_x += Math_cos(player.angle_h) * player.accel_x + Math_sin(player.angle_h) * player.accel_z;
 	player.speed_y += player.accel_y;
-	player.speed_z += -Math.sin(player.angle_h) * player.accel_x + Math.cos(player.angle_h) * player.accel_z;
+	player.speed_z += -Math_sin(player.angle_h) * player.accel_x + Math_cos(player.angle_h) * player.accel_z;
 
 	player.position_x += player.speed_x;
 	player.position_y += player.speed_y;

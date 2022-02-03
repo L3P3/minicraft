@@ -1,4 +1,7 @@
 import {
+	Math_PI,
+} from '../etc/helpers.js';
+import {
 	hook_dom,
 	hook_effect,
 	hook_memo,
@@ -31,8 +34,8 @@ export default function Game({
 		ref.game = model;
 		onmousemove = event => {
 			if (model.flag_paused) return;
-			model.player.angle_h = (event.clientX / model.resolution_raw_x - .5) * 2 * Math.PI;
-			model.player.angle_v = (.5 - event.clientY / model.resolution_raw_y) * Math.PI;
+			model.player.angle_h = (event.clientX / model.resolution_raw_x - .5) * 2 * Math_PI;
+			model.player.angle_v = (.5 - event.clientY / model.resolution_raw_y) * Math_PI;
 		};
 		return () => {
 			game_umount(model);
