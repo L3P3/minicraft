@@ -32,6 +32,7 @@ jobs:
         run: |
           export APPVERSION=$(echo "console.log(require('./package.json').version)" | node)
           mv dist /tmp/app-dist
+          git clean -f
           git fetch
           git checkout dist
           mv /tmp/app-dist/* ./
