@@ -1,9 +1,9 @@
 {
 	"compilerOptions": {
 		"baseUrl": "./src",
-		"lib": ["ES2016", "DOM"],
+		"lib": ["ESNext", "DOM"],
 		"moduleResolution": "classic",
-		"target": "ES2016"
+		"target": "ESNext"
 	},
 	"include": [
 		"src/**/*"
