@@ -2,33 +2,34 @@ import {
 	DEBUG,
 } from '../etc/env.js';
 import {
-	Math_cos,
 	Math_max,
+	Math_PI,
 	Math_round,
-	Math_sin,
 } from '../etc/helpers.js';
 import {
 	player_create,
+	player_tick,
 } from './m_player.js';
 import {
 	renderer_canvas_init,
 	renderer_create,
 	renderer_destroy,
+	renderer_render,
 } from './m_renderer.js';
 import {
 	world_create,
 } from './m_world.js';
 
 export const game_create = () => ({
-	flag_autoscaling: false,
 	flag_diagnostics: DEBUG,
 	flag_menu: false,
 	flag_paused: false,
+	frame_last: 0,
 	player: player_create(),
 	renderer: null,
 	resolution_scaling: 10,
-	resolution_raw_x: 0,
-	resolution_raw_y: 0,
+	resolution_raw_x: 1,
+	resolution_raw_y: 1,
 	resolution_x: 0,
 	resolution_y: 0,
 	tick_interval: null,
@@ -40,6 +41,12 @@ export const game_create = () => ({
 });
 
 export const game_start = (model, canvas) => {
+	onmousemove = event => {
+		if (!model.flag_paused) {
+			model.player.angle_h = (event.clientX / model.resolution_raw_x - .5) * 2 * Math_PI;
+			model.player.angle_v = (.5 - event.clientY / model.resolution_raw_y) * Math_PI;
+		}
+	};
 	model.renderer = renderer_create(model, canvas);
 	model.tick_interval = setInterval(() => {
 		game_tick(model);
@@ -47,8 +54,8 @@ export const game_start = (model, canvas) => {
 };
 
 export const game_resolution_raw_set = (model, width, height) => (
-	model.resolution_raw_x = width,
-	model.resolution_raw_y = height,
+	model.resolution_raw_x = Math_max(1, width),
+	model.resolution_raw_y = Math_max(1, height),
 	game_resolution_update(model)
 );
 
@@ -74,10 +81,11 @@ const game_resolution_update = model => {
 	}
 };
 
-export const game_umount = model => {
-	clearInterval(model.tick_interval);
-	renderer_destroy(model.renderer);
-};
+export const game_umount = model => (
+	onmousemove = null,
+	clearInterval(model.tick_interval),
+	renderer_destroy(model.renderer)
+);
 
 export const game_key = (model, code, state) => {
 	if (state) switch (code) {
@@ -131,39 +139,17 @@ export const game_key = (model, code, state) => {
 	return false;
 };
 
+export const game_render = (model, now) => {
+	model.frame_last &&
+	!model.flag_paused &&
+		player_tick(model.player, now - model.frame_last);
+	model.renderer &&
+		renderer_render(model.renderer, now);
+	model.frame_last = now;
+};
+
 const game_tick = model => {
 	if (model.flag_paused) return;
 	model.time = (model.time + 1) % 24e3;
 	model.time_f = ((model.time + 6e3) * (1 / 24e3)) % 1;
-
-	const {player} = model;
-
-	player.speed_x *= .8;
-	player.speed_y *= .8;
-	player.speed_z *= .8;
-
-	player.speed_x += Math_cos(player.angle_h) * player.accel_x + Math_sin(player.angle_h) * player.accel_z;
-	player.speed_y += player.accel_y;
-	player.speed_z += -Math_sin(player.angle_h) * player.accel_x + Math_cos(player.angle_h) * player.accel_z;
-
-	player.position_x += player.speed_x;
-	player.position_y += player.speed_y;
-	player.position_z += player.speed_z;
-
-	if (
-		model.flag_autoscaling &&
-		model.renderer &&
-		model.time % 10 === 0
-	) {
-		if (
-			model.resolution_scaling < 100 &&
-			model.renderer.fps < 20
-		)
-			game_scaling_set(model, model.resolution_scaling + 1);
-		else if (
-			model.resolution_scaling > 1 &&
-			model.renderer.fps > 40
-		)
-			game_scaling_set(model, model.resolution_scaling - 1);
-	}
 };

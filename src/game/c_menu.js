@@ -16,17 +16,7 @@ export default function Menu({
 	return [
 		node_dom('h1[innerText=Menü]'),
 		node_dom('div[className=settings]', null, [
-			node_dom('button', {
-				innerText: `Bildskalierung: ${
-					game.flag_autoscaling
-					?	'Dynamisch'
-					:	'Statisch'
-				}`,
-				onclick: hook_static(() => {
-					game.flag_autoscaling = !game.flag_autoscaling;
-				}),
-			}),
-			node_dom('label[innerText=Skalierung:]', null, [
+			node_dom('label[innerText=Auflösung:]', null, [
 				node_dom('input[type=range][min=1][max=100][step=1]', {
 					value: 101 - game.resolution_scaling,
 					onchange: hook_static(event => {

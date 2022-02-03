@@ -16,13 +16,11 @@ import Menu from './c_menu.js';
 
 import {
 	game_create,
+	game_render,
 	game_resolution_raw_set,
 	game_start,
 	game_umount,
 } from './m_game.js';
-import {
-	renderer_render,
-} from './m_renderer.js';
 
 export default function Game({
 	ref,
@@ -30,28 +28,21 @@ export default function Game({
 	const frame = hook_dom('div[className=game]');
 	const model = hook_memo(game_create);
 
-	hook_effect(() => {
-		ref.game = model;
-		onmousemove = event => {
-			if (model.flag_paused) return;
-			model.player.angle_h = (event.clientX / model.resolution_raw_x - .5) * 2 * Math_PI;
-			model.player.angle_v = (.5 - event.clientY / model.resolution_raw_y) * Math_PI;
-		};
-		return () => {
-			game_umount(model);
-			onmousemove = null;
-			ref.game = null;
-		};
-	});
+	hook_effect(() => (
+		ref.game = model,
+		() => (
+			game_umount(model),
+			ref.game = null
+		)
+	));
 
-	hook_effect((width, height) => {
-		game_resolution_raw_set(model, width, height);
-	}, [frame.offsetWidth, frame.offsetHeight]);
+	hook_effect((width, height) => (
+		game_resolution_raw_set(model, width, height)
+	), [frame.offsetWidth, frame.offsetHeight]);
 
-	hook_effect(now => {
-		model.renderer &&
-			renderer_render(model.renderer, now);
-	}, [now()]);
+	hook_effect(now => (
+		game_render(model, now)
+	), [now()]);
 
 	hook_rerender();
 
@@ -69,8 +60,9 @@ export default function Game({
 		model.flag_menu &&
 		node(Menu, {
 			game: model,
-			_1: model.flag_autoscaling,
-			_2: model.resolution_scaling,
+			_1: model.resolution_scaling,
+			_2: model.view_angle,
+			_3: model.view_distance,
 		}),
 	];
 }
