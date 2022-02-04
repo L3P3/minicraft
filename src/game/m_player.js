@@ -1,6 +1,6 @@
 import {
 	Math_cos,
-	Math_max,
+	Math_min,
 	Math_sin,
 } from '../etc/helpers.js';
 
@@ -19,11 +19,11 @@ export const player_create = () => ({
 });
 
 export const player_tick = (model, delay) => {
-	const time_factor = Math_max(delay * .01, 1);
+	const time_factor = Math_min(5, delay * .01);
 
-	model.speed_x *= .8;
-	model.speed_y *= .8;
-	model.speed_z *= .8;
+	model.speed_x -= model.speed_x * .1 * time_factor;
+	model.speed_y -= model.speed_y * .1 * time_factor;
+	model.speed_z -= model.speed_z * .1 * time_factor;
 
 	model.speed_x += (
 		Math_cos(model.angle_h) * model.accel_x +

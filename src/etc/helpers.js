@@ -4,6 +4,7 @@ export const Math_PI_180d = 180 / Math_PI;
 export const Math_random = Math_.random;
 export const Math_floor = Math_.floor;
 export const Math_round = Math_.round;
+export const Math_min = Math_.min;
 export const Math_max = Math_.max;
 export const Math_cos = Math_.cos;
 export const Math_sin = Math_.sin;
