@@ -42,7 +42,7 @@ jobs:
           git add .
           git diff-index --quiet HEAD || git commit -m "v$APPVERSION"
           git push
-      - name: Clear cache
+      - name: Update commit reference
         if: github.ref == 'refs/heads/master'
         run: |
-          for i in *.js; do curl -s "https://purge.jsdelivr.net/gh/L3P3/minicraft@dist/$i" > /dev/null; done
+          curl https://l3p3.de/svr/minicraft/update.txt
