@@ -108,7 +108,7 @@ export const game_key = (model, code, state) => {
 				);
 			break;
 		case -3: // MOUSE_RIGHT
-			if (model.player.block_focus_y) {
+			if (model.player.block_focus_y >= 0) {
 				let x = model.player.block_focus_x;
 				let y = model.player.block_focus_y;
 				let z = model.player.block_focus_z;
