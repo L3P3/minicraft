@@ -2,15 +2,13 @@
 
 ![Screenshot](https://l3p3.de/media/minicraft1.png)
 
-Minecraft, but based on ray tracing and written in JavaScript. Yes, it is a game and I am not a gamer but this is also very educational.
+Minecraft, but based on ray tracing and written in JavaScript, following my own rules.
 
 [Try it out now!](https://l3p3.de/minicraft)
 
-A game begun by early 2019 by [@L3P3](https://github.com/L3P3) after [proof of concept](https://l3p3.de/z/minicraft.html).
+[User manual](https://github.com/L3P3/minicraft/wiki)
 
 Heavily inspired by and somewhat based on the work of [@xNotch](https://github.com/xNotch).
-
-Originally written for [bake.js](https://l3p3.de/dok/bake.html) but it is getting ported to normal ES module syntax and my web framework [lui](https://github.com/L3P3/lui), in order to get this thing working!
 
 ## TODOs
 
@@ -53,15 +51,9 @@ Originally written for [bake.js](https://l3p3.de/dok/bake.html) but it is gettin
 - [ ] sound?
 - [ ] get a lawyer against Mojang?
 
-## How to use
+## How to use while developing
 
 I highly recommend using Visual Studio Code and the extension "Live Server". Then open "app-dev.html" to see the result.
-
-| Key | Effect |
-| --- | ------ |
-| Esc | Open/Close menu |
-| F3 | Show/Hide diagnostic numbers |
-| P | Pause/Start game clock |
 
 ## Build instructions
 
