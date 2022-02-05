@@ -245,4 +245,8 @@ var onmousemove;
 /**
 	@type {function(MouseEvent)?}
 */
+var onmousedown;
+/**
+	@type {function(MouseEvent)?}
+*/
 var onmouseup;

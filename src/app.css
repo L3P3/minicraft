@@ -20,7 +20,7 @@ div {
 	position: relative;
 	width: 100%;
 	height: 100%;
-	cursor: crosshair;
+	cursor: none;
 }
 .game > canvas {
 	position: absolute;

@@ -30,7 +30,8 @@ Originally written for [bake.js](https://l3p3.de/dok/bake.html) but it is gettin
 - [x] actual raytracing
 - [x] correct raytracing
 - [x] production build
-- [ ] build/destroy
+- [x] build/destroy
+- [ ] mobile view
 - [ ] texturing
 - [ ] entity models
 - [ ] multiple chunks

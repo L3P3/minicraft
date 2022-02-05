@@ -1,4 +1,15 @@
 import {
+	BLOCK_TYPE_AIR,
+	BLOCK_TYPE_BRICKS,
+	BLOCK_TYPE_FACE_B,
+	BLOCK_TYPE_FACE_E,
+	BLOCK_TYPE_FACE_S,
+	BLOCK_TYPE_FACE_T,
+	BLOCK_TYPE_FACE_W,
+	CHUNK_HEIGHT,
+	CHUNK_WIDTH_M1,
+} from '../etc/constants.js';
+import {
 	DEBUG,
 } from '../etc/env.js';
 import {
@@ -17,6 +28,7 @@ import {
 	renderer_render,
 } from './m_renderer.js';
 import {
+	world_block_set,
 	world_create,
 } from './m_world.js';
 
@@ -47,6 +59,13 @@ export const game_start = (model, canvas) => {
 			model.player.angle_v = (.5 - event.clientY / model.resolution_raw_y) * Math_PI;
 		}
 	};
+	onmousedown = onmouseup = event => (
+		model.flag_paused || (
+			game_key(model, -1 - event.button, event.type === 'mousedown'),
+			event.preventDefault(),
+			false
+		)
+	);
 	model.renderer = renderer_create(model, canvas);
 	model.tick_interval = setInterval(() => {
 		game_tick(model);
@@ -82,13 +101,47 @@ const game_resolution_update = model => {
 };
 
 export const game_umount = model => (
-	onmousemove = null,
+	onmousemove = onmousedown = onmouseup = null,
 	clearInterval(model.tick_interval),
 	renderer_destroy(model.renderer)
 );
 
 export const game_key = (model, code, state) => {
+	//console.log('KEY', code, state);
 	if (state) switch (code) {
+		case -1: // MOUSE_LEFT
+			model.player.block_focus_y >= 0 &&
+				world_block_set(
+					model.world,
+					model.player.block_focus_x,
+					model.player.block_focus_y,
+					model.player.block_focus_z,
+					BLOCK_TYPE_AIR
+				);
+			break;
+		case -3: // MOUSE_RIGHT
+			if (model.player.block_focus_y) {
+				let x = model.player.block_focus_x;
+				let y = model.player.block_focus_y;
+				let z = model.player.block_focus_z;
+				switch (model.player.block_focus_face) {
+					case BLOCK_TYPE_FACE_W: --x; break;
+					case BLOCK_TYPE_FACE_E: ++x; break;
+					case BLOCK_TYPE_FACE_B: --y; break;
+					case BLOCK_TYPE_FACE_T: ++y; break;
+					case BLOCK_TYPE_FACE_S: --z; break;
+					default: ++z;
+				}
+				y >= 0 && y < CHUNK_HEIGHT &&
+					world_block_set(
+						model.world,
+						x & CHUNK_WIDTH_M1,
+						y,
+						z & CHUNK_WIDTH_M1,
+						BLOCK_TYPE_BRICKS
+					);
+			}
+			break;
 		case 27: // ESC
 			model.flag_paused =
 			model.flag_menu = !model.flag_menu;

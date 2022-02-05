@@ -10,6 +10,8 @@ import {
 	game_key,
 } from './game/m_game.js';
 
+const handler_noop = () => false;
+
 lui_.init(() => {
 	const ref = hook_static({
 		game: null,
@@ -32,6 +34,8 @@ lui_.init(() => {
 	return [{
 		onkeydown: handler_key,
 		onkeyup: handler_key,
+		oncontextmenu: handler_noop,
+		ondragstart: handler_noop,
 	}, [
 		node(Game, {
 			ref,

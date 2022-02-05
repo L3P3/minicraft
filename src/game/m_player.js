@@ -16,6 +16,10 @@ export const player_create = () => ({
 	speed_z: 0.0,
 	angle_h: 0.0,
 	angle_v: 0.0,
+	block_focus_x: 0,
+	block_focus_y: -1,
+	block_focus_z: 0,
+	block_focus_face: 0,
 });
 
 export const player_tick = (model, delay) => {

@@ -1,13 +1,12 @@
 import {
-	BLOCK_AIR,
-	BLOCK_BEDROCK,
-	BLOCK_DIRT,
-	BLOCK_GRASS,
+	BLOCK_TYPE_AIR,
+	BLOCK_TYPE_BEDROCK,
+	BLOCK_TYPE_DIRT,
+	BLOCK_TYPE_GRASS,
 	CHUNK_HEIGHT,
 	CHUNK_WIDTH,
 	CHUNK_WIDTH_L2,
 	CHUNK_WIDTH_L2_T2,
-	CHUNK_WIDTH_M1,
 } from '../etc/constants.js';
 
 export const world_create = () => {
@@ -19,8 +18,8 @@ export const world_create = () => {
 	};
 
 	for (let i = 0; i < CHUNK_WIDTH; i += 2) {
-		world_block_set(model, i, 4, 0, BLOCK_DIRT);
-		world_block_set(model, 0, 4, i, BLOCK_DIRT);
+		world_block_set(model, i, 4, 0, BLOCK_TYPE_DIRT);
+		world_block_set(model, 0, 4, i, BLOCK_TYPE_DIRT);
 	}
 
 	[
@@ -33,7 +32,7 @@ export const world_create = () => {
 		z = arr.length - z;
 		row.split('').forEach((char, x) => {
 			char === 'X' &&
-			world_block_set(model, x + 1, 4, z, BLOCK_BEDROCK);
+			world_block_set(model, x + 1, 4, z, BLOCK_TYPE_BEDROCK);
 		});
 	});
 
@@ -41,13 +40,13 @@ export const world_create = () => {
 }
 
 const world_block_index = (x, y, z) => (
-	((y | 0) << CHUNK_WIDTH_L2_T2) +
-	((x - (x < 0) & CHUNK_WIDTH_M1) << CHUNK_WIDTH_L2) +
-	(z - (z < 0) & CHUNK_WIDTH_M1)
+	(y << CHUNK_WIDTH_L2_T2) +
+	(x << CHUNK_WIDTH_L2) +
+	z
 );
 
 export const world_block_get = (model, x, y, z) => (
-	y < 0 || y >= CHUNK_HEIGHT ? BLOCK_AIR :
+	y < 0 || y >= CHUNK_HEIGHT ? BLOCK_TYPE_AIR :
 	model.chunk[
 		world_block_index(x, y, z)
 	]
@@ -62,7 +61,7 @@ export const world_block_set = (model, x, y, z, value) => {
 const world_chunk_create = () => {
 	const result = new Uint8Array(CHUNK_WIDTH * CHUNK_WIDTH * CHUNK_HEIGHT);
 
-	const layers = [BLOCK_BEDROCK, BLOCK_DIRT, BLOCK_DIRT, BLOCK_DIRT, BLOCK_GRASS];
+	const layers = [BLOCK_TYPE_BEDROCK, BLOCK_TYPE_DIRT, BLOCK_TYPE_DIRT, BLOCK_TYPE_DIRT, BLOCK_TYPE_GRASS];
 
 	for (let i = -1, y = 0; y < layers.length; ++y) {
 		const value = layers[y];

@@ -3,18 +3,19 @@ export const CHUNK_WIDTH_L2_T2 = CHUNK_WIDTH_L2 << 1;
 export const CHUNK_WIDTH = 1 << CHUNK_WIDTH_L2;
 export const CHUNK_HEIGHT = 64;
 export const CHUNK_WIDTH_M1 = CHUNK_WIDTH - 1;
+export const COORDINATE_OFFSET = 1 << 30;
 
-export const BLOCK_AIR = 0;
-export const BLOCK_STONE = 1;
-export const BLOCK_GRASS = 2;
-export const BLOCK_DIRT = 3;
-export const BLOCK_COBBLE = 4;
-export const BLOCK_PLANKS = 5;
-export const BLOCK_BEDROCK = 6;
-export const BLOCK_LOG = 7;
-export const BLOCK_LEAVES = 8;
-export const BLOCK_BRICKS = 9;
-export const BLOCK_WOOL = 10;
+export const BLOCK_TYPE_AIR = 0;
+export const BLOCK_TYPE_STONE = 1;
+export const BLOCK_TYPE_GRASS = 2;
+export const BLOCK_TYPE_DIRT = 3;
+export const BLOCK_TYPE_COBBLE = 4;
+export const BLOCK_TYPE_PLANKS = 5;
+export const BLOCK_TYPE_BEDROCK = 6;
+export const BLOCK_TYPE_LOG = 7;
+export const BLOCK_TYPE_LEAVES = 8;
+export const BLOCK_TYPE_BRICKS = 9;
+export const BLOCK_TYPE_WOOL = 10;
 
 export const BLOCK_COLORS = [
 	0x000000, // VOID
@@ -30,4 +31,14 @@ export const BLOCK_COLORS = [
 	0xd7d7d7, // WOOL
 ];
 
+export const BLOCK_TYPE_FACE_LABELS = 'WEBTSN'.split('');
+export const BLOCK_TYPE_FACE_W = 0;
+export const BLOCK_TYPE_FACE_E = 1;
+export const BLOCK_TYPE_FACE_B = 2;
+export const BLOCK_TYPE_FACE_T = 3;
+export const BLOCK_TYPE_FACE_S = 4;
+export const BLOCK_TYPE_FACE_N = 5;
+
 export const SKY_COLOR = 0x84B1FF;
+
+export const PLAYER_FOCUS_DISTANCE = 5;
