@@ -54,6 +54,7 @@ export const renderer_render = (model, now) => {
 		game,
 	} = model;
 	const {
+		config,
 		player,
 		world,
 	} = game;
@@ -66,7 +67,8 @@ export const renderer_render = (model, now) => {
 
 		const pixels = canvas_surface.data;
 
-		const {resolution_x, resolution_y, view_distance} = game;
+		const {view_distance} = config;
+		const {resolution_x, resolution_y} = game;
 		const resolution_x_h = resolution_x * .5;
 		const resolution_y_h = resolution_y * .5;
 		const resolution_x_1d = 1 / resolution_x;
@@ -78,7 +80,7 @@ export const renderer_render = (model, now) => {
 		const angle_h_sin = Math_sin(angle_h);
 		const angle_v_cos = Math_cos(-angle_v);
 		const angle_v_sin = Math_sin(-angle_v);
-		const fov = game.view_angle / 45;// TODO
+		const fov = config.view_angle / 45;// TODO
 		const fov_x = resolution_x < resolution_y ? fov * resolution_x * resolution_y_1d : fov;
 		const fov_y = resolution_y < resolution_x ? fov * resolution_y * resolution_x_1d : fov;
 		const position_x_shifted = position_x + COORDINATE_OFFSET;
@@ -234,9 +236,9 @@ export const renderer_render = (model, now) => {
 			) + 'x' + (
 				game.resolution_y
 			) + ' (x' + (
-				game.resolution_scaling
+				config.resolution_scaling
 			) + '), C: 1, D: ' + (
-				game.view_distance
+				config.view_distance
 			) + '\n' +
 			'E: 0/0\n\n' +
 

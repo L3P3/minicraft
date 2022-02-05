@@ -31,6 +31,7 @@ Originally written for [bake.js](https://l3p3.de/dok/bake.html) but it is gettin
 - [x] correct raytracing
 - [x] production build
 - [x] build/destroy
+- [x] persistent user configuration
 - [ ] mobile view
 - [ ] texturing
 - [ ] entity models

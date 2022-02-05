@@ -5,10 +5,12 @@ import {
 } from '../etc/lui.js';
 
 import {
-	game_scaling_set,
-} from './m_game.js';
+	ACTION_CONFIG_SET,
+} from '../etc/state.js';
 
 export default function Menu({
+	config,
+	dispatch,
 	game,
 }) {
 	hook_dom('div[className=menu]');
@@ -18,31 +20,32 @@ export default function Menu({
 		node_dom('div[className=settings]', null, [
 			node_dom('label[innerText=Auflösung:]', null, [
 				node_dom('input[type=range][min=1][max=100][step=1]', {
-					value: 101 - game.resolution_scaling,
-					onchange: hook_static(event => {
-						game_scaling_set(
-							game,
-							101 - Number(event.target.value)
-						);
-					}),
+					value: 101 - config.resolution_scaling,
+					onchange: hook_static(event => (
+						dispatch(ACTION_CONFIG_SET, {
+							resolution_scaling: 101 - Number(event.target.value),
+						})
+					)),
 				}),
 			]),
 			node_dom('label[innerText=Blickwinkel:]', null, [
 				node_dom('input[type=range][min=1][max=180][step=1]', {
-					value: game.view_angle,
-					onchange: hook_static(event => {
-						game.view_angle = Number(event.target.value);
-						game.renderer.flag_dirty = true;
-					}),
+					value: config.view_angle,
+					onchange: hook_static(event => (
+						dispatch(ACTION_CONFIG_SET, {
+							view_angle: Number(event.target.value),
+						})
+					)),
 				}),
 			]),
 			node_dom('label[innerText=Sichtweite:]', null, [
 				node_dom('input[type=range][min=1][max=128][step=1]', {
-					value: game.view_distance,
-					onchange: hook_static(event => {
-						game.view_distance = Number(event.target.value);
-						game.renderer.flag_dirty = true;
-					}),
+					value: config.view_distance,
+					onchange: hook_static(event => (
+						dispatch(ACTION_CONFIG_SET, {
+							view_distance: Number(event.target.value),
+						})
+					)),
 				}),
 			]),
 		]),

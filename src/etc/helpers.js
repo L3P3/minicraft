@@ -9,6 +9,9 @@ export const Math_max = Math_.max;
 export const Math_cos = Math_.cos;
 export const Math_sin = Math_.sin;
 
+export const JSON_ = JSON;
+export const localStorage_ = localStorage;
+
 /**
 	@param {number} num
 	@return {string}
@@ -27,3 +30,8 @@ export const number_padStart2 = (num, pad) => (
 	.toString()
 	.padStart(2, pad)
 );
+
+/**
+	@return {boolean}
+*/
+export const handler_noop = () => false;

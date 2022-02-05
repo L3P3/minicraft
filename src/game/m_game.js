@@ -33,13 +33,13 @@ import {
 } from './m_world.js';
 
 export const game_create = () => ({
+	config: null,
 	flag_diagnostics: DEBUG,
 	flag_menu: false,
 	flag_paused: false,
 	frame_last: 0,
 	player: player_create(),
 	renderer: null,
-	resolution_scaling: 10,
 	resolution_raw_x: 1,
 	resolution_raw_y: 1,
 	resolution_x: 0,
@@ -47,8 +47,6 @@ export const game_create = () => ({
 	tick_interval: null,
 	time: 0,
 	time_f: 0.0,
-	view_angle: 80,
-	view_distance: 64,
 	world: world_create(),
 });
 
@@ -72,20 +70,16 @@ export const game_start = (model, canvas) => {
 	}, 50);
 };
 
-export const game_resolution_raw_set = (model, width, height) => (
-	model.resolution_raw_x = Math_max(1, width),
-	model.resolution_raw_y = Math_max(1, height),
-	game_resolution_update(model)
+export const game_umount = model => (
+	onmousemove = onmousedown = onmouseup = null,
+	clearInterval(model.tick_interval),
+	renderer_destroy(model.renderer)
 );
 
-export const game_scaling_set = (model, scaling) => (
-	model.resolution_scaling = scaling,
-	game_resolution_update(model)
-);
-
-const game_resolution_update = model => {
-	const x = Math_max(1, Math_round(model.resolution_raw_x / model.resolution_scaling));
-	const y = Math_max(1, Math_round(model.resolution_raw_y / model.resolution_scaling));
+export const game_resolution_update = model => {
+	const {resolution_scaling} = model.config;
+	const x = Math_max(1, Math_round(model.resolution_raw_x / resolution_scaling));
+	const y = Math_max(1, Math_round(model.resolution_raw_y / resolution_scaling));
 
 	if (
 		x === model.resolution_x &&
@@ -99,12 +93,6 @@ const game_resolution_update = model => {
 		renderer_canvas_init(model.renderer);
 	}
 };
-
-export const game_umount = model => (
-	onmousemove = onmousedown = onmouseup = null,
-	clearInterval(model.tick_interval),
-	renderer_destroy(model.renderer)
-);
 
 export const game_key = (model, code, state) => {
 	//console.log('KEY', code, state);
