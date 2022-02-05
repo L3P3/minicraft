@@ -1,5 +1,7 @@
 # Minicraft
 
+![Screenshot](https://l3p3.de/media/minicraft1.png)
+
 Minecraft, but based on ray tracing and written in JavaScript. Yes, it is a game and I am not a gamer but this is also very educational.
 
 [Try it out now!](https://l3p3.de/minicraft)
