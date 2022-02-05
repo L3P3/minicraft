@@ -32,6 +32,8 @@ jobs:
         run: |
           export APPVERSION=$(echo "console.log(require('./package.json').version)" | node)
           mv dist /tmp/app-dist
+          git tag "v$APPVERSION" || true
+          git push --tags
           git clean -f
           rm -rf ./node_modules
           git fetch
