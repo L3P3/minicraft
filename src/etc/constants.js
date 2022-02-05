@@ -4,6 +4,7 @@ export const CHUNK_WIDTH = 1 << CHUNK_WIDTH_L2;
 export const CHUNK_HEIGHT = 64;
 export const CHUNK_WIDTH_M1 = CHUNK_WIDTH - 1;
 export const COORDINATE_OFFSET = 1 << 30;
+export const COORDINATE_OFFSET_M1 = COORDINATE_OFFSET - 1;
 
 export const BLOCK_TYPE_AIR = 0;
 export const BLOCK_TYPE_STONE = 1;

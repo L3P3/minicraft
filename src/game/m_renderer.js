@@ -2,6 +2,7 @@ import {
 	BLOCK_TYPE_AIR,
 	BLOCK_COLORS,
 	COORDINATE_OFFSET,
+	COORDINATE_OFFSET_M1,
 	SKY_COLOR,
 	PLAYER_FOCUS_DISTANCE,
 	CHUNK_WIDTH_M1,
@@ -81,6 +82,7 @@ export const renderer_render = (model, now) => {
 		const fov_x = resolution_x < resolution_y ? fov * resolution_x * resolution_y_1d : fov;
 		const fov_y = resolution_y < resolution_x ? fov * resolution_y * resolution_x_1d : fov;
 		const position_x_shifted = position_x + COORDINATE_OFFSET;
+		const position_y_shifted = position_y + COORDINATE_OFFSET;
 		const position_z_shifted = position_z + COORDINATE_OFFSET;
 		const block_focus_x_prev = player.block_focus_x;
 		const block_focus_y_prev = player.block_focus_y;
@@ -134,14 +136,13 @@ export const renderer_render = (model, now) => {
 						dim === 0
 						?	position_x_shifted % 1
 						: dim === 1
-						?	position_y % 1
+						?	position_y_shifted % 1
 						:	position_z_shifted % 1
 					);
-					offset = offset < 0 ? -offset : offset;
 					offset = step_dim > 0 ? 1 - offset : offset;
 
 					let check_x = position_x_shifted + step_x * offset;
-					let check_y = position_y + step_y * offset;
+					let check_y = position_y_shifted + step_y * offset;
 					let check_z = position_z_shifted + step_z * offset;
 					let check_distance = step_normal * offset;
 
@@ -153,8 +154,8 @@ export const renderer_render = (model, now) => {
 					// add steps until collision or out of range
 					while (check_distance < check_distance_min) {
 						const check_x_int = check_x & CHUNK_WIDTH_M1;
+						const check_y_int = check_y & COORDINATE_OFFSET_M1;
 						const check_z_int = check_z & CHUNK_WIDTH_M1;
-						const check_y_int = check_y | 0;
 
 						const block = world_block_get(
 							world,
