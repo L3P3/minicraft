@@ -56,6 +56,8 @@ export const renderer_render = (model, now) => {
 	const {
 		config,
 		player,
+		resolution_x,
+		resolution_y,
 		world,
 	} = game;
 
@@ -65,17 +67,27 @@ export const renderer_render = (model, now) => {
 	) {
 		model.flag_dirty = false;
 
-		const pixels = canvas_surface.data;
+		const canvas_surface_data = canvas_surface.data;
 
-		const {view_distance} = config;
-		const {resolution_x, resolution_y} = game;
-		const resolution_x_h = resolution_x * .5;
-		const resolution_y_h = resolution_y * .5;
+		const {
+			view_distance,
+		} = config;
+		const {
+			angle_h,
+			angle_v,
+			block_focus_x,
+			block_focus_y,
+			block_focus_z,
+			position_x,
+			position_y,
+			position_z,
+		} = player;
 		const resolution_x_1d = 1 / resolution_x;
 		const resolution_y_1d = 1 / resolution_y;
-		const pixel_focus_x = resolution_x_h | 0;
-		const pixel_focus_y = resolution_y_h | 0;
-		const {angle_h, angle_v, position_x, position_y, position_z} = player;
+		const resolution_x_h = resolution_x >> 1;
+		const resolution_y_h = resolution_y >> 1;
+		const pixel_focus_x = resolution_x_h;
+		const pixel_focus_y = resolution_y_h;
 		const angle_h_cos = Math_cos(angle_h);
 		const angle_h_sin = Math_sin(angle_h);
 		const angle_v_cos = Math_cos(-angle_v);
@@ -86,29 +98,23 @@ export const renderer_render = (model, now) => {
 		const position_x_shifted = position_x + COORDINATE_OFFSET;
 		const position_y_shifted = position_y + COORDINATE_OFFSET;
 		const position_z_shifted = position_z + COORDINATE_OFFSET;
-		const block_focus_x_prev = player.block_focus_x;
-		const block_focus_y_prev = player.block_focus_y;
-		const block_focus_z_prev = player.block_focus_z;
+		const position_x_shifted_rest = position_x_shifted % 1;
+		const position_y_shifted_rest = position_y_shifted % 1;
+		const position_z_shifted_rest = position_z_shifted % 1;
 
-		let pixels_index = 0;
-
-		let block_focus_x = 0;
-		let block_focus_y = -1;
-		let block_focus_z = 0;
-		let block_focus_face = 0;
+		let canvas_surface_data_index =
+			player.block_focus_x =
+			player.block_focus_z =
+			player.block_focus_face = 0;
+		player.block_focus_y = -1;
 
 		for (let canvas_y = 0; canvas_y < resolution_y; ++canvas_y) {
-			const pixel_focussed_y = canvas_y === pixel_focus_y;
-
 			const canvas_y_relative = (resolution_y_h - canvas_y) * resolution_y_1d * fov_y;
 
 			const step_y_raw = canvas_y_relative * angle_v_cos - angle_v_sin;
 			const step_z_rot = canvas_y_relative * angle_v_sin + angle_v_cos;
 
 			for (let canvas_x = 0; canvas_x < resolution_x; ++canvas_x) {
-				const pixel_focussed_x = canvas_x === pixel_focus_x;
-				const pixel_focussed = pixel_focussed_y && pixel_focussed_x;
-
 				const canvas_x_relative = (canvas_x - resolution_x_h) * resolution_x_1d * fov_x;
 
 				const step_x_raw = step_z_rot * angle_h_sin + canvas_x_relative * angle_h_cos;
@@ -120,28 +126,22 @@ export const renderer_render = (model, now) => {
 				let check_distance_min = view_distance;
 				// step for each x, y, z
 				for (let dim = 0; dim < 3; ++dim) {
-					const step_dim = (
-						dim === 0
-						?	step_x_raw
-						: dim === 1
-						?	step_y_raw
-						:	step_z_raw
-					);
+					// https://jsben.ch/AqXcR
+					let step_dim = step_z_raw;
+					if (dim === 0) step_dim = step_x_raw;
+					if (dim === 1) step_dim = step_y_raw;
 
+					// https://jsben.ch/hKgi4
 					const step_normal = 1 / (step_dim < 0 ? -step_dim : step_dim);
 					const step_x = step_x_raw * step_normal;
 					const step_y = step_y_raw * step_normal;
 					const step_z = step_z_raw * step_normal;
 
 					// calculate distance to first intersection to then start on it
-					let offset = (
-						dim === 0
-						?	position_x_shifted % 1
-						: dim === 1
-						?	position_y_shifted % 1
-						:	position_z_shifted % 1
-					);
-					offset = step_dim > 0 ? 1 - offset : offset;
+					let offset = position_z_shifted_rest;
+					if (dim === 0) offset = position_x_shifted_rest;
+					if (dim === 1) offset = position_y_shifted_rest;
+					if (step_dim > 0) offset = 1 - offset;
 
 					let check_x = position_x_shifted + step_x * offset;
 					let check_y = position_y_shifted + step_y * offset;
@@ -149,71 +149,81 @@ export const renderer_render = (model, now) => {
 					let check_distance = step_normal * offset;
 
 					// move into middle of block to prevent rounding errors causing flicker
-					if (dim === 0) check_x += step_dim < 0 ? -.5 : .5;
-					else if (dim === 1) check_y += step_dim < 0 ? -.5 : .5;
-					else check_z += step_dim < 0 ? -.5 : .5;
+					// https://jsben.ch/iIvG7
+					if (dim === 0) check_x += .5 - ((step_dim < 0) | 0);
+					if (dim === 1) check_y += .5 - ((step_dim < 0) | 0);
+					if (dim === 2) check_z += .5 - ((step_dim < 0) | 0);
 
 					// add steps until collision or out of range
+					// https://jsben.ch/kM67J
+					let check_x_int, check_y_int, check_z_int, block;
 					while (check_distance < check_distance_min) {
-						const check_x_int = check_x & CHUNK_WIDTH_M1;
-						const check_y_int = check_y & COORDINATE_OFFSET_M1;
-						const check_z_int = check_z & CHUNK_WIDTH_M1;
-
-						const block = world_block_get(
-							world,
-							check_x_int,
-							check_y_int,
-							check_z_int
-						);
-
-						if (block === BLOCK_TYPE_AIR) {
-							// no collision
+						// no collision?
+						if (
+							(
+								block = world_block_get(
+									world,
+									check_x_int = check_x & CHUNK_WIDTH_M1,
+									check_y_int = check_y & COORDINATE_OFFSET_M1,
+									check_z_int = check_z & CHUNK_WIDTH_M1
+								)
+							) === BLOCK_TYPE_AIR
+						) {
 							check_x += step_x;
 							check_y += step_y;
 							check_z += step_z;
 							check_distance += step_normal;
-							continue;	
+							continue;
 						}
 
 						// collision
 						check_distance_min = check_distance;
 						pixel_color = BLOCK_COLORS[block];
-						pixel_factor = 1 - ((dim + 2) % 3) * .2;
+						pixel_factor = (
+							// fake shadow to see edges
+							1 - ((dim + 2) % 3) * .2 +
+							// highlight if focussed
+							(
+								check_y_int !== block_focus_y ||
+								check_x_int !== block_focus_x ||
+								check_z_int !== block_focus_z
+								?	0
+								:	.1
+							)
+						);
+
+						// should not be focussed?
 						if (
-							check_y_int === block_focus_y_prev &&
-							check_x_int === block_focus_x_prev &&
-							check_z_int === block_focus_z_prev
-						) {
-							pixel_factor += .1;
-						}
-						if (
-							pixel_focussed &&
-							check_distance <= PLAYER_FOCUS_DISTANCE
-						) {
-							block_focus_x = check_x_int;
-							block_focus_y = check_y_int;
-							block_focus_z = check_z_int;
-							block_focus_face = dim << 1 | (step_dim < 0);
-						}
+							canvas_y !== pixel_focus_y ||
+							canvas_x !== pixel_focus_x ||
+							check_distance > PLAYER_FOCUS_DISTANCE
+						) break;
+
+						// set focus
+						player.block_focus_x = check_x_int;
+						player.block_focus_y = check_y_int;
+						player.block_focus_z = check_z_int;
+						player.block_focus_face = (step_dim < 0) | (dim << 1);
 						break;
 					}
 				}
 
-				if (pixel_focussed) pixel_factor *= 2;
-
-				pixels[pixels_index] = ((pixel_color >> 16) & 0xff) * pixel_factor;
-				pixels[++pixels_index] = ((pixel_color >> 8) & 0xff) * pixel_factor;
-				pixels[++pixels_index] = (pixel_color & 0xff) * pixel_factor;
-				pixels_index += 2;
+				canvas_surface_data[canvas_surface_data_index] = ((pixel_color >> 16) & 0xff) * pixel_factor;
+				canvas_surface_data[++canvas_surface_data_index] = ((pixel_color >> 8) & 0xff) * pixel_factor;
+				canvas_surface_data[++canvas_surface_data_index] = (pixel_color & 0xff) * pixel_factor;
+				canvas_surface_data_index += 2;
 			}
 		}
 
-		model.canvas_context.putImageData(canvas_surface, 0, 0);
+		// cursor
+		canvas_surface_data[
+			canvas_surface_data_index =
+				(resolution_x * pixel_focus_y + pixel_focus_x) << 2
+		] *= 2;
+		canvas_surface_data[++canvas_surface_data_index] *= 2;
+		canvas_surface_data[++canvas_surface_data_index] *= 2;
 
-		player.block_focus_x = block_focus_x;
-		player.block_focus_y = block_focus_y;
-		player.block_focus_z = block_focus_z;
-		player.block_focus_face = block_focus_face;
+		model.canvas_context.putImageData(canvas_surface, 0, 0);
 	}
 
 	model.diagnostics = (
@@ -231,15 +241,8 @@ export const renderer_render = (model, now) => {
 				:	game.time
 			) + '\n' +
 
-			'R: ' + (
-				game.resolution_x
-			) + 'x' + (
-				game.resolution_y
-			) + ' (x' + (
-				config.resolution_scaling
-			) + '), C: 1, D: ' + (
-				config.view_distance
-			) + '\n' +
+			'R: ' + resolution_x + 'x' + resolution_y +
+			' (x' + config.resolution_scaling + '), C: 1, D: ' + config.view_distance + '\n' +
 			'E: 0/0\n\n' +
 
 			'Position: ' + (
@@ -282,6 +285,8 @@ export const renderer_canvas_init = model => {
 			model.canvas_context = model.canvas.getContext('2d')
 		).createImageData(width, height)
 	).data;
+
+	// set alpha to 255
 	const data_length = data.length;
 	for (let i = 3; i < data_length; i += 4)
 		data[i] = 0xff;
