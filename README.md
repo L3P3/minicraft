@@ -32,7 +32,7 @@ Heavily inspired by and somewhat based on the work of [@xNotch](https://github.c
 - [x] production build
 - [x] build/destroy
 - [x] persistent user configuration
-- [ ] texturing
+- [x] texturing
 - [ ] mobile view
 - [ ] entity models
 - [ ] multiple chunks

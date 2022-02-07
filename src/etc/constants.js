@@ -3,7 +3,7 @@ export const CHUNK_WIDTH_L2_T2 = CHUNK_WIDTH_L2 << 1;
 export const CHUNK_WIDTH = 1 << CHUNK_WIDTH_L2;
 export const CHUNK_HEIGHT = 64;
 export const CHUNK_WIDTH_M1 = CHUNK_WIDTH - 1;
-export const COORDINATE_OFFSET = 1 << 30;
+export const COORDINATE_OFFSET = 1 << 16;
 export const COORDINATE_OFFSET_M1 = COORDINATE_OFFSET - 1;
 
 export const BLOCK_TYPE_AIR = 0;
@@ -18,17 +18,18 @@ export const BLOCK_TYPE_LEAVES = 8;
 export const BLOCK_TYPE_BRICKS = 9;
 export const BLOCK_TYPE_WOOL = 10;
 
+// B G R
 export const BLOCK_COLORS = [
 	0x000000, // VOID
 	0x797979, // STONE
-	0x7fb752, // GRASS
-	0x785439, // DIRT
+	0x52b77f, // GRASS
+	0x395478, // DIRT
 	0x828282, // COBBLE
-	0x977b4d, // PLANKS
+	0x4d7b97, // PLANKS
 	0x454545, // BEDROCK
-	0x604d2f, // LOG
-	0x2f8222, // LEAVES
-	0xb88c80, // BRICKS
+	0x2f4d60, // LOG
+	0x22822f, // LEAVES
+	0x808cb8, // BRICKS
 	0xd7d7d7, // WOOL
 ];
 
@@ -40,6 +41,6 @@ export const BLOCK_TYPE_FACE_T = 3;
 export const BLOCK_TYPE_FACE_S = 4;
 export const BLOCK_TYPE_FACE_N = 5;
 
-export const SKY_COLOR = 0x84B1FF;
+export const SKY_COLOR = 0xffb184;
 
 export const PLAYER_FOCUS_DISTANCE = 5;

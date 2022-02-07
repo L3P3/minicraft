@@ -1,4 +1,5 @@
 import {
+	BLOCK_COLORS,
 	BLOCK_TYPE_AIR,
 	BLOCK_TYPE_BEDROCK,
 	BLOCK_TYPE_DIRT,
@@ -35,6 +36,9 @@ export const world_create = () => {
 			world_block_set(model, x + 1, 4, z, BLOCK_TYPE_BEDROCK);
 		});
 	});
+
+	for (let i = 0; i < BLOCK_COLORS.length; ++i)
+		world_block_set(model, i, 5, 7, i);
 
 	return model;
 }

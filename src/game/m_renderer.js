@@ -13,7 +13,6 @@ import {
 } from '../etc/env.js';
 import {
 	Math_cos,
-	Math_PI,
 	Math_PI_180d,
 	Math_sin,
 	number_padStart2,
@@ -22,6 +21,31 @@ import {
 import {
 	world_block_get,
 } from './m_world.js';
+import {
+	TILES_DATA,
+	TILES_RESOLUTION,
+	TILES_RESOLUTION_LOG2,
+	TILE_DIRT,
+	TILE_GRASS_SIDE,
+	TILE_GRASS_TOP,
+	TILE_LOG_SIDE,
+	TILE_LOG_TOP,
+} from '../../tools/textures/textures.js';
+
+// parse png
+let tiles_data = null;
+let tiles_image = new Image();
+tiles_image.onload = () => {
+	const canvas = document.createElement('canvas');
+	const width = canvas.width = tiles_image.width;
+	const height = canvas.height = tiles_image.height;
+	const context = canvas.getContext('2d');
+	context.drawImage(tiles_image, 0, 0);
+	tiles_image = tiles_data = new Uint32Array(
+		context.getImageData(0, 0, width, height).data.buffer
+	);
+};
+tiles_image.src = 'data:image/png;base64,' + TILES_DATA;
 
 export const renderer_create = (game, canvas) => {
 	const model = {
@@ -82,6 +106,8 @@ export const renderer_render = (model, now) => {
 			position_y,
 			position_z,
 		} = player;
+		const flag_textures = config.flag_textures && tiles_data !== null;
+		tiles_data = /** @type {Uint32Array!} */ (tiles_data);
 		const resolution_x_1d = 1 / resolution_x;
 		const resolution_y_1d = 1 / resolution_y;
 		const resolution_x_h = resolution_x >> 1;
@@ -157,28 +183,80 @@ export const renderer_render = (model, now) => {
 					// add steps until collision or out of range
 					// https://jsben.ch/kM67J
 					let check_x_int, check_y_int, check_z_int, block;
-					while (check_distance < check_distance_min) {
-						// no collision?
-						if (
-							(
-								block = world_block_get(
-									world,
-									check_x_int = check_x & CHUNK_WIDTH_M1,
-									check_y_int = check_y & COORDINATE_OFFSET_M1,
-									check_z_int = check_z & CHUNK_WIDTH_M1
-								)
-							) === BLOCK_TYPE_AIR
-						) {
-							check_x += step_x;
-							check_y += step_y;
-							check_z += step_z;
-							check_distance += step_normal;
-							continue;
-						}
-
+					while (check_distance < check_distance_min)
+					if (
+						(
+							block = world_block_get(
+								world,
+								check_x_int = check_x & CHUNK_WIDTH_M1,
+								check_y_int = check_y & COORDINATE_OFFSET_M1,
+								check_z_int = check_z & CHUNK_WIDTH_M1
+							)
+						) === BLOCK_TYPE_AIR
+					) {
+						// no collision
+						check_x += step_x;
+						check_y += step_y;
+						check_z += step_z;
+						check_distance += step_normal;
+					}
+					else {
 						// collision
+
+						// calculate color
+						if (flag_textures) {
+							// shift so that block id 1 => tile 0
+							--block;
+
+							if (dim === 1) {
+								if (block === TILE_LOG_SIDE)
+									block = TILE_LOG_TOP;
+								else if (
+									block === TILE_GRASS_TOP &&
+									step_dim > 0
+								) block = TILE_DIRT;
+							}
+							else if (block === TILE_GRASS_TOP)
+								block = TILE_GRASS_SIDE;
+
+							// pick pixel
+							const texture_pixel = tiles_data[
+								(block << (TILES_RESOLUTION_LOG2 + TILES_RESOLUTION_LOG2)) +
+								(
+									(
+										// y
+										(
+											dim === 1
+											?	check_z
+											:	check_y
+										) * TILES_RESOLUTION & (TILES_RESOLUTION - 1)
+									) << TILES_RESOLUTION_LOG2
+								) +
+								(
+									// x
+									(
+										dim === 1
+										?	check_x
+										:	check_x + check_z
+									) * TILES_RESOLUTION & (TILES_RESOLUTION - 1)
+								)
+							];
+
+							// solid pixel
+							if (texture_pixel >>> 24 !== 0)
+								pixel_color = texture_pixel & 0xffffff;
+							// transparent pixel
+							else {
+								check_x += step_x;
+								check_y += step_y;
+								check_z += step_z;
+								check_distance += step_normal;
+								continue;
+							}
+						}
+						else pixel_color = BLOCK_COLORS[block];
+
 						check_distance_min = check_distance;
-						pixel_color = BLOCK_COLORS[block];
 						pixel_factor = (
 							// fake shadow to see edges
 							1 - ((dim + 2) % 3) * .2 +
@@ -192,25 +270,27 @@ export const renderer_render = (model, now) => {
 							)
 						);
 
-						// should not be focussed?
 						if (
-							canvas_y !== pixel_focus_y ||
-							canvas_x !== pixel_focus_x ||
-							check_distance > PLAYER_FOCUS_DISTANCE
-						) break;
-
-						// set focus
-						player.block_focus_x = check_x_int;
-						player.block_focus_y = check_y_int;
-						player.block_focus_z = check_z_int;
-						player.block_focus_face = (step_dim < 0) | (dim << 1);
+							canvas_y === pixel_focus_y &&
+							canvas_x === pixel_focus_x &&
+							check_distance <= PLAYER_FOCUS_DISTANCE
+						) {
+							// set focus
+							player.block_focus_x = check_x_int;
+							player.block_focus_y = check_y_int;
+							player.block_focus_z = check_z_int;
+							player.block_focus_face = (step_dim < 0) | (dim << 1);
+						}
 						break;
 					}
 				}
 
-				canvas_surface_data[canvas_surface_data_index] = ((pixel_color >> 16) & 0xff) * pixel_factor;
-				canvas_surface_data[++canvas_surface_data_index] = ((pixel_color >> 8) & 0xff) * pixel_factor;
-				canvas_surface_data[++canvas_surface_data_index] = (pixel_color & 0xff) * pixel_factor;
+				canvas_surface_data[canvas_surface_data_index] =
+					(pixel_color & 0xff) * pixel_factor;
+				canvas_surface_data[++canvas_surface_data_index] =
+					((pixel_color >> 8) & 0xff) * pixel_factor;
+				canvas_surface_data[++canvas_surface_data_index] =
+					(pixel_color >> 16) * pixel_factor;
 				canvas_surface_data_index += 2;
 			}
 		}

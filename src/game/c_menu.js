@@ -1,4 +1,5 @@
 import {
+	hook_callback,
 	hook_dom,
 	hook_static,
 	node_dom,
@@ -18,6 +19,17 @@ export default function Menu({
 	return [
 		node_dom('h1[innerText=Menü]'),
 		node_dom('div[className=settings]', null, [
+			node_dom('button', {
+				innerText: (
+					'Oberflächen: ' +
+					(config.flag_textures ? 'Texturiert' : 'Einfarbig')
+				),
+				onclick: hook_callback(current => {
+					dispatch(ACTION_CONFIG_SET, {
+						flag_textures: !current,
+					});
+				}, [config.flag_textures]),
+			}),
 			node_dom('label[innerText=Auflösung:]', null, [
 				node_dom('input[type=range][min=1][max=100][step=1]', {
 					value: 101 - config.resolution_scaling,
