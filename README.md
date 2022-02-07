@@ -32,8 +32,8 @@ Heavily inspired by and somewhat based on the work of [@xNotch](https://github.c
 - [x] production build
 - [x] build/destroy
 - [x] persistent user configuration
-- [ ] mobile view
 - [ ] texturing
+- [ ] mobile view
 - [ ] entity models
 - [ ] multiple chunks
 - [ ] collision
@@ -77,3 +77,5 @@ This is not really supposed to be a community project, do not assume it would be
 ## License
 
 Just ZLib license, I do not care too much about it.
+
+This game includes slightly modified textures from Minecraft, which is of course owned by Microsoft. Since this is a purely educational project, I deem this fair use.

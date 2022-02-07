@@ -8,6 +8,10 @@ import {
 const input_meta = JSON.parse(readFileSync('./blocks.json', 'utf8'));
 console.log('metafile read, tiles:', input_meta.tiles.length);
 
+const input_resolution_log2 = Math.log2(input_meta.resolution);
+if (input_resolution_log2 % 1)
+	throw new Error('resolution must be in 1, 2, 4, 8...');
+
 const input_data = readFileSync('blocks.png');
 console.log('input read, size:', input_data.length);
 
@@ -54,6 +58,7 @@ for (const tile of input_meta.tiles) {
 
 output_text += `
 export const TILES_RESOLUTION = ${input_meta.resolution};
+export const TILES_ERSOLUTION_LOG2 = ${input_resolution_log2};
 export const TILES_DATA = '${transformed_data_text}';
 `;
 

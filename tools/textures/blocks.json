@@ -1,8 +1,8 @@
 {
-	"resolution": 1,
+	"resolution": 16,
 	"tiles": [
 		"stone",
-		"grass_side",
+		"grass_top",
 		"dirt",
 		"cobble",
 		"planks",
@@ -11,7 +11,8 @@
 		"leaves",
 		"bricks",
 		"wool",
-		"grass_top",
+
+		"grass_side",
 		"log_top"
 	]
 }
