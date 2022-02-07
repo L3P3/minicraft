@@ -38,7 +38,7 @@ async function build() {
 			'compilation_level ADVANCED',
 			'dependency_mode PRUNE',
 			'entry_point ./src/app.js',
-			'js .',
+			'js ./src',
 			'js_output_file /tmp/app.js',
 			'language_in ECMASCRIPT_NEXT',
 			'language_out ECMASCRIPT6_STRICT',

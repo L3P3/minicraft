@@ -30,7 +30,7 @@ import {
 	TILE_GRASS_TOP,
 	TILE_LOG_SIDE,
 	TILE_LOG_TOP,
-} from '../../tools/textures/textures.js';
+} from '../etc/textures.js';
 
 // parse png
 let tiles_data = null;
