@@ -1,0 +1,17 @@
+{
+	"resolution": 1,
+	"tiles": [
+		"stone",
+		"grass_side",
+		"dirt",
+		"cobble",
+		"planks",
+		"bedrock",
+		"log_side",
+		"leaves",
+		"bricks",
+		"wool",
+		"grass_top",
+		"log_top"
+	]
+}
