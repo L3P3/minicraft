@@ -58,7 +58,7 @@ for (const tile of input_meta.tiles) {
 
 output_text += `
 export const TILES_RESOLUTION = ${input_meta.resolution};
-export const TILES_ERSOLUTION_LOG2 = ${input_resolution_log2};
+export const TILES_RESOLUTION_LOG2 = ${input_resolution_log2};
 export const TILES_DATA = '${transformed_data_text}';
 `;
 
