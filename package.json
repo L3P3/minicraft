@@ -1,7 +1,7 @@
 {
 	"name": "minicraft",
 	"version": "0.1.14",
-	"description": "voxel-based 3d game",
+	"description": "voxel-based 3d game, written in javascript",
 	"homepage": "https://l3p3.de/minicraft",
 	"repository": {
 		"type": "git",
