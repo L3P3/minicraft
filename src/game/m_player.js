@@ -1,4 +1,7 @@
 import {
+	BLOCK_TYPE_BRICKS,
+} from '../etc/constants.js';
+import {
 	Math_cos,
 	Math_min,
 	Math_sin,
@@ -8,18 +11,19 @@ export const player_create = () => ({
 	accel_x: 0.0,
 	accel_y: 0.0,
 	accel_z: 0.0,
+	angle_h: 0.0,
+	angle_v: 0.0,
+	block_focus_face: 0,
+	block_focus_x: 0,
+	block_focus_y: -1,
+	block_focus_z: 0,
+	holds: BLOCK_TYPE_BRICKS,
 	position_x: 0.0,
 	position_y: 10.0,
 	position_z: 0.0,
 	speed_x: 0.0,
 	speed_y: 0.0,
 	speed_z: 0.0,
-	angle_h: 0.0,
-	angle_v: 0.0,
-	block_focus_x: 0,
-	block_focus_y: -1,
-	block_focus_z: 0,
-	block_focus_face: 0,
 });
 
 export const player_tick = (model, delay) => {

@@ -1,6 +1,5 @@
 import {
 	BLOCK_TYPE_AIR,
-	BLOCK_TYPE_BRICKS,
 	BLOCK_TYPE_FACE_B,
 	BLOCK_TYPE_FACE_E,
 	BLOCK_TYPE_FACE_S,
@@ -28,6 +27,7 @@ import {
 	renderer_render,
 } from './m_renderer.js';
 import {
+	world_block_get,
 	world_block_set,
 	world_create,
 } from './m_world.js';
@@ -107,6 +107,16 @@ export const game_key = (model, code, state) => {
 					BLOCK_TYPE_AIR
 				);
 			break;
+		case -2: // MOUSE_MIDDLE
+		case 71: // G
+			if (model.player.block_focus_y >= 0)
+					model.player.holds = world_block_get(
+						model.world,
+						model.player.block_focus_x,
+						model.player.block_focus_y,
+						model.player.block_focus_z
+					);
+			break;
 		case -3: // MOUSE_RIGHT
 			if (model.player.block_focus_y >= 0) {
 				let x = model.player.block_focus_x;
@@ -126,7 +136,7 @@ export const game_key = (model, code, state) => {
 						x & CHUNK_WIDTH_M1,
 						y,
 						z & CHUNK_WIDTH_M1,
-						BLOCK_TYPE_BRICKS
+						model.player.holds
 					);
 			}
 			break;
