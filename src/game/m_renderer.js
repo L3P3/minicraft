@@ -128,6 +128,7 @@ export const renderer_render = (model, now) => {
 		const position_y_shifted_rest = position_y_shifted % 1;
 		const position_z_shifted_rest = position_z_shifted % 1;
 
+		let focus_distance_min = PLAYER_FOCUS_DISTANCE;
 		let canvas_surface_data_index =
 			player.block_focus_x =
 			player.block_focus_z =
@@ -203,6 +204,19 @@ export const renderer_render = (model, now) => {
 					else {
 						// collision
 
+						if (
+							canvas_y === pixel_focus_y &&
+							canvas_x === pixel_focus_x &&
+							check_distance <= focus_distance_min
+						) {
+							// set focus
+							player.block_focus_x = check_x_int;
+							player.block_focus_y = check_y_int;
+							player.block_focus_z = check_z_int;
+							player.block_focus_face = (step_dim < 0) | (dim << 1);
+							focus_distance_min = check_distance;
+						}
+
 						// calculate color
 						if (flag_textures) {
 							// shift so that block id 1 => tile 0
@@ -269,18 +283,6 @@ export const renderer_render = (model, now) => {
 								:	.1
 							)
 						);
-
-						if (
-							canvas_y === pixel_focus_y &&
-							canvas_x === pixel_focus_x &&
-							check_distance <= PLAYER_FOCUS_DISTANCE
-						) {
-							// set focus
-							player.block_focus_x = check_x_int;
-							player.block_focus_y = check_y_int;
-							player.block_focus_z = check_z_int;
-							player.block_focus_face = (step_dim < 0) | (dim << 1);
-						}
 						break;
 					}
 				}
