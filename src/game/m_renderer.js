@@ -12,6 +12,7 @@ import {
 	VERSION,
 } from '../etc/env.js';
 import {
+	document_,
 	Math_cos,
 	Math_PI_180d,
 	Math_sin,
@@ -36,10 +37,10 @@ import {
 let tiles_data = null;
 let tiles_image = new Image();
 tiles_image.onload = () => {
-	const canvas = document.createElement('canvas');
-	const width = canvas.width = tiles_image.width;
-	const height = canvas.height = tiles_image.height;
-	const context = canvas.getContext('2d');
+	const canvas_temp = document_.createElement('canvas');
+	const width = canvas_temp.width = tiles_image.width;
+	const height = canvas_temp.height = tiles_image.height;
+	const context = canvas_temp.getContext('2d');
 	context.drawImage(tiles_image, 0, 0);
 	tiles_image = tiles_data = new Uint32Array(
 		context.getImageData(0, 0, width, height).data.buffer
@@ -47,9 +48,9 @@ tiles_image.onload = () => {
 };
 tiles_image.src = 'data:image/png;base64,' + TILES_DATA;
 
-export const renderer_create = (game, canvas) => {
+export const renderer_create = (game, canvas_element) => {
 	const model = {
-		canvas,
+		canvas_element,
 		canvas_context: null,
 		canvas_surface: null,
 		diagnostics: '',
@@ -360,11 +361,11 @@ export const renderer_render = (model, now) => {
 };
 
 export const renderer_canvas_init = model => {
-	const width = model.canvas.width = model.game.resolution_x;
-	const height = model.canvas.height = model.game.resolution_y;
+	const width = model.canvas_element.width = model.game.resolution_x;
+	const height = model.canvas_element.height = model.game.resolution_y;
 	const data = (
 		model.canvas_surface = (
-			model.canvas_context = model.canvas.getContext('2d')
+			model.canvas_context = model.canvas_element.getContext('2d')
 		).createImageData(width, height)
 	).data;
 

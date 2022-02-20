@@ -53,8 +53,8 @@ export const game_create = () => ({
 	world: world_create(),
 });
 
-export const game_start = (model, canvas) => {
-	model.renderer = renderer_create(model, canvas);
+export const game_start = (model, canvas_element) => {
+	model.renderer = renderer_create(model, canvas_element);
 	model.tick_interval = setInterval(() => {
 		game_tick(model);
 	}, 50);
@@ -83,6 +83,9 @@ export const game_resolution_update = model => {
 	}
 };
 
+/**
+	@noinline
+*/
 export const game_mouse_catch = model => (
 	model.frame_element.requestPointerLock()
 );

@@ -12,6 +12,7 @@ import {
 import Menu from './c_menu.js';
 
 import {
+	document_,
 	Math_max,
 } from '../etc/helpers.js';
 import {
@@ -32,25 +33,30 @@ export default function Game({
 }) {
 	const model = hook_memo(game_create);
 
-	const handler_mousebutton = hook_static(event => (
-		model.flag_menu || (
-			document.pointerLockElement === frame
-			?	model.flag_paused || game_key(
-					model,
-					-1 - event.button,
-					event.type === 'mousedown'
+	const frame = hook_dom(
+		'div[className=game]',
+		hook_memo(() => {
+			const handler_mousebutton = event => (
+				model.flag_menu || (
+					document_.pointerLockElement === frame
+					?	model.flag_paused || game_key(
+							model,
+							-1 - event.button,
+							event.type === 'mousedown'
+						)
+					:	game_mouse_catch(model),
+					event.preventDefault(),
+					false
 				)
-			:	game_mouse_catch(model),
-			event.preventDefault(),
-			false
-		)
-	));
-	const frame = hook_dom('div[className=game]', {
-		onmousedown: handler_mousebutton,
-		onmousemove: hook_static(event => game_mouse_move(model, event)),
-		onmouseup: handler_mousebutton,
-	});
-	const pointer_locked = document.pointerLockElement === frame;
+			);
+			return {
+				onmousedown: handler_mousebutton,
+				onmousemove: event => game_mouse_move(model, event),
+				onmouseup: handler_mousebutton,
+			};
+		})
+	);
+	const pointer_locked = document_.pointerLockElement === frame;
 
 	hook_effect(() => (
 		model.frame_element = frame,
@@ -88,7 +94,7 @@ export default function Game({
 
 	hook_effect(flag_paused => (
 		flag_paused && pointer_locked &&
-			document.exitPointerLock()
+			document_.exitPointerLock()
 	), [model.flag_paused]);
 
 	hook_effect(now => (
@@ -99,8 +105,8 @@ export default function Game({
 
 	return [
 		node_dom('canvas', {
-			R: hook_static(element => (
-				game_start(model, element)
+			R: hook_static(canvas_element => (
+				game_start(model, canvas_element)
 			)),
 		}),
 		model.renderer &&
