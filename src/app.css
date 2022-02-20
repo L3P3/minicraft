@@ -20,7 +20,6 @@ div {
 	position: relative;
 	width: 100%;
 	height: 100%;
-	cursor: none;
 }
 .game > canvas {
 	position: absolute;
@@ -45,7 +44,6 @@ div {
 	height: 100%;
 	background: rgba(0, 0, 0, .7);
 	text-align: center;
-	cursor: default;
 }
 .game > .menu > .settings {
 	margin: 1rem;

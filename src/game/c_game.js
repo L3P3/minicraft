@@ -16,6 +16,9 @@ import {
 } from '../etc/helpers.js';
 import {
 	game_create,
+	game_key,
+	game_mouse_catch,
+	game_mouse_move,
 	game_render,
 	game_resolution_update,
 	game_start,
@@ -27,10 +30,30 @@ export default function Game({
 	dispatch,
 	ref,
 }) {
-	const frame = hook_dom('div[className=game]');
 	const model = hook_memo(game_create);
 
+	const handler_mousebutton = hook_static(event => (
+		model.flag_menu || (
+			document.pointerLockElement === frame
+			?	model.flag_paused || game_key(
+					model,
+					-1 - event.button,
+					event.type === 'mousedown'
+				)
+			:	game_mouse_catch(model),
+			event.preventDefault(),
+			false
+		)
+	));
+	const frame = hook_dom('div[className=game]', {
+		onmousedown: handler_mousebutton,
+		onmousemove: hook_static(event => game_mouse_move(model, event)),
+		onmouseup: handler_mousebutton,
+	});
+	const pointer_locked = document.pointerLockElement === frame;
+
 	hook_effect(() => (
+		model.frame_element = frame,
 		ref.game = model,
 		() => (
 			game_umount(model),
@@ -54,6 +77,19 @@ export default function Game({
 		frame.offsetHeight,
 		config.resolution_scaling,
 	]);
+
+	// two-way binding for lock and pause
+	hook_effect(() => {
+		// esc pressed ingame?
+		if (!pointer_locked && !model.flag_paused)
+			model.flag_menu = true;
+		model.flag_paused = !pointer_locked;
+	}, [pointer_locked]);
+
+	hook_effect(flag_paused => (
+		flag_paused && pointer_locked &&
+			document.exitPointerLock()
+	), [model.flag_paused]);
 
 	hook_effect(now => (
 		game_render(model, now)

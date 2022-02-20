@@ -14,6 +14,7 @@ export const actions = [
 	() => {
 		const config = {
 			flag_textures: true,
+			mouse_sensitivity: 3,
 			resolution_scaling: 10,
 			view_angle: 80,
 			view_distance: 64,
@@ -22,8 +23,12 @@ export const actions = [
 		if (config_raw) {
 			let config_loaded = JSON_.parse(config_raw);
 			let tmp = config_loaded['flag_textures'];
-			if (tmp !== undefined)
+			if (tmp != null)
 				config.flag_textures = tmp;
+			if ((
+				tmp = config_loaded['mouse_sensitivity']
+			) != null)
+				config.mouse_sensitivity = tmp;
 			config.resolution_scaling = config_loaded['resolution_scaling'];
 			config.view_angle = config_loaded['view_angle'];
 			config.view_distance = config_loaded['view_distance'];
@@ -38,6 +43,7 @@ export const actions = [
 		localStorage_.setItem('minicraft.config', JSON_.stringify({
 			'version': VERSION,
 			'flag_textures': config.flag_textures,
+			'mouse_sensitivity': config.mouse_sensitivity,
 			'resolution_scaling': config.resolution_scaling,
 			'view_angle': config.view_angle,
 			'view_distance': config.view_distance,

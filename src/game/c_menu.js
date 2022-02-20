@@ -8,6 +8,9 @@ import {
 import {
 	ACTION_CONFIG_SET,
 } from '../etc/state.js';
+import {
+	game_mouse_catch,
+} from './m_game.js';
 
 export default function Menu({
 	config,
@@ -60,13 +63,23 @@ export default function Menu({
 					)),
 				}),
 			]),
+			node_dom('label[innerText=Mausempfindlichkeit:]', null, [
+				node_dom('input[type=range][min=1][max=15][step=1]', {
+					value: config.mouse_sensitivity,
+					onchange: hook_static(event => (
+						dispatch(ACTION_CONFIG_SET, {
+							mouse_sensitivity: Number(event.target.value),
+						})
+					)),
+				}),
+			]),
 		]),
 		node_dom('div', null, [
 			node_dom('button[innerText=Zurück]', {
-				onclick: hook_static(() => {
-					game.flag_paused =
-					game.flag_menu = false;
-				}),
+				onclick: hook_static(() => (
+					game.flag_menu = false,
+					game_mouse_catch(game)
+				)),
 			}),
 		]),
 	];

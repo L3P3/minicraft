@@ -1,5 +1,6 @@
 const Math_ = Math;
 export const Math_PI = Math_.PI;
+export const Math_PI_h = Math_PI * .5;
 export const Math_PI_180d = 180 / Math_PI;
 export const Math_random = Math_.random;
 export const Math_floor = Math_.floor;

@@ -13,7 +13,9 @@ import {
 } from '../etc/env.js';
 import {
 	Math_max,
+	Math_min,
 	Math_PI,
+	Math_PI_h,
 	Math_round,
 } from '../etc/helpers.js';
 import {
@@ -36,7 +38,8 @@ export const game_create = () => ({
 	config: null,
 	flag_diagnostics: DEBUG,
 	flag_menu: false,
-	flag_paused: false,
+	flag_paused: true,
+	frame_element: null,
 	frame_last: 0,
 	player: player_create(),
 	renderer: null,
@@ -51,19 +54,6 @@ export const game_create = () => ({
 });
 
 export const game_start = (model, canvas) => {
-	onmousemove = event => {
-		if (!model.flag_paused) {
-			model.player.angle_h = (event.clientX / model.resolution_raw_x - .5) * 2 * Math_PI;
-			model.player.angle_v = (.5 - event.clientY / model.resolution_raw_y) * Math_PI;
-		}
-	};
-	onmousedown = onmouseup = event => (
-		model.flag_paused || (
-			game_key(model, -1 - event.button, event.type === 'mousedown'),
-			event.preventDefault(),
-			false
-		)
-	);
 	model.renderer = renderer_create(model, canvas);
 	model.tick_interval = setInterval(() => {
 		game_tick(model);
@@ -71,7 +61,6 @@ export const game_start = (model, canvas) => {
 };
 
 export const game_umount = model => (
-	onmousemove = onmousedown = onmouseup = null,
 	clearInterval(model.tick_interval),
 	renderer_destroy(model.renderer)
 );
@@ -93,6 +82,34 @@ export const game_resolution_update = model => {
 		renderer_canvas_init(model.renderer);
 	}
 };
+
+export const game_mouse_catch = model => (
+	model.frame_element.requestPointerLock()
+);
+
+export const game_mouse_move = (model, event) => {
+	if (!model.flag_paused) {
+		const factor = model.config.mouse_sensitivity * Math_PI / Math_max(
+			model.resolution_raw_x,
+			model.resolution_raw_y
+		);
+		model.player.angle_h = (
+			model.player.angle_h
+			+ event.movementX * factor
+			+ Math_PI * 100
+		) % (Math_PI * 2);
+		model.player.angle_v = (
+			Math_max(
+				-Math_PI_h,
+				Math_min(
+					Math_PI_h,
+					model.player.angle_v
+					- event.movementY * factor
+				)
+			)
+		);
+	}
+}
 
 export const game_key = (model, code, state) => {
 	//console.log('KEY', code, state);
