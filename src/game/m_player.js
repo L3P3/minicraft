@@ -7,7 +7,7 @@ import {
 	Math_sin,
 } from '../etc/helpers.js';
 
-export const player_create = () => ({
+export const player_create = world => ({
 	accel_x: 0.0,
 	accel_y: 0.0,
 	accel_z: 0.0,
@@ -18,9 +18,9 @@ export const player_create = () => ({
 	block_focus_y: -1,
 	block_focus_z: 0,
 	holds: BLOCK_TYPE_BRICKS,
-	position_x: 0.0,
-	position_y: 10.0,
-	position_z: 0.0,
+	position_x: world.spawn_x,
+	position_y: world.spawn_y,
+	position_z: world.spawn_z,
 	speed_x: 0.0,
 	speed_y: 0.0,
 	speed_z: 0.0,

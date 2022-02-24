@@ -6,7 +6,7 @@ import {
 	BLOCK_TYPE_FACE_T,
 	BLOCK_TYPE_FACE_W,
 	CHUNK_HEIGHT,
-	CHUNK_WIDTH_M1,
+	CHUNK_WIDTH_L2,
 } from '../etc/constants.js';
 import {
 	DEBUG,
@@ -34,24 +34,27 @@ import {
 	world_create,
 } from './m_world.js';
 
-export const game_create = () => ({
-	config: null,
-	flag_diagnostics: DEBUG,
-	flag_menu: false,
-	flag_paused: true,
-	frame_element: null,
-	frame_last: 0,
-	player: player_create(),
-	renderer: null,
-	resolution_raw_x: 1,
-	resolution_raw_y: 1,
-	resolution_x: 0,
-	resolution_y: 0,
-	tick_interval: null,
-	time: 0,
-	time_f: 0.0,
-	world: world_create(),
-});
+export const game_create = () => {
+	const world = world_create(CHUNK_WIDTH_L2 + 2);
+	return {
+		config: null,
+		flag_diagnostics: DEBUG,
+		flag_menu: false,
+		flag_paused: true,
+		frame_element: null,
+		frame_last: 0,
+		player: player_create(world),
+		renderer: null,
+		resolution_raw_x: 1,
+		resolution_raw_y: 1,
+		resolution_x: 0,
+		resolution_y: 0,
+		tick_interval: null,
+		time: 0,
+		time_f: 0.0,
+		world,
+	};
+};
 
 export const game_start = (model, canvas_element) => {
 	model.renderer = renderer_create(model, canvas_element);
@@ -153,9 +156,9 @@ export const game_key = (model, code, state) => {
 				y >= 0 && y < CHUNK_HEIGHT &&
 					world_block_set(
 						model.world,
-						x & CHUNK_WIDTH_M1,
+						x & ((1 << model.world.width_l2) - 1),
 						y,
-						z & CHUNK_WIDTH_M1,
+						z & ((1 << model.world.width_l2) - 1),
 						model.player.holds
 					);
 			}

@@ -1,8 +1,6 @@
 export const CHUNK_WIDTH_L2 = 4;
-export const CHUNK_WIDTH_L2_T2 = CHUNK_WIDTH_L2 << 1;
 export const CHUNK_WIDTH = 1 << CHUNK_WIDTH_L2;
 export const CHUNK_HEIGHT = 64;
-export const CHUNK_WIDTH_M1 = CHUNK_WIDTH - 1;
 export const COORDINATE_OFFSET = 1 << 16;
 export const COORDINATE_OFFSET_M1 = COORDINATE_OFFSET - 1;
 

@@ -10,6 +10,7 @@ export const Math_min = Math_.min;
 export const Math_max = Math_.max;
 export const Math_cos = Math_.cos;
 export const Math_sin = Math_.sin;
+export const Math_pow = Math_.pow;
 
 export const JSON_ = JSON;
 export const localStorage_ = localStorage;

@@ -1,12 +1,13 @@
 import {
 	BLOCK_TYPE_AIR,
 	BLOCK_COLORS,
+	CHUNK_WIDTH_L2,
 	COORDINATE_OFFSET,
 	COORDINATE_OFFSET_M1,
 	SKY_COLOR,
 	PLAYER_FOCUS_DISTANCE,
-	CHUNK_WIDTH_M1,
 	BLOCK_TYPE_FACE_LABELS,
+	CHUNK_HEIGHT,
 } from '../etc/constants.js';
 import {
 	VERSION,
@@ -15,6 +16,7 @@ import {
 	document_,
 	Math_cos,
 	Math_PI_180d,
+	Math_pow,
 	Math_sin,
 	number_padStart2,
 	number_toFixed2,
@@ -107,6 +109,10 @@ export const renderer_render = (model, now) => {
 			position_y,
 			position_z,
 		} = player;
+		const {
+			blocks,
+			width_l2,
+		} = world;
 		const flag_textures = config.flag_textures && tiles_data !== null;
 		tiles_data = /** @type {Uint32Array!} */ (tiles_data);
 		const resolution_x_1d = 1 / resolution_x;
@@ -128,6 +134,7 @@ export const renderer_render = (model, now) => {
 		const position_x_shifted_rest = position_x_shifted % 1;
 		const position_y_shifted_rest = position_y_shifted % 1;
 		const position_z_shifted_rest = position_z_shifted % 1;
+		const world_width_m1 = (1 << width_l2) - 1;
 
 		let focus_distance_min = PLAYER_FOCUS_DISTANCE;
 		let canvas_surface_data_index =
@@ -187,13 +194,18 @@ export const renderer_render = (model, now) => {
 					let check_x_int, check_y_int, check_z_int, block;
 					while (check_distance < check_distance_min)
 					if (
+						(check_y_int = check_y & COORDINATE_OFFSET_M1) < 0 ||
+						check_y_int >= CHUNK_HEIGHT ||
 						(
-							block = world_block_get(
-								world,
-								check_x_int = check_x & CHUNK_WIDTH_M1,
-								check_y_int = check_y & COORDINATE_OFFSET_M1,
-								check_z_int = check_z & CHUNK_WIDTH_M1
-							)
+							block = blocks[
+								(
+									(
+										(check_y_int << width_l2) |
+										(check_x_int = check_x & world_width_m1)
+									) << width_l2
+								) |
+								(check_z_int = check_z & world_width_m1)
+							]
 						) === BLOCK_TYPE_AIR
 					) {
 						// no collision
@@ -325,7 +337,9 @@ export const renderer_render = (model, now) => {
 			) + '\n' +
 
 			'R: ' + resolution_x + 'x' + resolution_y +
-			' (x' + config.resolution_scaling + '), C: 1, D: ' + config.view_distance + '\n' +
+			' (x' + config.resolution_scaling + '), D: ' + config.view_distance + ', ' +
+			'C: ' + Math_pow(1 << (world.width_l2 - CHUNK_WIDTH_L2), 2) + ', ' +
+			'M: ' + (Math_pow(1 << world.width_l2, 2) * CHUNK_HEIGHT >> 10) + 'k\n' +
 			'E: 0/0\n\n' +
 
 			'Position: ' + (
