@@ -7,11 +7,13 @@ import {
 	BLOCK_TYPE_FACE_W,
 	CHUNK_HEIGHT,
 	CHUNK_WIDTH_L2,
+	COORDINATE_OFFSET,
 } from '../etc/constants.js';
 import {
 	DEBUG,
 } from '../etc/env.js';
 import {
+	Math_floor,
 	Math_max,
 	Math_min,
 	Math_PI,
@@ -31,11 +33,12 @@ import {
 import {
 	world_block_get,
 	world_block_set,
+	world_chunk_load,
 	world_create,
 } from './m_world.js';
 
 export const game_create = () => {
-	const world = world_create(CHUNK_WIDTH_L2 + 2);
+	const world = world_create(4);
 	return {
 		config: null,
 		flag_diagnostics: DEBUG,
@@ -156,9 +159,9 @@ export const game_key = (model, code, state) => {
 				y >= 0 && y < CHUNK_HEIGHT &&
 					world_block_set(
 						model.world,
-						x & ((1 << model.world.width_l2) - 1),
+						x & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
 						y,
-						z & ((1 << model.world.width_l2) - 1),
+						z & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
 						model.player.holds
 					);
 			}
@@ -226,4 +229,18 @@ const game_tick = model => {
 	if (model.flag_paused) return;
 	model.time = (model.time + 1) % 24e3;
 	model.time_f = ((model.time + 6e3) * (1 / 24e3)) % 1;
+
+	const {player, world} = model;
+	const world_size = 1 << world.size_l2;
+	world.focus_x = (
+		COORDINATE_OFFSET + (
+			world.offset_x = Math_floor(player.position_x) >> CHUNK_WIDTH_L2
+		)
+	) % world_size;
+	world.focus_z = (
+		COORDINATE_OFFSET + (
+			world.offset_z = Math_floor(player.position_z) >> CHUNK_WIDTH_L2
+		)
+	) % world_size;
+	world_chunk_load(world);
 };

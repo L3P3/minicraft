@@ -1,6 +1,7 @@
 export const CHUNK_WIDTH_L2 = 4;
 export const CHUNK_WIDTH = 1 << CHUNK_WIDTH_L2;
-export const CHUNK_HEIGHT = 64;
+export const CHUNK_HEIGHT_L2 = 4;
+export const CHUNK_HEIGHT = 1 << CHUNK_HEIGHT_L2;
 export const COORDINATE_OFFSET = 1 << 16;
 export const COORDINATE_OFFSET_M1 = COORDINATE_OFFSET - 1;
 
@@ -30,6 +31,7 @@ export const BLOCK_COLORS = [
 	0x808cb8, // BRICKS
 	0xd7d7d7, // WOOL
 ];
+export const BLOCK_COLORS_LENGTH = BLOCK_COLORS.length;
 
 export const BLOCK_TYPE_FACE_LABELS = 'WEBTSN'.split('');
 export const BLOCK_TYPE_FACE_W = 0;
@@ -42,3 +44,14 @@ export const BLOCK_TYPE_FACE_N = 5;
 export const SKY_COLOR = 0xffb184;
 
 export const PLAYER_FOCUS_DISTANCE = 5;
+
+export const FLATMAP_LAYERS = [
+	BLOCK_TYPE_BEDROCK,
+	BLOCK_TYPE_STONE,
+	BLOCK_TYPE_STONE,
+	BLOCK_TYPE_DIRT,
+	BLOCK_TYPE_DIRT,
+	BLOCK_TYPE_DIRT,
+	BLOCK_TYPE_GRASS,
+];
+export const FLATMAP_LAYERS_LENGTH = FLATMAP_LAYERS.length;

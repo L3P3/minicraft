@@ -95,5 +95,5 @@ console.log('done.');
 })()
 .catch(console.log)
 .finally(() => {
-	env_set('local', true);
+	env_set('dev', true);
 });

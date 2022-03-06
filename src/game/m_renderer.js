@@ -8,6 +8,7 @@ import {
 	PLAYER_FOCUS_DISTANCE,
 	BLOCK_TYPE_FACE_LABELS,
 	CHUNK_HEIGHT,
+	CHUNK_HEIGHT_L2,
 } from '../etc/constants.js';
 import {
 	VERSION,
@@ -15,11 +16,13 @@ import {
 import {
 	document_,
 	Math_cos,
+	Math_floor,
 	Math_PI_180d,
 	Math_pow,
 	Math_sin,
 	number_padStart2,
 	number_toFixed2,
+	Uint32Array_,
 } from '../etc/helpers.js';
 import {
 	world_block_get,
@@ -44,7 +47,7 @@ tiles_image.onload = () => {
 	const height = canvas_temp.height = tiles_image.height;
 	const context = canvas_temp.getContext('2d');
 	context.drawImage(tiles_image, 0, 0);
-	tiles_image = tiles_data = new Uint32Array(
+	tiles_image = tiles_data = new Uint32Array_(
 		context.getImageData(0, 0, width, height).data.buffer
 	);
 };
@@ -111,7 +114,7 @@ export const renderer_render = (model, now) => {
 		} = player;
 		const {
 			blocks,
-			width_l2,
+			size_l2,
 		} = world;
 		const flag_textures = config.flag_textures && tiles_data !== null;
 		tiles_data = /** @type {Uint32Array!} */ (tiles_data);
@@ -134,7 +137,8 @@ export const renderer_render = (model, now) => {
 		const position_x_shifted_rest = position_x_shifted % 1;
 		const position_y_shifted_rest = position_y_shifted % 1;
 		const position_z_shifted_rest = position_z_shifted % 1;
-		const world_width_m1 = (1 << width_l2) - 1;
+		const world_width_l2 = CHUNK_WIDTH_L2 + size_l2;
+		const world_width_m1 = (1 << world_width_l2) - 1;
 
 		let focus_distance_min = PLAYER_FOCUS_DISTANCE;
 		let canvas_surface_data_index =
@@ -194,17 +198,21 @@ export const renderer_render = (model, now) => {
 					let check_x_int, check_y_int, check_z_int, block;
 					while (check_distance < check_distance_min)
 					if (
-						(check_y_int = check_y & COORDINATE_OFFSET_M1) < 0 ||
+						(
+							check_y_int = check_y & COORDINATE_OFFSET_M1
+						) < 0 ||
 						check_y_int >= CHUNK_HEIGHT ||
 						(
 							block = blocks[
 								(
 									(
-										(check_y_int << width_l2) |
-										(check_x_int = check_x & world_width_m1)
-									) << width_l2
-								) |
-								(check_z_int = check_z & world_width_m1)
+										check_x_int = check_x & world_width_m1
+									) << world_width_l2 |
+									(
+										check_z_int = check_z & world_width_m1
+									)
+								) << CHUNK_HEIGHT_L2 |
+								check_y_int
 							]
 						) === BLOCK_TYPE_AIR
 					) {
@@ -226,7 +234,7 @@ export const renderer_render = (model, now) => {
 							player.block_focus_x = check_x_int;
 							player.block_focus_y = check_y_int;
 							player.block_focus_z = check_z_int;
-							player.block_focus_face = (step_dim < 0) | (dim << 1);
+							player.block_focus_face = (step_dim < 0) | dim << 1;
 							focus_distance_min = check_distance;
 						}
 
@@ -248,25 +256,21 @@ export const renderer_render = (model, now) => {
 
 							// pick pixel
 							const texture_pixel = tiles_data[
-								(block << (TILES_RESOLUTION_LOG2 + TILES_RESOLUTION_LOG2)) +
+								block << (TILES_RESOLUTION_LOG2 + TILES_RESOLUTION_LOG2) |
 								(
-									(
-										// y
-										(
-											dim === 1
-											?	check_z
-											:	check_y
-										) * TILES_RESOLUTION & (TILES_RESOLUTION - 1)
-									) << TILES_RESOLUTION_LOG2
-								) +
-								(
-									// x
+									// y
 									(
 										dim === 1
-										?	check_x
-										:	check_x + check_z
+										?	check_z
+										:	check_y
 									) * TILES_RESOLUTION & (TILES_RESOLUTION - 1)
-								)
+								) << TILES_RESOLUTION_LOG2 |
+								// x
+								(
+									dim === 1
+									?	check_x
+									:	check_x + check_z
+								) * TILES_RESOLUTION & (TILES_RESOLUTION - 1)
 							];
 
 							// solid pixel
@@ -314,9 +318,9 @@ export const renderer_render = (model, now) => {
 		canvas_surface_data[
 			canvas_surface_data_index =
 				(resolution_x * pixel_focus_y + pixel_focus_x) << 2
-		] *= 2;
-		canvas_surface_data[++canvas_surface_data_index] *= 2;
-		canvas_surface_data[++canvas_surface_data_index] *= 2;
+		] += 128;
+		canvas_surface_data[++canvas_surface_data_index] += 128;
+		canvas_surface_data[++canvas_surface_data_index] += 128;
 
 		model.canvas_context.putImageData(canvas_surface, 0, 0);
 	}
@@ -338,8 +342,8 @@ export const renderer_render = (model, now) => {
 
 			'R: ' + resolution_x + 'x' + resolution_y +
 			' (x' + config.resolution_scaling + '), D: ' + config.view_distance + ', ' +
-			'C: ' + Math_pow(1 << (world.width_l2 - CHUNK_WIDTH_L2), 2) + ', ' +
-			'M: ' + (Math_pow(1 << world.width_l2, 2) * CHUNK_HEIGHT >> 10) + 'k\n' +
+			'C: ' + Math_pow(1 << world.size_l2, 2) + ', ' +
+			'M: ' + (Math_pow(1 << (CHUNK_WIDTH_L2 + world.size_l2), 2) * CHUNK_HEIGHT >> 10) + 'k\n' +
 			'E: 0/0\n\n' +
 
 			'Position: ' + (
@@ -369,7 +373,11 @@ export const renderer_render = (model, now) => {
 						player.block_focus_z
 					)
 			) + '\n' +
-			'Chunk: 0 0'
+			'Chunk: ' + (
+				Math_floor(player.position_x) >> CHUNK_WIDTH_L2
+			) + ' ' + (
+				Math_floor(player.position_z) >> CHUNK_WIDTH_L2
+			)
 		:	''
 	);
 };

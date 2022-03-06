@@ -1,2 +1,2 @@
-export const VERSION = 'local';
+export const VERSION = 'dev';
 export const DEBUG = true;
