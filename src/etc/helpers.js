@@ -3,22 +3,23 @@ const Math_ = Math;
 export const Math_PI = Math_.PI;
 export const Math_PI_h = Math_PI * .5;
 export const Math_PI_180d = 180 / Math_PI;
-export const Math_abs = Math_.abs;
 export const Math_random = Math_.random;
 export const Math_floor = Math_.floor;
+export const Math_ceil = Math_.ceil;
 export const Math_round = Math_.round;
 export const Math_min = Math_.min;
 export const Math_max = Math_.max;
 export const Math_cos = Math_.cos;
 export const Math_sin = Math_.sin;
 export const Math_sqrt = Math_.sqrt;
-export const Math_pow = Math_.pow;
+export const Math_log2 = Math_.log2;
+export const String_fromCharCode = String.fromCharCode;
 
 export const JSON_ = JSON;
 export const localStorage_ = localStorage;
+export const Uint8Array_ = Uint8Array;
 export const Uint32Array_ = Uint32Array;
-
-export const diagonal = (a, b) => Math_sqrt(a * a + b * b);
+export const Map_ = Map;
 
 /**
 	@param {number} num

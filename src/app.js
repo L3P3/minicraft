@@ -17,6 +17,7 @@ import {
 } from './etc/helpers.js';
 import {
 	game_key,
+	game_save,
 } from './game/m_game.js';
 
 lui_.init(() => {
@@ -29,6 +30,7 @@ lui_.init(() => {
 	hook_effect(() => {
 		onbeforeunload = () => {
 			dispatch(ACTION_SAVE);
+			if (ref.game) game_save(ref.game);
 		};
 	});
 

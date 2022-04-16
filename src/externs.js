@@ -238,6 +238,8 @@ function onbeforeinstallprompt(){}
 function onbeforeunload(){}
 function onerror(error){}
 function onkeydown(event){}
+function oncontextmenu(){}
+function ondragstart(){}
 /**
 	@type {function(MouseEvent)?}
 */

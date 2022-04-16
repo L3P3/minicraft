@@ -33,17 +33,21 @@ Heavily inspired by and somewhat based on the work of [@xNotch](https://github.c
 - [x] build/destroy
 - [x] persistent user configuration
 - [x] texturing
+- [x] multiple chunks
+- [x] load/save chunks
 - [ ] mobile view
+- [ ] multiple worlds
 - [ ] entity models
-- [ ] multiple chunks
 - [ ] collision
-- [ ] load/save worlds
-- [ ] themed ui
+- [ ] styled ui
+- [ ] more blocks
 - [ ] migrate to typescript?
-- [ ] backwards compatiblity
+- [ ] support older browsers
 - [ ] items/inventory
-- [ ] use separate threads?
+- [ ] multi-threading
+- [ ] download/upload worlds
 - [ ] multiplayer?
+- [ ] time of day
 - [ ] sky elements
 - [ ] visible entities
 - [ ] particles

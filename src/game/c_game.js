@@ -24,6 +24,7 @@ import {
 	game_resolution_update,
 	game_start,
 	game_umount,
+	game_view_distance_update,
 } from './m_game.js';
 
 export default function Game({
@@ -67,12 +68,13 @@ export default function Game({
 		)
 	));
 
-	hook_effect(() => {
-		model.config = config;
+	hook_effect(() => (
+		model.config = config,
 		model.renderer && (
 			model.renderer.flag_dirty = true
-		);
-	}, [config]);
+		),
+		game_view_distance_update(model)
+	), [config]);
 
 	hook_effect((width, height) => (
 		model.resolution_raw_x = Math_max(1, width),

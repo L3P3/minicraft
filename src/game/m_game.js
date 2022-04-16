@@ -6,6 +6,7 @@ import {
 	BLOCK_TYPE_FACE_T,
 	BLOCK_TYPE_FACE_W,
 	CHUNK_HEIGHT,
+	CHUNK_WIDTH,
 	CHUNK_WIDTH_L2,
 	COORDINATE_OFFSET,
 } from '../etc/constants.js';
@@ -13,7 +14,9 @@ import {
 	DEBUG,
 } from '../etc/env.js';
 import {
+	Math_ceil,
 	Math_floor,
+	Math_log2,
 	Math_max,
 	Math_min,
 	Math_PI,
@@ -34,11 +37,14 @@ import {
 	world_block_get,
 	world_block_set,
 	world_chunk_load,
+	world_chunk_load_setup,
 	world_create,
+	world_data_init,
+	world_save,
 } from './m_world.js';
 
 export const game_create = () => {
-	const world = world_create(4);
+	const world = world_create();
 	return {
 		config: null,
 		flag_diagnostics: DEBUG,
@@ -57,14 +63,18 @@ export const game_create = () => {
 		time_f: 0.0,
 		world,
 	};
-};
+}
 
 export const game_start = (model, canvas_element) => {
 	model.renderer = renderer_create(model, canvas_element);
 	model.tick_interval = setInterval(() => {
 		game_tick(model);
 	}, 50);
-};
+}
+
+export const game_save = model => (
+	world_save(model.world)
+);
 
 export const game_umount = model => (
 	clearInterval(model.tick_interval),
@@ -87,7 +97,38 @@ export const game_resolution_update = model => {
 		model.renderer.flag_dirty = true;
 		renderer_canvas_init(model.renderer);
 	}
-};
+}
+
+export const game_view_distance_update = model => {
+	const {world} = model;
+	const {view_distance} = model.config;
+	// TODO proper formula would be less embarrassing
+	const size_l2 = (
+		view_distance < 17 ? 2
+		: view_distance < 49 ? 3
+		: view_distance < 113 ? 4
+		: view_distance < 241 ? 5
+		: view_distance < 497 ? 6
+		: view_distance < 1009 ? 7
+		: view_distance < 2033 ? 8
+		: view_distance < 4081 ? 9
+		: view_distance < 8177 ? 10
+		: view_distance < 16369 ? 11
+		: view_distance < 32753 ? 12
+		: 13
+	);
+	/*Math_max(
+		Math_ceil(
+			Math_log2(
+				model.config.view_distance
+			) - CHUNK_WIDTH_L2 + 2
+		),
+		2
+	);*/
+	//console.log('size_l2', world.size_l2, size_l2, 1 << (CHUNK_WIDTH_L2 + size_l2));
+	if (world.size_l2 !== size_l2)
+		world_data_init(world, size_l2);
+}
 
 /**
 	@noinline
@@ -185,6 +226,11 @@ export const game_key = (model, code, state) => {
 		case 80: // P
 			model.flag_paused = !model.flag_paused;
 			break;
+		case 82: // R
+			model.player.position_x = model.world.spawn_x;
+			model.player.position_y = model.world.spawn_y;
+			model.player.position_z = model.world.spawn_z;
+			break;
 		case 83: // S
 			model.player.accel_z = -.1;
 			break;
@@ -214,7 +260,7 @@ export const game_key = (model, code, state) => {
 			return true;
 	}
 	return false;
-};
+}
 
 export const game_render = (model, now) => {
 	model.frame_last &&
@@ -223,7 +269,7 @@ export const game_render = (model, now) => {
 	model.renderer &&
 		renderer_render(model.renderer, now);
 	model.frame_last = now;
-};
+}
 
 const game_tick = model => {
 	if (model.flag_paused) return;
@@ -231,16 +277,25 @@ const game_tick = model => {
 	model.time_f = ((model.time + 6e3) * (1 / 24e3)) % 1;
 
 	const {player, world} = model;
-	const world_size = 1 << world.size_l2;
-	world.focus_x = (
-		COORDINATE_OFFSET + (
-			world.offset_x = Math_floor(player.position_x) >> CHUNK_WIDTH_L2
-		)
-	) % world_size;
-	world.focus_z = (
-		COORDINATE_OFFSET + (
-			world.offset_z = Math_floor(player.position_z) >> CHUNK_WIDTH_L2
-		)
-	) % world_size;
+	const chunk_x_abs = Math_floor(player.position_x) >> CHUNK_WIDTH_L2;
+	const chunk_z_abs = Math_floor(player.position_z) >> CHUNK_WIDTH_L2;
+	if (
+		world.offset_x + world.focus_x !== chunk_x_abs ||
+		world.offset_z + world.focus_z !== chunk_z_abs
+	) {
+		const world_size = 1 << world.size_l2;
+		world.offset_x = chunk_x_abs - (
+			world.focus_x = (
+				COORDINATE_OFFSET + chunk_x_abs
+			) % world_size
+		);
+		world.offset_z = chunk_z_abs - (
+			world.focus_z = (
+				COORDINATE_OFFSET + chunk_z_abs
+			) % world_size
+		);
+		world_chunk_load_setup(world);
+	}
+
 	world_chunk_load(world);
-};
+}

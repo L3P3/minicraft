@@ -3,12 +3,12 @@ import {
 	BLOCK_COLORS,
 	CHUNK_WIDTH_L2,
 	COORDINATE_OFFSET,
-	COORDINATE_OFFSET_M1,
 	SKY_COLOR,
 	PLAYER_FOCUS_DISTANCE,
 	BLOCK_TYPE_FACE_LABELS,
 	CHUNK_HEIGHT,
 	CHUNK_HEIGHT_L2,
+	CHUNK_HEIGHT_M1,
 } from '../etc/constants.js';
 import {
 	VERSION,
@@ -18,8 +18,8 @@ import {
 	Math_cos,
 	Math_floor,
 	Math_PI_180d,
-	Math_pow,
 	Math_sin,
+	Math_sqrt,
 	number_padStart2,
 	number_toFixed2,
 	Uint32Array_,
@@ -90,6 +90,8 @@ export const renderer_render = (model, now) => {
 		resolution_y,
 		world,
 	} = game;
+
+	//let check_count = 0;
 
 	if (
 		!game.flag_paused ||
@@ -175,6 +177,11 @@ export const renderer_render = (model, now) => {
 					const step_x = step_x_raw * step_normal;
 					const step_y = step_y_raw * step_normal;
 					const step_z = step_z_raw * step_normal;
+					const step_diagonal = Math_sqrt(
+						step_x * step_x +
+						step_y * step_y +
+						step_z * step_z
+					);
 
 					// calculate distance to first intersection to then start on it
 					let offset = position_z_shifted_rest;
@@ -185,7 +192,7 @@ export const renderer_render = (model, now) => {
 					let check_x = position_x_shifted + step_x * offset;
 					let check_y = position_y_shifted + step_y * offset;
 					let check_z = position_z_shifted + step_z * offset;
-					let check_distance = step_normal * offset;
+					let check_distance = step_diagonal * offset;
 
 					// move into middle of block to prevent rounding errors causing flicker
 					// https://jsben.ch/iIvG7
@@ -195,112 +202,115 @@ export const renderer_render = (model, now) => {
 
 					// add steps until collision or out of range
 					// https://jsben.ch/kM67J
-					let check_x_int, check_y_int, check_z_int, block;
-					while (check_distance < check_distance_min)
-					if (
-						(
-							check_y_int = check_y & COORDINATE_OFFSET_M1
-						) < 0 ||
-						check_y_int >= CHUNK_HEIGHT ||
-						(
-							block = blocks[
-								(
-									(
-										check_x_int = check_x & world_width_m1
-									) << world_width_l2 |
-									(
-										check_z_int = check_z & world_width_m1
-									)
-								) << CHUNK_HEIGHT_L2 |
-								check_y_int
-							]
-						) === BLOCK_TYPE_AIR
+					for (
+						let check_x_int, check_y_int, check_z_int, block;
+						check_distance < check_distance_min;
+						check_x += step_x,
+						check_y += step_y,
+						check_z += step_z,
+						check_distance += step_diagonal
 					) {
-						// no collision
-						check_x += step_x;
-						check_y += step_y;
-						check_z += step_z;
-						check_distance += step_normal;
-					}
-					else {
-						// collision
-
-						if (
-							canvas_y === pixel_focus_y &&
-							canvas_x === pixel_focus_x &&
-							check_distance <= focus_distance_min
-						) {
-							// set focus
-							player.block_focus_x = check_x_int;
-							player.block_focus_y = check_y_int;
-							player.block_focus_z = check_z_int;
-							player.block_focus_face = (step_dim < 0) | dim << 1;
-							focus_distance_min = check_distance;
+						if (check_y < COORDINATE_OFFSET) {
+							if (step_y < 0) break;
+							continue;
 						}
+						if (check_y >= COORDINATE_OFFSET + CHUNK_HEIGHT) {
+							if (step_y > 0) break;
+							continue;
+						}
+						//++check_count;
+						if (
+							(
+								block = blocks[
+									(
+										(
+											check_x_int = check_x & world_width_m1
+										) << world_width_l2 |
+										(
+											check_z_int = check_z & world_width_m1
+										)
+									) << CHUNK_HEIGHT_L2 |
+									(
+										check_y_int = check_y & CHUNK_HEIGHT_M1
+									)
+								]
+							) !== BLOCK_TYPE_AIR
+						) {
+							// collision
 
-						// calculate color
-						if (flag_textures) {
-							// shift so that block id 1 => tile 0
-							--block;
-
-							if (dim === 1) {
-								if (block === TILE_LOG_SIDE)
-									block = TILE_LOG_TOP;
-								else if (
-									block === TILE_GRASS_TOP &&
-									step_dim > 0
-								) block = TILE_DIRT;
+							if (
+								canvas_y === pixel_focus_y &&
+								canvas_x === pixel_focus_x &&
+								check_distance <= focus_distance_min
+							) {
+								// set focus
+								player.block_focus_x = check_x_int;
+								player.block_focus_y = check_y_int;
+								player.block_focus_z = check_z_int;
+								player.block_focus_face = (step_dim < 0) | dim << 1;
+								focus_distance_min = check_distance;
 							}
-							else if (block === TILE_GRASS_TOP)
-								block = TILE_GRASS_SIDE;
 
-							// pick pixel
-							const texture_pixel = tiles_data[
-								block << (TILES_RESOLUTION_LOG2 + TILES_RESOLUTION_LOG2) |
-								(
-									// y
+							// calculate color
+							if (flag_textures) {
+								// shift so that block id 1 => tile 0
+								--block;
+
+								if (dim === 1) {
+									if (block === TILE_LOG_SIDE)
+										block = TILE_LOG_TOP;
+									else if (
+										block === TILE_GRASS_TOP &&
+										step_y > 0
+									) block = TILE_DIRT;
+								}
+								else if (block === TILE_GRASS_TOP)
+									block = TILE_GRASS_SIDE;
+
+								// pick pixel
+								const texture_pixel = tiles_data[
+									block << (TILES_RESOLUTION_LOG2 + TILES_RESOLUTION_LOG2) |
+									(
+										// y
+										(
+											dim === 1
+											?	check_z
+											:	check_y
+										) * TILES_RESOLUTION & (TILES_RESOLUTION - 1)
+									) << TILES_RESOLUTION_LOG2 |
+									// x
 									(
 										dim === 1
-										?	check_z
-										:	check_y
+										?	check_x
+										:	check_x + check_z
 									) * TILES_RESOLUTION & (TILES_RESOLUTION - 1)
-								) << TILES_RESOLUTION_LOG2 |
-								// x
-								(
-									dim === 1
-									?	check_x
-									:	check_x + check_z
-								) * TILES_RESOLUTION & (TILES_RESOLUTION - 1)
-							];
+								];
 
-							// solid pixel
-							if (texture_pixel >>> 24 !== 0)
+								// transparent pixel?
+								if (texture_pixel >>> 24 === 0) continue;
+
+								// solid pixel
 								pixel_color = texture_pixel & 0xffffff;
-							// transparent pixel
-							else {
-								check_x += step_x;
-								check_y += step_y;
-								check_z += step_z;
-								check_distance += step_normal;
-								continue;
 							}
-						}
-						else pixel_color = BLOCK_COLORS[block];
+							else pixel_color = BLOCK_COLORS[block];
 
-						check_distance_min = check_distance;
-						pixel_factor = (
-							// fake shadow to see edges
-							1 - ((dim + 2) % 3) * .2 +
-							// highlight if focussed
-							(
-								check_y_int !== block_focus_y ||
-								check_x_int !== block_focus_x ||
-								check_z_int !== block_focus_z
-								?	0
-								:	.1
-							)
-						);
-						break;
+							check_distance_min = check_distance;
+							pixel_factor = (
+								// fake shadow to see edges
+								1 - ((dim + 2) % 3) * .2 +
+								// highlight if focussed
+								(
+									check_y_int !== block_focus_y ||
+									check_x_int !== block_focus_x ||
+									check_z_int !== block_focus_z
+									?	0
+									:	.1
+								)
+							);
+							break;
+						}
+
+						// no collision
 					}
 				}
 
@@ -342,8 +352,14 @@ export const renderer_render = (model, now) => {
 
 			'R: ' + resolution_x + 'x' + resolution_y +
 			' (x' + config.resolution_scaling + '), D: ' + config.view_distance + ', ' +
-			'C: ' + Math_pow(1 << world.size_l2, 2) + ', ' +
-			'M: ' + (Math_pow(1 << (CHUNK_WIDTH_L2 + world.size_l2), 2) * CHUNK_HEIGHT >> 10) + 'k\n' +
+			//'S: ' + check_count + ', ' +
+			'C: ' + world.chunks_checklist_index + '/' + world.chunks_checklist.length + ', ' +
+			'M: ' + (
+				(
+					1 << (CHUNK_WIDTH_L2 + world.size_l2)
+				) ** 2
+				* CHUNK_HEIGHT >> 10
+			) + 'k\n' +
 			'E: 0/0\n\n' +
 
 			'Position: ' + (
