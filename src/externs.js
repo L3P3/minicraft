@@ -12,6 +12,11 @@ var TYPE_NODEDATA;
 var TYPE_NODEDATA_ITEM;
 
 /**
+	@typedef {!Object<string, *>}
+*/
+var TYPE_PROPS_D;
+
+/**
 	@typedef {!Object<string, boolean>}
 */
 var TYPE_PROPS_F;
@@ -24,6 +29,7 @@ var TYPE_PROPS_S;
 /**
 	@typedef {{
 		C: (void|TYPE_NODELIST),
+		D: (void|TYPE_PROPS_D),
 		F: (void|TYPE_PROPS_F),
 		R: (void|function(HTMLElement):void),
 		S: (void|TYPE_PROPS_S),

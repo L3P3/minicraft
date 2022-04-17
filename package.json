@@ -26,6 +26,7 @@
 	"author": "L3P3 <dev@l3p3.de> (https://l3p3.de)",
 	"license": "Zlib",
 	"devDependencies": {
-		"google-closure-compiler": "latest"
+		"google-closure-compiler": "latest",
+		"cssnano": "latest"
 	}
 }

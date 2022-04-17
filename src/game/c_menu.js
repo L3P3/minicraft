@@ -80,7 +80,7 @@ export default function Menu({
 					game.flag_menu = false,
 					event.pointerType === 'mouse'
 					?	game_mouse_catch(game)
-					: (game.flag_pause = false)
+					:	(game.flag_paused = false)
 				)),
 			}),
 		]),

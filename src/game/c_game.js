@@ -59,11 +59,10 @@ export default function Game({
 				onmouseup: handler_mousebutton,
 				ontouchstart: event => {
 					model.flag_touch = true;
-					if (
-						!model.flag_paused ||
-						tag_ignore_touch(event.target.tagName)
-					)
+					if (!model.flag_menu) {
+						model.flag_paused = false;
 						event.preventDefault();
+					}
 				},
 			};
 		})

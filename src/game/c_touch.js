@@ -41,7 +41,6 @@ export default function Touch({
 		hook_static({
 			ontouchstart: event => {
 				event.preventDefault();
-				game.flag_paused = false;
 				const code = Number(event.target.dataset.code);
 				if (
 					code != null &&

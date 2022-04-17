@@ -3,6 +3,7 @@
 
 import * as fs from 'fs';
 import {exec as child_process_exec} from 'child_process';
+import cssnano from 'cssnano';
 
 const {version} = JSON.parse(
 	fs.readFileSync('./package.json', 'utf-8')
@@ -29,6 +30,15 @@ export const DEBUG = ${debug};
 
 async function build() {
 	env_set(version, false);
+
+	console.log('css...');
+	const code_css_promise = (
+		cssnano()
+		.process(
+			fs.readFileSync('./src/app.css', 'utf8'),
+			{from: undefined}
+		)
+	);
 
 	console.log('pass 1...');
 	console.log((await exec(
@@ -70,6 +80,12 @@ async function build() {
 	))[2]);
 
 	await exec('rm /tmp/app.js');
+
+	fs.writeFileSync(
+		'./dist/app.css',
+		'' + await code_css_promise,
+		'ascii'
+	);
 }
 
 (async () => {

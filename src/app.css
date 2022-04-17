@@ -50,7 +50,7 @@ div {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
 	grid-template-rows: 3rem;
-	grid-gap: 1rem;
+	gap: 1rem;
 }
 .game > .touch {
 	position: absolute;
@@ -73,9 +73,8 @@ div {
 	right: 1rem;
 	top: 1rem;
 	display: flex;
-	flex-direction: row;
 	justify-content: flex-end;
-	gap: .1rem;
+	gap: .3rem;
 }
 .game > .touch > .top > * {
 	min-width: 2rem;
