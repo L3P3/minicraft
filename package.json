@@ -27,6 +27,7 @@
 	"license": "Zlib",
 	"devDependencies": {
 		"google-closure-compiler": "latest",
-		"cssnano": "latest"
+		"cssnano": "latest",
+		"postcss": "latest"
 	}
 }
