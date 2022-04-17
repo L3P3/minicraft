@@ -55,3 +55,13 @@ export const FLATMAP_LAYERS = [
 	BLOCK_TYPE_GRASS,
 ];
 export const FLATMAP_LAYERS_LENGTH = FLATMAP_LAYERS.length;
+
+export const KEY_MOUSE_LEFT = -1;
+export const KEY_MOUSE_MIDDLE = -2;
+export const KEY_MOUSE_RIGHT = -3;
+export const KEY_MOVE_FRONT = -10;
+export const KEY_MOVE_BACK = -11;
+export const KEY_MOVE_LEFT = -12;
+export const KEY_MOVE_RIGHT = -13;
+export const KEY_MOVE_UP = -14;
+export const KEY_MOVE_DOWN = -15;

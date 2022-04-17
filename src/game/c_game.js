@@ -10,10 +10,12 @@ import {
 } from '../etc/lui.js';
 
 import Menu from './c_menu.js';
+import Touch from './c_touch.js';
 
 import {
 	document_,
 	Math_max,
+	tag_ignore_touch,
 } from '../etc/helpers.js';
 import {
 	game_create,
@@ -39,6 +41,7 @@ export default function Game({
 		hook_memo(() => {
 			const handler_mousebutton = event => (
 				model.flag_menu || (
+					model.flag_touch = false,
 					document_.pointerLockElement === frame
 					?	model.flag_paused || game_key(
 							model,
@@ -54,6 +57,14 @@ export default function Game({
 				onmousedown: handler_mousebutton,
 				onmousemove: event => game_mouse_move(model, event),
 				onmouseup: handler_mousebutton,
+				ontouchstart: event => {
+					model.flag_touch = true;
+					if (
+						!model.flag_paused ||
+						tag_ignore_touch(event.target.tagName)
+					)
+						event.preventDefault();
+				},
 			};
 		})
 	);
@@ -115,6 +126,11 @@ export default function Game({
 		model.flag_diagnostics &&
 		node_dom('div[className=diagnostics]', {
 			innerText: model.renderer.diagnostics,
+		}),
+		model.flag_touch &&
+		node(Touch, {
+			game: model,
+			keys_active_check: model.keys_active_check,
 		}),
 		model.flag_menu &&
 		node(Menu, {

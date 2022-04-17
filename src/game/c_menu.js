@@ -76,9 +76,11 @@ export default function Menu({
 		]),
 		node_dom('div', null, [
 			node_dom('button[innerText=Zurück]', {
-				onclick: hook_static(() => (
+				onclick: hook_static(event => (
 					game.flag_menu = false,
-					game_mouse_catch(game)
+					event.pointerType === 'mouse'
+					?	game_mouse_catch(game)
+					: (game.flag_pause = false)
 				)),
 			}),
 		]),

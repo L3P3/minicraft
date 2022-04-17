@@ -6,17 +6,23 @@ import {
 	BLOCK_TYPE_FACE_T,
 	BLOCK_TYPE_FACE_W,
 	CHUNK_HEIGHT,
-	CHUNK_WIDTH,
 	CHUNK_WIDTH_L2,
 	COORDINATE_OFFSET,
+	KEY_MOUSE_LEFT,
+	KEY_MOUSE_MIDDLE,
+	KEY_MOUSE_RIGHT,
+	KEY_MOVE_BACK,
+	KEY_MOVE_DOWN,
+	KEY_MOVE_LEFT,
+	KEY_MOVE_FRONT,
+	KEY_MOVE_RIGHT,
+	KEY_MOVE_UP,
 } from '../etc/constants.js';
 import {
 	DEBUG,
 } from '../etc/env.js';
 import {
-	Math_ceil,
 	Math_floor,
-	Math_log2,
 	Math_max,
 	Math_min,
 	Math_PI,
@@ -50,8 +56,11 @@ export const game_create = () => {
 		flag_diagnostics: DEBUG,
 		flag_menu: false,
 		flag_paused: true,
+		flag_touch: DEBUG,
 		frame_element: null,
 		frame_last: 0,
+		keys_active: new Set,
+		keys_active_check: '',
 		player: player_create(world),
 		renderer: null,
 		resolution_raw_x: 1,
@@ -161,105 +170,129 @@ export const game_mouse_move = (model, event) => {
 	}
 }
 
+/**
+	@return {boolean} true if state changed
+*/
 export const game_key = (model, code, state) => {
 	//console.log('KEY', code, state);
-	if (state) switch (code) {
-		case -1: // MOUSE_LEFT
-			model.player.block_focus_y >= 0 &&
-				world_block_set(
-					model.world,
-					model.player.block_focus_x,
-					model.player.block_focus_y,
-					model.player.block_focus_z,
-					BLOCK_TYPE_AIR
-				);
-			break;
-		case -2: // MOUSE_MIDDLE
-		case 71: // G
-			if (model.player.block_focus_y >= 0)
-					model.player.holds = world_block_get(
+	const {keys_active} = model;
+	if (state) {
+		if (keys_active.has(code)) return false;
+		switch (code) {
+			case KEY_MOUSE_LEFT:
+				model.player.block_focus_y >= 0 &&
+					world_block_set(
 						model.world,
 						model.player.block_focus_x,
 						model.player.block_focus_y,
-						model.player.block_focus_z
+						model.player.block_focus_z,
+						BLOCK_TYPE_AIR
 					);
-			break;
-		case -3: // MOUSE_RIGHT
-			if (model.player.block_focus_y >= 0) {
-				let x = model.player.block_focus_x;
-				let y = model.player.block_focus_y;
-				let z = model.player.block_focus_z;
-				switch (model.player.block_focus_face) {
-					case BLOCK_TYPE_FACE_W: --x; break;
-					case BLOCK_TYPE_FACE_E: ++x; break;
-					case BLOCK_TYPE_FACE_B: --y; break;
-					case BLOCK_TYPE_FACE_T: ++y; break;
-					case BLOCK_TYPE_FACE_S: --z; break;
-					default: ++z;
+				break;
+			case KEY_MOUSE_MIDDLE:
+			case 71: // G
+				if (model.player.block_focus_y >= 0)
+						model.player.holds = world_block_get(
+							model.world,
+							model.player.block_focus_x,
+							model.player.block_focus_y,
+							model.player.block_focus_z
+						);
+				break;
+			case KEY_MOUSE_RIGHT:
+				if (model.player.block_focus_y >= 0) {
+					let x = model.player.block_focus_x;
+					let y = model.player.block_focus_y;
+					let z = model.player.block_focus_z;
+					switch (model.player.block_focus_face) {
+						case BLOCK_TYPE_FACE_W: --x; break;
+						case BLOCK_TYPE_FACE_E: ++x; break;
+						case BLOCK_TYPE_FACE_B: --y; break;
+						case BLOCK_TYPE_FACE_T: ++y; break;
+						case BLOCK_TYPE_FACE_S: --z; break;
+						default: ++z;
+					}
+					y >= 0 && y < CHUNK_HEIGHT &&
+						world_block_set(
+							model.world,
+							x & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
+							y,
+							z & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
+							model.player.holds
+						);
 				}
-				y >= 0 && y < CHUNK_HEIGHT &&
-					world_block_set(
-						model.world,
-						x & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
-						y,
-						z & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
-						model.player.holds
-					);
-			}
-			break;
-		case 27: // ESC
-			model.flag_paused =
-			model.flag_menu = !model.flag_menu;
-			break;
-		case 16: // SHIFT
-			model.player.accel_y = -.1;
-			break;
-		case 32: // SPACE
-			model.player.accel_y = .1;
-			break;
-		case 65: // A
-			model.player.accel_x = -.1;
-			break;
-		case 68: // D
-			model.player.accel_x = .1;
-			break;
-		case 80: // P
-			model.flag_paused = !model.flag_paused;
-			break;
-		case 82: // R
-			model.player.position_x = model.world.spawn_x;
-			model.player.position_y = model.world.spawn_y;
-			model.player.position_z = model.world.spawn_z;
-			break;
-		case 83: // S
-			model.player.accel_z = -.1;
-			break;
-		case 87: // W
-			model.player.accel_z = .1;
-			break;
-		case 114: // F3
-			model.flag_diagnostics = !model.flag_diagnostics;
-			break;
-		default:
-			return true;
+				break;
+			case 27: // ESC
+				model.flag_paused =
+				model.flag_menu = !model.flag_menu;
+				break;
+			case KEY_MOVE_DOWN:
+			case 16: // SHIFT
+				model.player.accel_y = -.1;
+				break;
+			case KEY_MOVE_UP:
+			case 32: // SPACE
+				model.player.accel_y = .1;
+				break;
+			case KEY_MOVE_LEFT:
+			case 65: // A
+				model.player.accel_x = -.1;
+				break;
+			case KEY_MOVE_RIGHT:
+			case 68: // D
+				model.player.accel_x = .1;
+				break;
+			case 80: // P
+				model.flag_paused = !model.flag_paused;
+				break;
+			case 82: // R
+				model.player.position_x = model.world.spawn_x;
+				model.player.position_y = model.world.spawn_y;
+				model.player.position_z = model.world.spawn_z;
+				break;
+			case KEY_MOVE_BACK:
+			case 83: // S
+				model.player.accel_z = -.1;
+				break;
+			case KEY_MOVE_FRONT:
+			case 87: // W
+				model.player.accel_z = .1;
+				break;
+			case 114: // F3
+				model.flag_diagnostics = !model.flag_diagnostics;
+				break;
+			case 116: // F5
+				if (DEBUG)
+					location.reload();
+			default:
+				return false;
+		}
+		keys_active.add(code);
 	}
-	else switch (code) {
-		case 16: // SHIFT
-		case 32: // SPACE
-			model.player.accel_y = 0;
-			break;
-		case 65: // A
-		case 68: // D
-			model.player.accel_x = 0;
-			break;
-		case 83: // S
-		case 87: // W
-			model.player.accel_z = 0;
-			break;
-		default:
-			return true;
+	else {
+		if (!keys_active.delete(code)) return false;
+		switch (code) {
+			case KEY_MOVE_UP:
+			case KEY_MOVE_DOWN:
+			case 16: // SHIFT
+			case 32: // SPACE
+				model.player.accel_y = 0;
+				break;
+			case KEY_MOVE_LEFT:
+			case KEY_MOVE_RIGHT:
+			case 65: // A
+			case 68: // D
+				model.player.accel_x = 0;
+				break;
+			case KEY_MOVE_FRONT:
+			case KEY_MOVE_BACK:
+			case 83: // S
+			case 87: // W
+				model.player.accel_z = 0;
+		}
 	}
-	return false;
+	model.keys_active_check = [...keys_active].join(',');
+	return true;
 }
 
 export const game_render = (model, now) => {

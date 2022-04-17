@@ -52,3 +52,108 @@ div {
 	grid-template-rows: 3rem;
 	grid-gap: 1rem;
 }
+.game > .touch {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	opacity: .5;
+}
+.game > .touch .button {
+	border: .3rem outset;
+	border-radius: .5rem;
+	background: #ccc;
+}
+.game > .touch .button.active {
+	border-color: transparent;
+}
+.game > .touch > .top {
+	position: absolute;
+	height: 2rem;
+	left: 1rem;
+	right: 1rem;
+	top: 1rem;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	gap: .1rem;
+}
+.game > .touch > .top > * {
+	min-width: 2rem;
+	color: black;
+	text-align: center;
+}
+
+.game > .touch > .move {
+	position: absolute;
+	width: 10rem;
+	height: 10rem;
+	left: 1rem;
+	bottom: 1rem;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(3, 1fr);
+	gap: .2rem;
+}
+.game > .touch > .move > * {
+	position: relative;
+	overflow: hidden;
+}
+.game > .touch > .move > *::before {
+	content: '';
+	position: absolute;
+	margin: 50%;
+	width: 0;
+	height: 0;
+	left: -1rem;
+	top: -1rem;
+	border: 0 solid transparent;
+}
+.game > .touch > .move > .up {
+	grid-column: 2;
+	grid-row: 1;
+}
+.game > .touch > .move > .up::before {
+	border-bottom-color: black;
+	border-width: .3rem 1rem 1.7rem 1rem;
+	top: -1.2rem;
+}
+.game > .touch > .move > .down {
+	grid-column: 2;
+	grid-row: 3;
+}
+.game > .touch > .move > .down::before {
+	border-top-color: black;
+	border-width: 1.7rem 1rem .3rem 1rem;
+	top: -.8rem;
+}
+.game > .touch > .move > .left {
+	grid-column: 1;
+	grid-row: 2;
+}
+.game > .touch > .move > .left::before {
+	border-right-color: black;
+	border-width: 1rem 1.7rem 1rem .3rem;
+	left: -1.2rem;
+}
+.game > .touch > .move > .right {
+	grid-column: 3;
+	grid-row: 2;
+}
+.game > .touch > .move > .right::before {
+	border-left-color: black;
+	border-width: 1rem .3rem 1rem 1.7rem;
+	left: -.8rem;
+}
+.game > .touch > .move > .center {
+	grid-column: 2;
+	grid-row: 2;
+	margin: .2rem;
+}
+.game > .touch > .move > .center::before {
+	width: 1rem;
+	height: 1rem;
+	left: -.5rem;
+	top: -.5rem;
+	background: black;
+	transform: rotate(45deg);
+}

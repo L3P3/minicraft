@@ -41,6 +41,19 @@ export const number_padStart2 = (num, pad) => (
 );
 
 /**
+	@noinline
+*/
+export const touch_id_get = event => event.changedTouches[0].identifier;
+
+/**
+	@noinline
+*/
+export const tag_ignore_touch = tag => (
+	tag !== 'BUTTON' &&
+	tag !== 'INPUT'
+);
+
+/**
 	@return {boolean}
 */
 export const handler_noop = () => false;
