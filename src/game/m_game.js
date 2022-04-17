@@ -171,6 +171,54 @@ export const game_mouse_move = (model, event) => {
 }
 
 /**
+	@noinline
+*/
+const game_movement_calc = (neg, pos) => (
+	neg === pos
+	?	0
+	:	.1 - neg * .2
+);
+/**
+	@noinline
+*/
+const game_movement_x_update = model => (
+	model.player.accel_x = game_movement_calc(
+		(
+			model = model.keys_active
+		).has(KEY_MOVE_LEFT) ||
+		model.has(65),
+		model.has(KEY_MOVE_RIGHT) ||
+		model.has(68)
+	)
+);
+/**
+	@noinline
+*/
+const game_movement_y_update = model => (
+	model.player.accel_y = game_movement_calc(
+		(
+			model = model.keys_active
+		).has(KEY_MOVE_DOWN) ||
+		model.has(16),
+		model.has(KEY_MOVE_UP) ||
+		model.has(32)
+	)
+);
+/**
+	@noinline
+*/
+const game_movement_z_update = model => (
+	model.player.accel_z = game_movement_calc(
+		(
+			model = model.keys_active
+		).has(KEY_MOVE_BACK) ||
+		model.has(83),
+		model.has(KEY_MOVE_FRONT) ||
+		model.has(87)
+	)
+);
+
+/**
 	@return {boolean} true if state changed
 */
 export const game_key = (model, code, state) => {
@@ -178,6 +226,7 @@ export const game_key = (model, code, state) => {
 	const {keys_active} = model;
 	if (state) {
 		if (keys_active.has(code)) return false;
+		keys_active.add(code);
 		switch (code) {
 			case KEY_MOUSE_LEFT:
 				model.player.block_focus_y >= 0 &&
@@ -227,20 +276,16 @@ export const game_key = (model, code, state) => {
 				model.flag_menu = !model.flag_menu;
 				break;
 			case KEY_MOVE_DOWN:
-			case 16: // SHIFT
-				model.player.accel_y = -.1;
-				break;
 			case KEY_MOVE_UP:
+			case 16: // SHIFT
 			case 32: // SPACE
-				model.player.accel_y = .1;
+				game_movement_y_update(model);
 				break;
 			case KEY_MOVE_LEFT:
-			case 65: // A
-				model.player.accel_x = -.1;
-				break;
 			case KEY_MOVE_RIGHT:
+			case 65: // A
 			case 68: // D
-				model.player.accel_x = .1;
+				game_movement_x_update(model);
 				break;
 			case 80: // P
 				model.flag_paused = !model.flag_paused;
@@ -251,12 +296,10 @@ export const game_key = (model, code, state) => {
 				model.player.position_z = model.world.spawn_z;
 				break;
 			case KEY_MOVE_BACK:
-			case 83: // S
-				model.player.accel_z = -.1;
-				break;
 			case KEY_MOVE_FRONT:
+			case 83: // S
 			case 87: // W
-				model.player.accel_z = .1;
+				game_movement_z_update(model);
 				break;
 			case 114: // F3
 				model.flag_diagnostics = !model.flag_diagnostics;
@@ -267,28 +310,27 @@ export const game_key = (model, code, state) => {
 			default:
 				return false;
 		}
-		keys_active.add(code);
 	}
 	else {
 		if (!keys_active.delete(code)) return false;
 		switch (code) {
-			case KEY_MOVE_UP:
 			case KEY_MOVE_DOWN:
+			case KEY_MOVE_UP:
 			case 16: // SHIFT
 			case 32: // SPACE
-				model.player.accel_y = 0;
+				game_movement_y_update(model);
 				break;
 			case KEY_MOVE_LEFT:
 			case KEY_MOVE_RIGHT:
 			case 65: // A
 			case 68: // D
-				model.player.accel_x = 0;
+				game_movement_x_update(model);
 				break;
-			case KEY_MOVE_FRONT:
 			case KEY_MOVE_BACK:
+			case KEY_MOVE_FRONT:
 			case 83: // S
 			case 87: // W
-				model.player.accel_z = 0;
+				game_movement_z_update(model);
 		}
 	}
 	model.keys_active_check = [...keys_active].join(',');
