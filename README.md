@@ -37,7 +37,7 @@ Heavily inspired by and somewhat based on the work of [@xNotch](https://github.c
 - [x] load/save chunks
 - [x] basic mobile view
 - [x] chat/terminal
-- [x] world edit
+- [ ] world edit
 - [ ] multiple worlds
 - [ ] entity models
 - [ ] collision

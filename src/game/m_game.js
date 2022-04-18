@@ -157,7 +157,10 @@ export const game_mouse_catch = model => (
 );
 
 export const game_mouse_move = (model, event) => {
-	if (!model.flag_paused) {
+	if (
+		!model.flag_paused &&
+		!model.menu
+	) {
 		const factor = model.config.mouse_sensitivity * Math_PI / Math_max(
 			model.resolution_raw_x,
 			model.resolution_raw_y
