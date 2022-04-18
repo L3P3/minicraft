@@ -35,11 +35,13 @@ Heavily inspired by and somewhat based on the work of [@xNotch](https://github.c
 - [x] texturing
 - [x] multiple chunks
 - [x] load/save chunks
-- [ ] mobile view
+- [x] basic mobile view
+- [ ] world edit
 - [ ] multiple worlds
 - [ ] entity models
 - [ ] collision
 - [ ] styled ui
+- [ ] good mobile view
 - [ ] more blocks
 - [ ] migrate to typescript?
 - [ ] support older browsers

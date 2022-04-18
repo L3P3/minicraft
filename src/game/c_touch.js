@@ -5,7 +5,11 @@ import {
 } from '../etc/lui.js';
 
 import {
+	KEY_MOUSE_LEFT,
+	KEY_MOUSE_MIDDLE,
+	KEY_MOUSE_RIGHT,
 	KEY_MOVE_BACK,
+	KEY_MOVE_DOWN,
 	KEY_MOVE_FRONT,
 	KEY_MOVE_LEFT,
 	KEY_MOVE_RIGHT,
@@ -19,16 +23,20 @@ import {
 } from './m_game.js';
 
 const buttons_top = [
-	['F3', 114],
-	['R', 82],
-	['...', 27], // ESC
+	['place', KEY_MOUSE_RIGHT], // TODO
+	['pick', KEY_MOUSE_MIDDLE],
+	['up', KEY_MOVE_UP],
+	['down', KEY_MOVE_DOWN],
+	['spawn', 82],
+	['f3', 114],
+	['...', 27],
 ];
 const buttons_move = [
 	['up', KEY_MOVE_FRONT],
 	['down', KEY_MOVE_BACK],
 	['left', KEY_MOVE_LEFT],
 	['right', KEY_MOVE_RIGHT],
-	['center', KEY_MOVE_UP],
+	['center', KEY_MOUSE_LEFT],
 ];
 
 export default function Touch({
