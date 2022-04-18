@@ -14,6 +14,7 @@ import {
 	VERSION,
 } from '../etc/env.js';
 import {
+	clearInterval_,
 	document_,
 	Math_cos,
 	Math_floor,
@@ -22,6 +23,7 @@ import {
 	Math_sqrt,
 	number_padStart2,
 	number_toFixed2,
+	setInterval_,
 	Uint32Array_,
 } from '../etc/helpers.js';
 import {
@@ -50,7 +52,7 @@ tiles_image.onload = () => {
 	tiles_image = tiles_data = new Uint32Array_(
 		context.getImageData(0, 0, width, height).data.buffer
 	);
-};
+}
 tiles_image.src = 'data:image/png;base64,' + TILES_DATA;
 
 export const renderer_create = (game, canvas_element) => {
@@ -62,19 +64,19 @@ export const renderer_create = (game, canvas_element) => {
 		flag_dirty: false,
 		fps: 0,
 		fps_counter: 0,
-		fps_interval: setInterval(() => {
-			model.fps = model.fps_counter;
-			model.fps_counter = 0;
-		}, 1e3),
+		fps_interval: setInterval_(() => (
+			model.fps = model.fps_counter,
+			model.fps_counter = 0
+		), 1e3),
 		game,
 	};
 	renderer_canvas_init(model);
 	return model;
-};
+}
 
-export const renderer_destroy = model => {
-	clearInterval(model.fps_interval);
-};
+export const renderer_destroy = model => (
+	clearInterval_(model.fps_interval)
+);
 
 export const renderer_render = (model, now) => {
 	++model.fps_counter;
@@ -396,7 +398,7 @@ export const renderer_render = (model, now) => {
 			)
 		:	''
 	);
-};
+}
 
 export const renderer_canvas_init = model => {
 	const width = model.canvas_element.width = model.game.resolution_x;
@@ -411,4 +413,4 @@ export const renderer_canvas_init = model => {
 	const data_length = data.length;
 	for (let i = 3; i < data_length; i += 4)
 		data[i] = 0xff;
-};
+}

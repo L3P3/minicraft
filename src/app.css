@@ -170,7 +170,9 @@ div {
 	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
-	justify-content: end;
+}
+.game > .terminal > .history > :first-child {
+	margin-top: auto;
 }
 .game > .terminal > input {
 	border: none;

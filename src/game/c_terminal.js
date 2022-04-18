@@ -1,5 +1,6 @@
 import {
 	hook_dom,
+	hook_effect,
 	hook_static,
 	node_dom,
 	node_map,
@@ -8,6 +9,9 @@ import {
 import {
 	MENU_NONE,
 } from '../etc/constants.js';
+import {
+	setTimeout_,
+} from '../etc/helpers.js';
 
 import {
 	game_message_send,
@@ -30,12 +34,30 @@ export default function Terminal({
 }) {
 	hook_dom('div[className=menu terminal]');
 
+	const ref = hook_static({
+		history: null,
+	});
+
+	hook_effect(id => {
+		id &&
+		setTimeout_(() => (
+			ref.history.scrollTop = 1e9
+		), 0);
+	}, [
+		messages.length &&
+		messages[messages.length - 1].id
+	]);
+
 	return [
-		node_dom('div[className=history]', null, [
+		node_dom('div[className=history]', {
+			R: hook_static(element => {
+				ref.history = element;
+			}),
+		}, [
 			node_map(Message, messages),
 		]),
 		node_dom(
-			'input[autofocus][enterkeyhint=send][mozactionhint=send][name=message][required]',
+			'input[enterkeyhint=send][mozactionhint=send][name=message][required]',
 			hook_static({
 				onkeydown: event => {
 					const {
@@ -52,9 +74,14 @@ export default function Terminal({
 					}
 					event.stopPropagation();
 				},
-				onkeyup: event => {
-					event.stopPropagation();
-				},
+				onkeyup: event => (
+					event.stopPropagation()
+				),
+				R: element => (
+					setTimeout_(() => (
+						element.focus()
+					), 0)
+				),
 			})
 		),
 	];

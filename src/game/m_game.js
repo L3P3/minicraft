@@ -29,12 +29,14 @@ import {
 	DEBUG, VERSION,
 } from '../etc/env.js';
 import {
+	clearInterval_,
 	Math_floor,
 	Math_max,
 	Math_min,
 	Math_PI,
 	Math_PI_h,
 	Math_round,
+	setInterval_,
 } from '../etc/helpers.js';
 import {
 	player_create,
@@ -86,9 +88,9 @@ export const game_create = () => {
 
 export const game_start = (model, canvas_element) => {
 	model.renderer = renderer_create(model, canvas_element);
-	model.tick_interval = setInterval(() => {
-		game_tick(model);
-	}, 50);
+	model.tick_interval = setInterval_(() => (
+		game_tick(model)
+	), 50);
 }
 
 export const game_save = model => (
@@ -96,7 +98,7 @@ export const game_save = model => (
 );
 
 export const game_umount = model => (
-	clearInterval(model.tick_interval),
+	clearInterval_(model.tick_interval),
 	renderer_destroy(model.renderer)
 );
 
@@ -399,16 +401,20 @@ const game_tick = model => {
 }
 
 export const game_message_send = (model, value) => {
-	if (value.charAt(0) === '/') {
+	if (!value) {}
+	else if (value.charAt(0) === '/') {
 		const args = value.substr(1).split(' ');
 		const command = args.shift();
 		switch(command) {
+			case 'clear':
+				model.messages = [];
+				break;
 			case 'exit':
 				model.flag_paused = false;
 				model.menu = MENU_NONE;
 				break;
 			case 'help':
-				game_message_print(model, 'commands: exit, help, version');
+				game_message_print(model, 'commands: clear, exit, help, version');
 				break;
 			case 'version':
 				game_message_print(model, 'Minicraft ' + VERSION);
