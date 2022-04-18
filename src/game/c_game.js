@@ -9,13 +9,18 @@ import {
 	now,
 } from '../etc/lui.js';
 
-import Menu from './c_menu.js';
+import Settings from './c_settings.js';
+import Terminal from './c_terminal.js';
 import Touch from './c_touch.js';
 
 import {
+	MENU_NONE,
+	MENU_SETTINGS,
+	MENU_TERMINAL,
+} from '../etc/constants.js';
+import {
 	document_,
 	Math_max,
-	tag_ignore_touch,
 } from '../etc/helpers.js';
 import {
 	game_create,
@@ -40,7 +45,7 @@ export default function Game({
 		'div[className=game]',
 		hook_memo(() => {
 			const handler_mousebutton = event => (
-				model.flag_menu || (
+				model.menu !== MENU_NONE || (
 					model.flag_touch = false,
 					document_.pointerLockElement === frame
 					?	model.flag_paused || game_key(
@@ -59,7 +64,7 @@ export default function Game({
 				onmouseup: handler_mousebutton,
 				ontouchstart: event => {
 					model.flag_touch = true;
-					if (!model.flag_menu) {
+					if (!model.menu) {
 						model.flag_paused = false;
 						event.preventDefault();
 					}
@@ -99,15 +104,20 @@ export default function Game({
 	// two-way binding for lock and pause
 	hook_effect(() => {
 		// esc pressed ingame?
-		if (!pointer_locked && !model.flag_paused)
-			model.flag_menu = true;
+		if (
+			!pointer_locked &&
+			!model.flag_paused &&
+			!model.menu
+		)
+			model.menu = MENU_SETTINGS;
 		model.flag_paused = !pointer_locked;
 	}, [pointer_locked]);
 
-	hook_effect(flag_paused => (
-		flag_paused && pointer_locked &&
+	hook_effect(shouldRelease => (
+		pointer_locked &&
+		shouldRelease &&
 			document_.exitPointerLock()
-	), [model.flag_paused]);
+	), [model.flag_paused || model.menu]);
 
 	hook_effect(now => (
 		game_render(model, now)
@@ -131,11 +141,16 @@ export default function Game({
 			game: model,
 			keys_active_check: model.keys_active_check,
 		}),
-		model.flag_menu &&
-		node(Menu, {
+		model.menu === MENU_SETTINGS &&
+		node(Settings, {
 			config,
 			dispatch,
 			game: model,
+		}),
+		model.menu === MENU_TERMINAL &&
+		node(Terminal, {
+			game: model,
+			messages: model.messages,
 		}),
 	];
 }

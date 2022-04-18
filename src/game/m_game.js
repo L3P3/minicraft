@@ -1,4 +1,8 @@
 import {
+	now,
+} from '../etc/lui.js';
+
+import {
 	BLOCK_TYPE_AIR,
 	BLOCK_TYPE_FACE_B,
 	BLOCK_TYPE_FACE_E,
@@ -17,9 +21,12 @@ import {
 	KEY_MOVE_FRONT,
 	KEY_MOVE_RIGHT,
 	KEY_MOVE_UP,
+	MENU_NONE,
+	MENU_SETTINGS,
+	MENU_TERMINAL,
 } from '../etc/constants.js';
 import {
-	DEBUG,
+	DEBUG, VERSION,
 } from '../etc/env.js';
 import {
 	Math_floor,
@@ -49,18 +56,21 @@ import {
 	world_save,
 } from './m_world.js';
 
+let message_id_counter = 0;
+
 export const game_create = () => {
 	const world = world_create();
 	return {
 		config: null,
 		flag_diagnostics: DEBUG,
-		flag_menu: false,
 		flag_paused: true,
 		flag_touch: DEBUG,
 		frame_element: null,
 		frame_last: 0,
 		keys_active: new Set,
 		keys_active_check: '',
+		menu: MENU_NONE,
+		messages: [],
 		player: player_create(world),
 		renderer: null,
 		resolution_raw_x: 1,
@@ -272,8 +282,14 @@ export const game_key = (model, code, state) => {
 				}
 				break;
 			case 27: // ESC
-				model.flag_paused =
-				model.flag_menu = !model.flag_menu;
+				if (model.menu) {
+					model.flag_paused = false;
+					model.menu = MENU_NONE;
+				}
+				else {
+					model.flag_paused = true;
+					model.menu = MENU_SETTINGS;
+				}
 				break;
 			case KEY_MOVE_DOWN:
 			case KEY_MOVE_UP:
@@ -300,6 +316,10 @@ export const game_key = (model, code, state) => {
 			case 83: // S
 			case 87: // W
 				game_movement_z_update(model);
+				break;
+			case 84: // T
+				if (!model.menu)
+					model.menu = MENU_TERMINAL;
 				break;
 			case 114: // F3
 				model.flag_diagnostics = !model.flag_diagnostics;
@@ -373,4 +393,39 @@ const game_tick = model => {
 	}
 
 	world_chunk_load(world);
+}
+
+export const game_message_send = (model, value) => {
+	if (value.charAt(0) === '/') {
+		const args = value.substr(1).split(' ');
+		const command = args.shift();
+		switch(command) {
+			case 'exit':
+				model.flag_paused = false;
+				model.menu = MENU_NONE;
+				break;
+			case 'help':
+				game_message_print(model, 'commands: exit, help, version');
+				break;
+			case 'version':
+				game_message_print(model, 'Minicraft ' + VERSION);
+				break;
+			default:
+				game_message_print(model, 'unknown command: ' + command)
+		}
+	}
+	else {
+		game_message_print(model, '<me> ' + value);
+	}
+}
+
+const game_message_print = (model, value) => {
+	model.messages = [
+		...model.messages.slice(-30),
+		{
+			id: ++message_id_counter,
+			time: now(),
+			value,
+		},
+	];
 }

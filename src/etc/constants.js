@@ -65,3 +65,7 @@ export const KEY_MOVE_LEFT = -12;
 export const KEY_MOVE_RIGHT = -13;
 export const KEY_MOVE_UP = -14;
 export const KEY_MOVE_DOWN = -15;
+
+export const MENU_NONE = 0;
+export const MENU_SETTINGS = 1;
+export const MENU_TERMINAL = 2;

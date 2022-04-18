@@ -6,13 +6,16 @@ import {
 } from '../etc/lui.js';
 
 import {
+	MENU_NONE,
+} from '../etc/constants.js';
+import {
 	ACTION_CONFIG_SET,
 } from '../etc/state.js';
 import {
 	game_mouse_catch,
 } from './m_game.js';
 
-export default function Menu({
+export default function Settings({
 	config,
 	dispatch,
 	game,
@@ -74,10 +77,10 @@ export default function Menu({
 				}),
 			]),
 		]),
-		node_dom('div', null, [
+		node_dom('center', null, [
 			node_dom('button[innerText=Zurück]', {
 				onclick: hook_static(event => (
-					game.flag_menu = false,
+					game.menu = MENU_NONE,
 					event.pointerType === 'mouse'
 					?	game_mouse_catch(game)
 					:	(game.flag_paused = false)

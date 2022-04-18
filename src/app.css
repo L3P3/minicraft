@@ -38,20 +38,6 @@ div {
 	font-family: monospace;
 	color: #fff;
 }
-.game > .menu {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	background: rgba(0, 0, 0, .7);
-	text-align: center;
-}
-.game > .menu > .settings {
-	margin: 1rem;
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-	grid-template-rows: 3rem;
-	gap: 1rem;
-}
 .game > .touch {
 	position: absolute;
 	width: 100%;
@@ -155,4 +141,40 @@ div {
 	top: -.5rem;
 	background: black;
 	transform: rotate(45deg);
+}
+.game > .menu {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, .7);
+}
+.game > .menu > h1 {
+	text-align: center;
+}
+.game > .menu > .settings {
+	margin: 1rem;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+	grid-template-rows: 3rem;
+	gap: 1rem;
+}
+.game > .terminal {
+	display: flex;
+	flex-direction: column;
+	padding: 1rem;
+	gap: 1rem;
+	font-family: 'Courier New', Courier, monospace;
+}
+.game > .terminal > .history {
+	flex: 1;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	justify-content: end;
+}
+.game > .terminal > input {
+	border: none;
+	background: black;
+	color: inherit;
+	font: inherit;
 }
