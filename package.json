@@ -1,6 +1,6 @@
 {
 	"name": "minicraft",
-	"version": "0.3.2",
+	"version": "0.4.0",
 	"description": "voxel-based 3d game, written in javascript",
 	"homepage": "https://l3p3.de/minicraft",
 	"repository": {

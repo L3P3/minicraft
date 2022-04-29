@@ -16,20 +16,48 @@ export const BLOCK_TYPE_LOG = 7;
 export const BLOCK_TYPE_LEAVES = 8;
 export const BLOCK_TYPE_BRICKS = 9;
 export const BLOCK_TYPE_WOOL = 10;
+export const BLOCK_TYPE_SAND = 11;
+export const BLOCK_TYPE_GRAVEL = 12;
+export const BLOCK_TYPE_GLASS = 13;
+export const BLOCK_TYPE_BOOKSHELF = 14;
+export const BLOCK_TYPE_OBSIDIAN = 15;
+export const BLOCK_TYPE_STONE_BRICKS = 16;
+export const BLOCK_TYPE_SANDSTONE = 17;
+export const BLOCK_TYPE_LAPIS_BLOCK = 18;
+export const BLOCK_TYPE_IRON_BLOCK = 19;
+export const BLOCK_TYPE_GOLD_BLOCK = 20;
+export const BLOCK_TYPE_DIAMOND_BLOCK = 21;
+export const BLOCK_TYPE_EMERALD_BLOCK = 22;
+export const BLOCK_TYPE_REDSTONE_BLOCK = 23;
+export const BLOCK_TYPE_QUARTZ_BLOCK = 24;
 
 // B G R
 export const BLOCK_COLORS = [
 	0x000000, // VOID
-	0x797979, // STONE
-	0x52b77f, // GRASS
-	0x395478, // DIRT
-	0x828282, // COBBLE
-	0x4d7b97, // PLANKS
-	0x454545, // BEDROCK
-	0x2f4d60, // LOG
-	0x22822f, // LEAVES
-	0x808cb8, // BRICKS
-	0xd7d7d7, // WOOL
+	0x818181, // STONE
+	0x41b172, // GRASS
+	0x425d81, // DIRT
+	0x7b7b7b, // COBBLE
+	0x5183a2, // PLANKS
+	0x6b6b6b, // BEDROCK
+	0x36586f, // LOG
+	0x3fac6e, // LEAVES
+	0x616b95, // BRICKS
+	0xecebe8, // WOOL
+	0xa2d4dc, // SAND
+	0x7b7c7e, // GRAVEL
+	0xfaf6e0, // GLASS
+	0x3f5978, // BOOKSHELF
+	0x1e1214, // OBSIDIAN
+	0x7b7b7b, // STONE_BRICKS
+	0x93ccd3, // SANDSTONE
+	0x8b4327, // LAPIS_BLOCK
+	0xe7e7e7, // IRON_BLOCK
+	0x54f3fd, // GOLD_BLOCK
+	0xdde17e, // DIAMOND_BLOCK
+	0x78db55, // EMERALD_BLOCK
+	0x0a1dac, // REDSTONE_BLOCK
+	0xe3eaed, // QUARTZ_BLOCK
 ];
 export const BLOCK_COLORS_LENGTH = BLOCK_COLORS.length;
 

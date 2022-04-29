@@ -12,6 +12,7 @@ import {
 import {
 	localStorage_,
 	Map_,
+	Math_floor,
 	Math_sqrt,
 	Uint32Array_,
 	Uint8Array_,
@@ -121,8 +122,14 @@ export const world_data_init = (model, size_l2) => {
 	world_chunk_load(model);
 
 	// block palette
-	for (let i = 0; i < BLOCK_COLORS_LENGTH; ++i)
-		world_block_set(model, i, FLATMAP_LAYERS_LENGTH, 1, i);
+	for (let i = 1; i < BLOCK_COLORS_LENGTH; ++i)
+		world_block_set(
+			model,
+			i % 9,
+			FLATMAP_LAYERS_LENGTH,
+			Math_floor(i / 9),
+			i
+		);
 }
 
 export const world_chunk_load_setup = model => {

@@ -33,11 +33,13 @@ import {
 	TILES_DATA,
 	TILES_RESOLUTION,
 	TILES_RESOLUTION_LOG2,
+	TILE_BOOKSHELF,
 	TILE_DIRT,
 	TILE_GRASS_SIDE,
 	TILE_GRASS_TOP,
 	TILE_LOG_SIDE,
 	TILE_LOG_TOP,
+	TILE_PLANKS,
 } from '../etc/textures.js';
 
 // parse png
@@ -261,6 +263,8 @@ export const renderer_render = (model, now) => {
 								if (dim === 1) {
 									if (block === TILE_LOG_SIDE)
 										block = TILE_LOG_TOP;
+									else if (block === TILE_BOOKSHELF)
+										block = TILE_PLANKS;
 									else if (
 										block === TILE_GRASS_TOP &&
 										step_y > 0
@@ -284,7 +288,9 @@ export const renderer_render = (model, now) => {
 									(
 										dim === 1
 										?	check_x
-										:	check_x + check_z
+										: step_dim > 0
+										?	check_x - check_z + .5
+										:	check_z - check_x - (.5 + 1/TILES_RESOLUTION)
 									) * TILES_RESOLUTION & (TILES_RESOLUTION - 1)
 								];
 
@@ -299,14 +305,22 @@ export const renderer_render = (model, now) => {
 							check_distance_min = check_distance;
 							pixel_factor = (
 								// fake shadow to see edges
-								1 - ((dim + 2) % 3) * .2 +
+								(
+									dim === 0
+									?	.8
+									: dim === 2
+									?	.6
+									: step_dim > 0
+									?	.4
+									:	1
+								) +
 								// highlight if focussed
 								(
 									check_y_int !== block_focus_y ||
 									check_x_int !== block_focus_x ||
 									check_z_int !== block_focus_z
 									?	0
-									:	.1
+									:	.2
 								)
 							);
 							break;
