@@ -44,6 +44,7 @@ import {
 // parse png
 let tiles_data = null;
 let tiles_image = new Image();
+tiles_image.crossOrigin = 'anonymous';
 tiles_image.onload = () => {
 	const canvas_temp = document_.createElement('canvas');
 	const width = canvas_temp.width = tiles_image.width;
