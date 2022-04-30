@@ -30,7 +30,6 @@ import {
 	world_block_get,
 } from './m_world.js';
 import {
-	TILES_DATA,
 	TILES_RESOLUTION,
 	TILES_RESOLUTION_LOG2,
 	TILE_BOOKSHELF,
@@ -55,7 +54,7 @@ tiles_image.onload = () => {
 		context.getImageData(0, 0, width, height).data.buffer
 	);
 }
-tiles_image.src = 'data:image/png;base64,' + TILES_DATA;
+tiles_image.src = ASSETS + 'blocks.png';
 
 export const renderer_create = (game, canvas_element) => {
 	const model = {

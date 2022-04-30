@@ -258,3 +258,8 @@ var onmousedown;
 	@type {function(MouseEvent)?}
 */
 var onmouseup;
+
+/**
+	@type {string}
+*/
+var ASSETS;
