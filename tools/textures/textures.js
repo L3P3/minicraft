@@ -27,5 +27,6 @@ export const TILE_QUARTZ_BLOCK = 23;
 export const TILE_GRASS_SIDE = 24;
 export const TILE_LOG_TOP = 25;
 
+export const TILES_COUNT = 26;
 export const TILES_RESOLUTION = 16;
 export const TILES_RESOLUTION_LOG2 = 4;

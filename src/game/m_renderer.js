@@ -22,6 +22,7 @@ import {
 	Math_sin,
 	Math_sqrt,
 	number_padStart2,
+	number_square,
 	number_toFixed2,
 	setInterval_,
 	Uint32Array_,
@@ -30,6 +31,7 @@ import {
 	world_block_get,
 } from './m_world.js';
 import {
+	TILES_COUNT,
 	TILES_RESOLUTION,
 	TILES_RESOLUTION_LOG2,
 	TILE_BOOKSHELF,
@@ -47,12 +49,17 @@ let tiles_image = new Image();
 tiles_image.crossOrigin = 'anonymous';
 tiles_image.onload = () => {
 	const canvas_temp = document_.createElement('canvas');
-	const width = canvas_temp.width = tiles_image.width;
-	const height = canvas_temp.height = tiles_image.height;
+	canvas_temp.width = 1 << (TILES_RESOLUTION_LOG2 * 2);
+	canvas_temp.height = TILES_COUNT;
 	const context = canvas_temp.getContext('2d');
 	context.drawImage(tiles_image, 0, 0);
-	tiles_image = tiles_data = new Uint32Array_(
-		context.getImageData(0, 0, width, height).data.buffer
+	tiles_image = null;
+	tiles_data = new Uint32Array_(
+		context.getImageData(
+			0, 0,
+			1 << (TILES_RESOLUTION_LOG2 * 2),
+			TILES_COUNT
+		).data.buffer
 	);
 }
 tiles_image.src = ASSETS + 'blocks.png';
@@ -371,9 +378,9 @@ export const renderer_render = (model, now) => {
 			//'S: ' + check_count + ', ' +
 			'C: ' + world.chunks_checklist_index + '/' + world.chunks_checklist.length + ', ' +
 			'M: ' + (
-				(
+				number_square(
 					1 << (CHUNK_WIDTH_L2 + world.size_l2)
-				) ** 2
+				)
 				* CHUNK_HEIGHT >> 10
 			) + 'k\n' +
 			'E: 0/0\n\n' +

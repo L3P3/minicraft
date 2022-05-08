@@ -14,6 +14,7 @@ import {
 	Map_,
 	Math_floor,
 	Math_sqrt,
+	number_square,
 	Uint32Array_,
 	Uint8Array_,
 } from '../etc/helpers.js';
@@ -68,6 +69,12 @@ const world_block_index = (model, x, y, z) => (
 	(
 		x << (model.size_l2 + CHUNK_WIDTH_L2) | z
 	) << CHUNK_HEIGHT_L2 | y
+);
+
+const world_block_index_y0_r2 = (model, x, z) => (
+	(
+		x << (model.size_l2 + CHUNK_WIDTH_L2) | z
+	) << (CHUNK_HEIGHT_L2 - 2)
 );
 
 export const world_block_get = (model, x, y, z) => (
@@ -140,11 +147,11 @@ export const world_chunk_load_setup = model => {
 		const size = 1 << size_l2;
 		chunks_checklists.set(key, chunks_checklist = (
 			model.chunks
-			.map(({x, z}, index) => {
+			.map(({x, z}, chunks_index) => {
 				// https://jsben.ch/2kBkT
-				let dist_x = (x - focus_x) ** 2;
-				let dist_z = (z - focus_z) ** 2;
-				let tmp = (x - focus_x - size) ** 2;
+				let dist_x = number_square(x - focus_x);
+				let dist_z = number_square(z - focus_z);
+				let tmp = number_square(x - focus_x - size);
 				let offset_x = 0;
 				let offset_z = 0;
 
@@ -154,7 +161,7 @@ export const world_chunk_load_setup = model => {
 				}
 				if (
 					(
-						tmp = (x - focus_x + size) ** 2
+						tmp = number_square(x - focus_x + size)
 					) < dist_x
 				) {
 					dist_x = tmp;
@@ -162,7 +169,7 @@ export const world_chunk_load_setup = model => {
 				}
 				if (
 					(
-						tmp = (z - focus_z - size) ** 2
+						tmp = number_square(z - focus_z - size)
 					) < dist_z
 				) {
 					dist_z = tmp;
@@ -170,7 +177,7 @@ export const world_chunk_load_setup = model => {
 				}
 				if (
 					(
-						tmp = (z - focus_z + size) ** 2
+						tmp = number_square(z - focus_z + size)
 					) < dist_z
 				) {
 					dist_z = tmp;
@@ -181,7 +188,7 @@ export const world_chunk_load_setup = model => {
 					dist: Math_sqrt(
 						dist_x + dist_z
 					),
-					index,
+					chunks_index,
 					offset_x,
 					offset_z,
 				};
@@ -206,7 +213,7 @@ const world_chunk_save = (model, chunk) => {
 	const blocks_offset_x = chunk.x << CHUNK_WIDTH_L2;
 	const blocks_offset_z = chunk.z << CHUNK_WIDTH_L2;
 	for (let x = 0, chunk_data_index = 0; x < CHUNK_WIDTH; ++x) {
-		const blocks_u32_index = world_block_index(model, blocks_offset_x + x, 0, blocks_offset_z) >> 2;
+		const blocks_u32_index = world_block_index_y0_r2(model, blocks_offset_x + x, blocks_offset_z);
 		chunk_data_tmp.set(
 			blocks_u32.subarray(
 				blocks_u32_index,
@@ -235,7 +242,7 @@ export const world_chunk_load = model => {
 	const chunks_checklist_length = chunks_checklist.length;
 	while (model.chunks_checklist_index < chunks_checklist_length) {
 		const checklist_item = chunks_checklist[model.chunks_checklist_index++];
-		const chunk = chunks[checklist_item.index];
+		const chunk = chunks[checklist_item.chunks_index];
 		const {x, z} = chunk;
 		const x_abs = offset_x + checklist_item.offset_x + x;
 		const z_abs = offset_z + checklist_item.offset_z + z;
@@ -268,14 +275,14 @@ export const world_chunk_load = model => {
 								chunk_stored_u32_index += (1 << (CHUNK_WIDTH_L2 + CHUNK_HEIGHT_L2 - 2))
 							)
 						),
-						world_block_index(model, blocks_offset_x + x, 0, blocks_offset_z) >> 2
+						world_block_index_y0_r2(model, blocks_offset_x + x, blocks_offset_z)
 					);
 				}
 			}
 			else {
 				// generate chunk
 				for (let x = 0; x < CHUNK_WIDTH; ++x) {
-					let i = world_block_index(model, blocks_offset_x + x, 0, blocks_offset_z) >> 2;
+					let i = world_block_index_y0_r2(model, blocks_offset_x + x, blocks_offset_z);
 					for (let z = 0; z < CHUNK_WIDTH; ++z) {
 						blocks_u32.set(chunk_template, i);
 						i += 1 << (CHUNK_HEIGHT_L2 - 2);

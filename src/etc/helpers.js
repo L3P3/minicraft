@@ -44,6 +44,14 @@ export const number_padStart2 = (num, pad) => (
 );
 
 /**
+	@param {number} num
+	@return {number}
+*/
+export const number_square = num => (
+	num * num
+);
+
+/**
 	@noinline
 */
 export const touch_id_get = event => event.changedTouches[0].identifier;

@@ -95,6 +95,7 @@ for (const tile of input_meta.tiles) {
 }
 
 output_text += `
+export const TILES_COUNT = ${tiles_length};
 export const TILES_RESOLUTION = ${resolution};
 export const TILES_RESOLUTION_LOG2 = ${input_resolution_log2};
 `;
