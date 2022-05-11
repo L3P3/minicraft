@@ -144,6 +144,8 @@ export const renderer_render = (model, now) => {
 		const fov = config.view_angle / 45;// TODO
 		const fov_x = resolution_x < resolution_y ? fov * resolution_x * resolution_y_1d : fov;
 		const fov_y = resolution_y < resolution_x ? fov * resolution_y * resolution_x_1d : fov;
+		const resolution_x_1d__fov_x = resolution_x_1d * fov_x;
+		const resolution_y_1d__fov_y = resolution_y_1d * fov_y;
 		const position_x_shifted = position_x + COORDINATE_OFFSET;
 		const position_y_shifted = position_y + COORDINATE_OFFSET;
 		const position_z_shifted = position_z + COORDINATE_OFFSET;
@@ -161,16 +163,18 @@ export const renderer_render = (model, now) => {
 		player.block_focus_y = -1;
 
 		for (let canvas_y = 0; canvas_y < resolution_y; ++canvas_y) {
-			const canvas_y_relative = (resolution_y_h - canvas_y) * resolution_y_1d * fov_y;
+			const canvas_y_relative = (resolution_y_h - canvas_y) * resolution_y_1d__fov_y;
 
 			const step_y_raw = canvas_y_relative * angle_v_cos - angle_v_sin;
 			const step_z_rot = canvas_y_relative * angle_v_sin + angle_v_cos;
+			const step_z_rot_sin = step_z_rot * angle_h_sin;
+			const step_z_rot_cos = step_z_rot * angle_h_cos;
 
 			for (let canvas_x = 0; canvas_x < resolution_x; ++canvas_x) {
-				const canvas_x_relative = (canvas_x - resolution_x_h) * resolution_x_1d * fov_x;
+				const canvas_x_relative = (canvas_x - resolution_x_h) * resolution_x_1d__fov_x;
 
-				const step_x_raw = step_z_rot * angle_h_sin + canvas_x_relative * angle_h_cos;
-				const step_z_raw = step_z_rot * angle_h_cos - canvas_x_relative * angle_h_sin;
+				const step_x_raw = step_z_rot_sin + angle_h_cos * canvas_x_relative;
+				const step_z_raw = step_z_rot_cos - angle_h_sin * canvas_x_relative;
 
 				let pixel_color = SKY_COLOR;
 				let pixel_factor = 1.0;
@@ -282,7 +286,7 @@ export const renderer_render = (model, now) => {
 
 								// pick pixel
 								const texture_pixel = tiles_data[
-									block << (TILES_RESOLUTION_LOG2 + TILES_RESOLUTION_LOG2) |
+									block << (TILES_RESOLUTION_LOG2 * 2) |
 									(
 										// y
 										(
@@ -295,9 +299,7 @@ export const renderer_render = (model, now) => {
 									(
 										dim === 1
 										?	check_x
-										: step_dim > 0
-										?	check_x - check_z + .5
-										:	check_z - check_x - (.5 + 1/TILES_RESOLUTION)
+										: 	check_x - check_z + COORDINATE_OFFSET + .5
 									) * TILES_RESOLUTION & (TILES_RESOLUTION - 1)
 								];
 
