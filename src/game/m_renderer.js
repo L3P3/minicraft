@@ -16,8 +16,10 @@ import {
 import {
 	clearInterval_,
 	document_,
+	Math_ceil,
 	Math_cos,
 	Math_floor,
+	Math_min,
 	Math_PI_180d,
 	Math_sin,
 	Math_sqrt,
@@ -91,6 +93,7 @@ export const renderer_render = (model, now) => {
 	++model.fps_counter;
 
 	const {
+		canvas_context,
 		canvas_surface,
 		game,
 	} = model;
@@ -135,6 +138,8 @@ export const renderer_render = (model, now) => {
 		const resolution_y_1d = 1 / resolution_y;
 		const resolution_x_h = resolution_x >> 1;
 		const resolution_y_h = resolution_y >> 1;
+		const resolution_min = Math_min(resolution_x, resolution_y);
+		const cursor_cross = resolution_min > 32;
 		const pixel_focus_x = resolution_x_h;
 		const pixel_focus_y = resolution_y_h;
 		const angle_h_cos = Math_cos(angle_h);
@@ -354,14 +359,41 @@ export const renderer_render = (model, now) => {
 		}
 
 		// cursor
-		canvas_surface_data[
-			canvas_surface_data_index =
-				(resolution_x * pixel_focus_y + pixel_focus_x) << 2
-		] += 128;
-		canvas_surface_data[++canvas_surface_data_index] += 128;
-		canvas_surface_data[++canvas_surface_data_index] += 128;
+		if (!cursor_cross) {
+			canvas_surface_data[
+				canvas_surface_data_index =
+					(resolution_x * pixel_focus_y + pixel_focus_x) << 2
+			] += 128;
+			canvas_surface_data[++canvas_surface_data_index] += 128;
+			canvas_surface_data[++canvas_surface_data_index] += 128;
+		}
 
-		model.canvas_context.putImageData(canvas_surface, 0, 0);
+		canvas_context.putImageData(canvas_surface, 0, 0);
+
+		if (cursor_cross) {
+			const cross_width_h = Math_ceil(
+				resolution_min * .05
+			);
+			const cross_width = cross_width_h << 1;
+			canvas_context.fillRect(
+				resolution_x_h - cross_width_h,
+				resolution_y_h - 1,
+				cross_width,
+				2
+			);
+			canvas_context.fillRect(
+				resolution_x_h - 1,
+				resolution_y_h - cross_width_h,
+				2,
+				cross_width_h - 1
+			);
+			canvas_context.fillRect(
+				resolution_x_h - 1,
+				resolution_y_h + 1,
+				2,
+				cross_width_h - 1
+			);
+		}
 	}
 
 	model.diagnostics = (
@@ -435,6 +467,7 @@ export const renderer_canvas_init = model => {
 			model.canvas_context = model.canvas_element.getContext('2d')
 		).createImageData(width, height)
 	).data;
+	model.canvas_context.fillStyle = 'rgba(255,255,255,.5)';
 
 	// set alpha to 255
 	const data_length = data.length;
