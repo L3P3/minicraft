@@ -299,7 +299,11 @@ export const renderer_render = (model, now) => {
 									(
 										dim === 1
 										?	check_x
-										: 	check_x - check_z + COORDINATE_OFFSET + .5
+										:	(
+											step_dim > 0
+											?	check_x - check_z
+											:	check_z - check_x
+										) + COORDINATE_OFFSET + .5
 									) * TILES_RESOLUTION & (TILES_RESOLUTION - 1)
 								];
 
