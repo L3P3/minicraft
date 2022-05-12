@@ -237,11 +237,12 @@ const game_movement_z_update = model => (
 	@return {boolean} true if state changed
 */
 export const game_key = (model, code, state) => {
-	console.log('KEY', code, state);
+	//console.log('KEY', code, state);
 	const {keys_active} = model;
 	if (state) {
 		if (keys_active.has(code)) return false;
-		let add = true;
+		keys_active.add(code);
+		let release = false;
 		switch (code) {
 			case KEY_MOUSE_LEFT:
 				model.player.block_focus_y >= 0 &&
@@ -295,7 +296,7 @@ export const game_key = (model, code, state) => {
 					model.flag_paused = true;
 					model.menu = MENU_SETTINGS;
 				}
-				add = false;
+				release = true;
 				break;
 			case KEY_MOVE_DOWN:
 			case KEY_MOVE_UP:
@@ -326,7 +327,7 @@ export const game_key = (model, code, state) => {
 			case 84: // T
 				if (!model.menu) {
 					model.menu = MENU_TERMINAL;
-					add = false;
+					release = true;
 				}
 				break;
 			case 114: // F3
@@ -338,7 +339,7 @@ export const game_key = (model, code, state) => {
 			default:
 				return false;
 		}
-		if (add) keys_active.add(code);
+		if (release) keys_active.delete(code);
 	}
 	else {
 		if (!keys_active.delete(code)) return false;
