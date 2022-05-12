@@ -35,14 +35,15 @@ lui_.init(() => {
 	});
 
 	const handler_key = hook_static(event => (
-		event.preventDefault(),
+		event.target.tagName === 'INPUT' ||
 		!ref.game || (
-			ref.game.flag_touch = false,
+			event.preventDefault(),
 			game_key(
 				ref.game,
 				event.keyCode,
 				event.type === 'keydown'
-			)
+			),
+			ref.game.flag_touch = false
 		)
 	));
 

@@ -72,11 +72,7 @@ export default function Terminal({
 						game.flag_paused = false;
 						game.menu = MENU_NONE;
 					}
-					event.stopPropagation();
 				},
-				onkeyup: event => (
-					event.stopPropagation()
-				),
 				R: element => (
 					setTimeout_(() => (
 						element.focus()
