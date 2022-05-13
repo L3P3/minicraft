@@ -21,6 +21,7 @@ import {
 import {
 	document_,
 	Math_max,
+	window_,
 } from '../etc/helpers.js';
 import {
 	game_create,
@@ -91,13 +92,14 @@ export default function Game({
 		game_view_distance_update(model)
 	), [config]);
 
-	hook_effect((width, height) => (
-		model.resolution_raw_x = Math_max(1, width),
-		model.resolution_raw_y = Math_max(1, height),
+	hook_effect((width, height, ratio) => (
+		model.resolution_raw_x = Math_max(1, width * ratio),
+		model.resolution_raw_y = Math_max(1, height * ratio),
 		game_resolution_update(model)
 	), [
 		frame.offsetWidth,
 		frame.offsetHeight,
+		window_.devicePixelRatio || 1,
 		config.resolution_scaling,
 	]);
 

@@ -1,3 +1,4 @@
+export const window_ = window;
 export const document_ = document;
 const Math_ = Math;
 export const Math_PI = Math_.PI;
