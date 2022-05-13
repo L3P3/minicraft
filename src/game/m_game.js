@@ -51,10 +51,10 @@ import {
 import {
 	world_block_get,
 	world_block_set,
-	world_chunk_load,
-	world_chunk_load_setup,
+	world_chunk_reset,
 	world_create,
 	world_data_init,
+	world_offset_update,
 	world_save,
 } from './m_world.js';
 
@@ -121,7 +121,7 @@ export const game_resolution_update = model => {
 }
 
 export const game_view_distance_update = model => {
-	const {world} = model;
+	const {player, world} = model;
 	const {view_distance} = model.config;
 	// TODO proper formula would be less embarrassing
 	const size_l2 = (
@@ -148,7 +148,7 @@ export const game_view_distance_update = model => {
 	);*/
 	//console.log('size_l2', world.size_l2, size_l2, 1 << (CHUNK_WIDTH_L2 + size_l2));
 	if (world.size_l2 !== size_l2)
-		world_data_init(world, size_l2);
+		world_data_init(world, player, size_l2);
 }
 
 /**
@@ -381,28 +381,7 @@ const game_tick = model => {
 	model.time = (model.time + 1) % 24e3;
 	model.time_f = ((model.time + 6e3) * (1 / 24e3)) % 1;
 
-	const {player, world} = model;
-	const chunk_x_abs = Math_floor(player.position_x) >> CHUNK_WIDTH_L2;
-	const chunk_z_abs = Math_floor(player.position_z) >> CHUNK_WIDTH_L2;
-	if (
-		world.offset_x + world.focus_x !== chunk_x_abs ||
-		world.offset_z + world.focus_z !== chunk_z_abs
-	) {
-		const world_size = 1 << world.size_l2;
-		world.offset_x = chunk_x_abs - (
-			world.focus_x = (
-				COORDINATE_OFFSET + chunk_x_abs
-			) % world_size
-		);
-		world.offset_z = chunk_z_abs - (
-			world.focus_z = (
-				COORDINATE_OFFSET + chunk_z_abs
-			) % world_size
-		);
-		world_chunk_load_setup(world);
-	}
-
-	world_chunk_load(world);
+	world_offset_update(model.world, model.player, false);
 }
 
 export const game_message_send = (model, value) => {
@@ -423,6 +402,11 @@ export const game_message_send = (model, value) => {
 				break;
 			case 'version':
 				game_message_print(model, 'Minicraft ' + VERSION);
+				break;
+			case '/regen':
+				world_chunk_reset(model.world);
+				game_message_print(model, 'regenerate chunk');
+				model.renderer.flag_dirty = true;
 				break;
 			default:
 				game_message_print(model, 'unknown command: ' + command)

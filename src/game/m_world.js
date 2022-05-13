@@ -6,6 +6,7 @@ import {
 	CHUNK_HEIGHT_L2,
 	CHUNK_WIDTH,
 	CHUNK_WIDTH_L2,
+	COORDINATE_OFFSET,
 	FLATMAP_LAYERS,
 	FLATMAP_LAYERS_LENGTH,
 } from '../etc/constants.js';
@@ -98,7 +99,7 @@ export const world_block_set = (model, x, y, z, value) => {
 	chunk.dirty = true;
 }
 
-export const world_data_init = (model, size_l2) => {
+export const world_data_init = (model, player, size_l2) => {
 	if (model.chunks) world_save(model);
 
 	model.blocks_u32 = new Uint32Array_((
@@ -118,15 +119,14 @@ export const world_data_init = (model, size_l2) => {
 	for (let z = 0; z < size; ++z)
 		chunks.push({
 			dirty: false,
+			loaded: false,
 			x,
 			z,
-			// +1 in order to make it always invalid at first so it will be initialized
-			x_abs: model.offset_x + x + 1,
-			z_abs: model.offset_z + z + 1,
+			x_abs: 0,
+			z_abs: 0,
 		});
 
-	world_chunk_load_setup(model);
-	world_chunk_load(model);
+	world_offset_update(model, player, true);
 
 	// block palette
 	for (let i = 1; i < BLOCK_COLORS_LENGTH; ++i)
@@ -139,7 +139,31 @@ export const world_data_init = (model, size_l2) => {
 		);
 }
 
-export const world_chunk_load_setup = model => {
+export const world_offset_update = (model, player, force) => {
+	const chunk_x_abs = Math_floor(player.position_x) >> CHUNK_WIDTH_L2;
+	const chunk_z_abs = Math_floor(player.position_z) >> CHUNK_WIDTH_L2;
+	if (
+		force ||
+		model.offset_x + model.focus_x !== chunk_x_abs ||
+		model.offset_z + model.focus_z !== chunk_z_abs
+	) {
+		const world_size = 1 << model.size_l2;
+		model.offset_x = chunk_x_abs - (
+			model.focus_x = (
+				COORDINATE_OFFSET + chunk_x_abs
+			) % world_size
+		);
+		model.offset_z = chunk_z_abs - (
+			model.focus_z = (
+				COORDINATE_OFFSET + chunk_z_abs
+			) % world_size
+		);
+		world_chunk_load_setup(model);
+	}
+	world_chunk_load(model);
+}
+
+const world_chunk_load_setup = model => {
 	const {focus_x, focus_z, size_l2} = model;
 	const key = `${size_l2} ${focus_x} ${focus_z}`;
 	let chunks_checklist = chunks_checklists.get(key);
@@ -208,6 +232,24 @@ export const world_save = model => {
 	}
 }
 
+const world_chunk_key = (model, chunk) => (
+	// console.log('chunk', chunk.x_abs, chunk.z_abs),
+	`minicraft.world.${model.id}:${chunk.x_abs}/${chunk.z_abs}`
+);
+
+export const world_chunk_reset = model => {
+	const chunk = model.chunks[
+		model.chunks_checklist[
+			model.chunks_checklist_index = 0
+		].chunks_index
+	];
+	localStorage_.removeItem(
+		world_chunk_key(model, chunk)
+	);
+	chunk.dirty = chunk.loaded = false;
+	world_chunk_load(model);
+}
+
 const world_chunk_save = (model, chunk) => {
 	const {blocks_u32} = model;
 	const blocks_offset_x = chunk.x << CHUNK_WIDTH_L2;
@@ -226,13 +268,13 @@ const world_chunk_save = (model, chunk) => {
 
 	// console.log('chunk_save', chunk.x_abs, chunk.z_abs);
 	localStorage_.setItem(
-		`minicraft.world.${model.id}:${chunk.x_abs}/${chunk.z_abs}`,
+		world_chunk_key(model, chunk),
 		compress(chunk_data_tmp_u8)
 	);
 	chunk.dirty = false;
 }
 
-export const world_chunk_load = model => {
+const world_chunk_load = model => {
 	const {
 		chunks,
 		chunks_checklist,
@@ -247,18 +289,18 @@ export const world_chunk_load = model => {
 		const x_abs = offset_x + checklist_item.offset_x + x;
 		const z_abs = offset_z + checklist_item.offset_z + z;
 		if (
+			!chunk.loaded ||
 			x_abs !== chunk.x_abs ||
 			z_abs !== chunk.z_abs
 		) {
 			if (chunk.dirty) world_chunk_save(model, chunk);
 			// console.log('chunk_load', x_abs, z_abs);
+			chunk.x_abs = x_abs;
+			chunk.z_abs = z_abs;
+			chunk.loaded = true;
 			const chunk_stored = decompress(
 				localStorage_.getItem(
-					`minicraft.world.${model.id}:${
-						chunk.x_abs = x_abs
-					}/${
-						chunk.z_abs = z_abs
-					}`
+					world_chunk_key(model, chunk)
 				),
 				chunk_data_tmp_u8
 			);
