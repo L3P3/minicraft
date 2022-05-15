@@ -242,7 +242,6 @@ export const game_key = (model, code, state) => {
 	if (state) {
 		if (keys_active.has(code)) return false;
 		keys_active.add(code);
-		let release = false;
 		switch (code) {
 			case KEY_MOUSE_LEFT:
 				model.player.block_focus_y >= 0 &&
@@ -296,7 +295,6 @@ export const game_key = (model, code, state) => {
 					model.flag_paused = true;
 					model.menu = MENU_SETTINGS;
 				}
-				release = true;
 				break;
 			case KEY_MOVE_DOWN:
 			case KEY_MOVE_UP:
@@ -327,7 +325,8 @@ export const game_key = (model, code, state) => {
 			case 84: // T
 				if (!model.menu) {
 					model.menu = MENU_TERMINAL;
-					release = true;
+					for (const code of keys_active)
+						game_key(model, code, false);
 				}
 				break;
 			case 114: // F3
@@ -339,7 +338,6 @@ export const game_key = (model, code, state) => {
 			default:
 				return false;
 		}
-		if (release) keys_active.delete(code);
 	}
 	else {
 		if (!keys_active.delete(code)) return false;
