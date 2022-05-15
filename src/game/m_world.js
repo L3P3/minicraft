@@ -3,6 +3,7 @@ import {
 	BLOCK_TYPE_AIR,
 	BLOCK_TYPE_DIRT,
 	CHUNK_HEIGHT,
+	CHUNK_HEIGHT_FACTOR_L2,
 	CHUNK_HEIGHT_L2,
 	CHUNK_WIDTH,
 	CHUNK_WIDTH_L2,
@@ -14,7 +15,6 @@ import {
 	localStorage_,
 	Map_,
 	Math_floor,
-	Math_sqrt,
 	number_square,
 	Uint32Array_,
 	Uint8Array_,
@@ -25,13 +25,13 @@ import {
 } from '../etc/lz.js';
 
 // vertical strip of chunk for flatland generation
-const chunk_template = new Uint32Array_(1 << (CHUNK_HEIGHT_L2 - 2));
+const chunk_template = new Uint32Array_(1 << (CHUNK_WIDTH_L2 - 2));
 for (let y = 0; y < FLATMAP_LAYERS_LENGTH; ++y) {
 	chunk_template[y >> 2] |= FLATMAP_LAYERS[y] << (y << 3);
 }
 
 // used for loading/saving of chunks (prevent frequent reallocation)
-const chunk_data_tmp = new Uint32Array_(1 << (CHUNK_WIDTH_L2 + CHUNK_WIDTH_L2 + CHUNK_HEIGHT_L2 - 2));
+const chunk_data_tmp = new Uint32Array_(1 << (CHUNK_WIDTH_L2 * 3 - 2));
 const chunk_data_tmp_u8 = new Uint8Array_(chunk_data_tmp.buffer);
 
 const chunks_checklists = new Map_();
@@ -79,7 +79,7 @@ const world_block_index_y0_r2 = (model, x, z) => (
 );
 
 export const world_block_get = (model, x, y, z) => (
-	y < 0 || y >= CHUNK_HEIGHT ? BLOCK_TYPE_AIR :
+	y < 0 || y > (CHUNK_HEIGHT - 1) ? BLOCK_TYPE_AIR :
 	model.blocks[
 		world_block_index(model, x, y, z)
 	]
@@ -102,12 +102,12 @@ export const world_block_set = (model, x, y, z, value) => {
 export const world_data_init = (model, player, size_l2) => {
 	if (model.chunks) world_save(model);
 
-	model.blocks_u32 = new Uint32Array_((
-		model.blocks = new Uint8Array_(1 << (
-			CHUNK_WIDTH_L2 +
-			CHUNK_WIDTH_L2 +
-			CHUNK_HEIGHT_L2 +
-			(size_l2 << 1)
+	model.blocks = new Uint8Array_((
+		model.blocks_u32 = new Uint32Array_(1 << (
+			CHUNK_WIDTH_L2 * 3
+			+ CHUNK_HEIGHT_FACTOR_L2
+			- 2
+			+ (size_l2 * 2)
 		))
 	).buffer);
 
@@ -127,16 +127,6 @@ export const world_data_init = (model, player, size_l2) => {
 		});
 
 	world_offset_update(model, player, true);
-
-	// block palette
-	for (let i = 1; i < BLOCK_COLORS_LENGTH; ++i)
-		world_block_set(
-			model,
-			i % 9,
-			FLATMAP_LAYERS_LENGTH,
-			Math_floor(i / 9),
-			i
-		);
 }
 
 export const world_offset_update = (model, player, force) => {
@@ -209,9 +199,7 @@ const world_chunk_load_setup = model => {
 				}
 
 				return {
-					dist: Math_sqrt(
-						dist_x + dist_z
-					),
+					dist: dist_x + dist_z,
 					chunks_index,
 					offset_x,
 					offset_z,
@@ -365,6 +353,18 @@ const world_chunk_load = model => {
 					}
 					chunk.dirty = false;
 				*/
+			}
+			if ((chunk.x | chunk.z) === 0) {
+				// block palette
+				for (let i = 1; i < BLOCK_COLORS_LENGTH; ++i)
+					world_block_set(
+						model,
+						i % 9,
+						FLATMAP_LAYERS_LENGTH,
+						Math_floor(i / 9),
+						i
+					);
+				chunk.dirty = false;
 			}
 			return;
 		}

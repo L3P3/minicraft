@@ -8,7 +8,6 @@ import {
 	BLOCK_TYPE_FACE_LABELS,
 	CHUNK_HEIGHT,
 	CHUNK_HEIGHT_L2,
-	CHUNK_HEIGHT_M1,
 } from '../etc/constants.js';
 import {
 	VERSION,
@@ -251,7 +250,7 @@ export const renderer_render = (model, now) => {
 										)
 									) << CHUNK_HEIGHT_L2 |
 									(
-										check_y_int = check_y & CHUNK_HEIGHT_M1
+										check_y_int = check_y & (CHUNK_HEIGHT - 1)
 									)
 								]
 							) !== BLOCK_TYPE_AIR
