@@ -449,10 +449,18 @@ export const renderer_render = (model, now) => {
 						player.block_focus_z
 					)
 			) + '\n' +
-			'Chunk: ' + (
+			'Chunk abs: ' + (
 				Math_floor(player.position_x) >> CHUNK_WIDTH_L2
 			) + ' ' + (
 				Math_floor(player.position_z) >> CHUNK_WIDTH_L2
+			) + ' ' + (
+				Math_floor(player.position_y) >> CHUNK_WIDTH_L2
+			) + ' rel: ' + (
+				world.focus_x
+			) + ' ' + (
+				world.focus_z
+			) + ' ' + (
+				world.focus_y
 			)
 		:	''
 	);

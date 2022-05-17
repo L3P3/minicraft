@@ -311,11 +311,6 @@ export const game_key = (model, code, state) => {
 			case 80: // P
 				model.flag_paused = !model.flag_paused;
 				break;
-			case 82: // R
-				model.player.position_x = model.world.spawn_x;
-				model.player.position_y = model.world.spawn_y;
-				model.player.position_z = model.world.spawn_z;
-				break;
 			case KEY_MOVE_BACK:
 			case KEY_MOVE_FRONT:
 			case 83: // S
@@ -396,7 +391,13 @@ export const game_message_send = (model, value) => {
 				model.menu = MENU_NONE;
 				break;
 			case 'help':
-				game_message_print(model, 'commands: clear, exit, help, version');
+				game_message_print(model, 'commands: clear, exit, help, spawn, version, /regen');
+				break;
+			case 'spawn':
+				model.player.position_x = model.world.spawn_x;
+				model.player.position_y = model.world.spawn_y;
+				model.player.position_z = model.world.spawn_z;
+				model.renderer.flag_dirty = true;
 				break;
 			case 'version':
 				game_message_print(model, 'Minicraft ' + VERSION);

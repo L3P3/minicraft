@@ -1,20 +1,25 @@
 import {
 	BLOCK_COLORS_LENGTH,
 	BLOCK_TYPE_AIR,
+	BLOCK_TYPE_BEDROCK,
 	BLOCK_TYPE_DIRT,
+	BLOCK_TYPE_GRASS,
+	BLOCK_TYPE_STONE,
 	CHUNK_HEIGHT,
+	CHUNK_HEIGHT_FACTOR,
 	CHUNK_HEIGHT_FACTOR_L2,
 	CHUNK_HEIGHT_L2,
 	CHUNK_WIDTH,
 	CHUNK_WIDTH_L2,
 	COORDINATE_OFFSET,
-	FLATMAP_LAYERS,
 	FLATMAP_LAYERS_LENGTH,
 } from '../etc/constants.js';
 import {
 	localStorage_,
 	Map_,
 	Math_floor,
+	Math_max,
+	Math_min,
 	number_square,
 	Uint32Array_,
 	Uint8Array_,
@@ -23,12 +28,6 @@ import {
 	compress,
 	decompress,
 } from '../etc/lz.js';
-
-// vertical strip of chunk for flatland generation
-const chunk_template = new Uint32Array_(1 << (CHUNK_WIDTH_L2 - 2));
-for (let y = 0; y < FLATMAP_LAYERS_LENGTH; ++y) {
-	chunk_template[y >> 2] |= FLATMAP_LAYERS[y] << (y << 3);
-}
 
 // used for loading/saving of chunks (prevent frequent reallocation)
 const chunk_data_tmp = new Uint32Array_(1 << (CHUNK_WIDTH_L2 * 3 - 2));
@@ -49,6 +48,7 @@ export const world_create = () => {
 		chunks_checklist_index: 0,
 		// currently centered chunk (relative chunk position inside world tile)
 		focus_x: 0,
+		focus_y: 0,
 		focus_z: 0,
 		// world id for storage
 		id: 0,
@@ -66,50 +66,63 @@ export const world_create = () => {
 	return model;
 }
 
-const world_block_index = (model, x, y, z) => (
+/*
+	blocks:
+	x << CHUNK_HEIGHT_L2 + CHUNK_WIDTH_L2 + size_l2
+	z << CHUNK_HEIGHT_L2
+	y
+*/
+
+const world_block_index = (size_l2, x, z, y) => (
 	(
-		x << (model.size_l2 + CHUNK_WIDTH_L2) | z
+		x << (size_l2 + CHUNK_WIDTH_L2) | z
 	) << CHUNK_HEIGHT_L2 | y
 );
 
-const world_block_index_y0_r2 = (model, x, z) => (
-	(
-		x << (model.size_l2 + CHUNK_WIDTH_L2) | z
-	) << (CHUNK_HEIGHT_L2 - 2)
+const world_chunk_index_r2 = (size_l2, x, z, y) => (
+	world_block_index(
+		size_l2,
+		x, z, y
+	) << (CHUNK_WIDTH_L2 - 2)
+);
+
+/*
+	chunks:
+	x << CHUNK_HEIGHT_FACTOR + size_l2
+	z << CHUNK_HEIGHT_FACTOR
+	y
+*/
+
+const world_chunk_get = (chunks, size_l2, x, y, z) => (
+	chunks[
+		(
+			(x >> CHUNK_WIDTH_L2) << size_l2 |
+			(z >> CHUNK_WIDTH_L2)
+		) << CHUNK_HEIGHT_FACTOR_L2 |
+		y >> CHUNK_WIDTH_L2
+	]
 );
 
 export const world_block_get = (model, x, y, z) => (
 	y < 0 || y > (CHUNK_HEIGHT - 1) ? BLOCK_TYPE_AIR :
 	model.blocks[
-		world_block_index(model, x, y, z)
+		world_block_index(model.size_l2, x, z, y)
 	]
 );
 
 export const world_block_set = (model, x, y, z, value) => {
-	const chunk = model.chunks[
-		(x >> CHUNK_WIDTH_L2) << model.size_l2 |
-		z >> CHUNK_WIDTH_L2
-	];
-	//if (chunk.x !== x >> CHUNK_WIDTH_L2 || chunk.z !== z >> CHUNK_WIDTH_L2)
-	//	console.error(x >> CHUNK_WIDTH_L2, z >> CHUNK_WIDTH_L2, chunk.x, chunk.z);
+	const {size_l2} = model;
 	model.blocks[
-		world_block_index(model, x, y, z)
+		world_block_index(size_l2, x, z, y)
 	] = value;
-	//if (!chunk.dirty) console.log('dirtify chunk', chunk.x, chunk.z);
-	chunk.dirty = true;
+	world_chunk_get(
+		model.chunks, size_l2,
+		x, y, z
+	).dirty = true;
 }
 
 export const world_data_init = (model, player, size_l2) => {
 	if (model.chunks) world_save(model);
-
-	model.blocks = new Uint8Array_((
-		model.blocks_u32 = new Uint32Array_(1 << (
-			CHUNK_WIDTH_L2 * 3
-			+ CHUNK_HEIGHT_FACTOR_L2
-			- 2
-			+ (size_l2 * 2)
-		))
-	).buffer);
 
 	const size = 1 << (
 		model.size_l2 = size_l2
@@ -117,27 +130,44 @@ export const world_data_init = (model, player, size_l2) => {
 	const chunks = model.chunks = [];
 	for (let x = 0; x < size; ++x)
 	for (let z = 0; z < size; ++z)
+	for (let y = 0; y < CHUNK_HEIGHT_FACTOR; ++y)
 		chunks.push({
 			dirty: false,
 			loaded: false,
 			x,
+			y,
 			z,
 			x_abs: 0,
 			z_abs: 0,
 		});
 
+	model.blocks = new Uint8Array_((
+		model.blocks_u32 = new Uint32Array_(size << (
+			size_l2
+			+ CHUNK_WIDTH_L2 * 3
+			+ CHUNK_HEIGHT_FACTOR_L2
+			- 2
+		))
+	).buffer);
+
 	world_offset_update(model, player, true);
 }
 
 export const world_offset_update = (model, player, force) => {
+	const focus_y = Math_max(
+		Math_min(player.position_y, CHUNK_HEIGHT - 1),
+		0
+	) >> CHUNK_WIDTH_L2;
 	const chunk_x_abs = Math_floor(player.position_x) >> CHUNK_WIDTH_L2;
 	const chunk_z_abs = Math_floor(player.position_z) >> CHUNK_WIDTH_L2;
 	if (
 		force ||
+		model.focus_y !== focus_y ||
 		model.offset_x + model.focus_x !== chunk_x_abs ||
 		model.offset_z + model.focus_z !== chunk_z_abs
 	) {
 		const world_size = 1 << model.size_l2;
+		model.focus_y = focus_y;
 		model.offset_x = chunk_x_abs - (
 			model.focus_x = (
 				COORDINATE_OFFSET + chunk_x_abs
@@ -154,14 +184,19 @@ export const world_offset_update = (model, player, force) => {
 }
 
 const world_chunk_load_setup = model => {
-	const {focus_x, focus_z, size_l2} = model;
-	const key = `${size_l2} ${focus_x} ${focus_z}`;
+	const {
+		focus_x,
+		focus_y,
+		focus_z,
+		size_l2,
+	} = model;
+	const key = `${size_l2} ${focus_x} ${focus_z} ${focus_y}`;
 	let chunks_checklist = chunks_checklists.get(key);
 	if (chunks_checklist == null) {
 		const size = 1 << size_l2;
 		chunks_checklists.set(key, chunks_checklist = (
 			model.chunks
-			.map(({x, z}, chunks_index) => {
+			.map(({x, y, z}, chunks_index) => {
 				// https://jsben.ch/2kBkT
 				let dist_x = number_square(x - focus_x);
 				let dist_z = number_square(z - focus_z);
@@ -199,7 +234,7 @@ const world_chunk_load_setup = model => {
 				}
 
 				return {
-					dist: dist_x + dist_z,
+					dist: dist_x + dist_z + number_square(y - focus_y),
 					chunks_index,
 					offset_x,
 					offset_z,
@@ -220,9 +255,13 @@ export const world_save = model => {
 	}
 }
 
-const world_chunk_key = (model, chunk) => (
-	// console.log('chunk', chunk.x_abs, chunk.z_abs),
-	`minicraft.world.${model.id}:${chunk.x_abs}/${chunk.z_abs}`
+const world_chunk_key = (model, x_abs, z_abs, y) => (
+	// console.log('chunk', chunk.x_abs, chunk.z_abs, chunk.y),
+	`minicraft.world.${model.id}:${x_abs}/${z_abs}` + (
+		y > 0
+		?	'/' + y
+		:	''
+	)
 );
 
 export const world_chunk_reset = model => {
@@ -232,31 +271,55 @@ export const world_chunk_reset = model => {
 		].chunks_index
 	];
 	localStorage_.removeItem(
-		world_chunk_key(model, chunk)
+		world_chunk_key(
+			model,
+			chunk.x_abs, chunk.z_abs, chunk.y
+		)
 	);
-	chunk.dirty = chunk.loaded = false;
+	chunk.dirty = false;
+	++chunk.x_abs;
 	world_chunk_load(model);
 }
 
 const world_chunk_save = (model, chunk) => {
-	const {blocks_u32} = model;
-	const blocks_offset_x = chunk.x << CHUNK_WIDTH_L2;
-	const blocks_offset_z = chunk.z << CHUNK_WIDTH_L2;
-	for (let x = 0, chunk_data_index = 0; x < CHUNK_WIDTH; ++x) {
-		const blocks_u32_index = world_block_index_y0_r2(model, blocks_offset_x + x, blocks_offset_z);
-		chunk_data_tmp.set(
-			blocks_u32.subarray(
-				blocks_u32_index,
-				blocks_u32_index + (1 << (CHUNK_WIDTH_L2 + CHUNK_HEIGHT_L2 - 2))
-			),
-			chunk_data_index
-		);
-		chunk_data_index += (1 << (CHUNK_WIDTH_L2 + CHUNK_HEIGHT_L2 - 2));
+	const {
+		blocks_u32,
+		size_l2,
+	} = model;
+	const {y} = chunk;
+	const step_x = (
+		(
+			1 << (CHUNK_WIDTH_L2 + CHUNK_HEIGHT_L2 - 2) << size_l2
+		) - (
+			1 << (CHUNK_WIDTH_L2 + CHUNK_HEIGHT_L2 - 2)
+		)
+	);
+	for (
+		let x = 0,
+			chunk_data_index = -1,
+			blocks_u32_index = world_chunk_index_r2(
+				size_l2,
+				chunk.x, chunk.z, y
+			);
+		x < CHUNK_WIDTH;
+		++x
+	) {
+		for (let z = 0; z < CHUNK_WIDTH; ++z) {
+			chunk_data_tmp[++chunk_data_index] = blocks_u32[blocks_u32_index];
+			chunk_data_tmp[++chunk_data_index] = blocks_u32[++blocks_u32_index];
+			chunk_data_tmp[++chunk_data_index] = blocks_u32[++blocks_u32_index];
+			chunk_data_tmp[++chunk_data_index] = blocks_u32[++blocks_u32_index];
+			blocks_u32_index += ((CHUNK_HEIGHT - CHUNK_WIDTH) >> 2) + 1;
+		}
+		blocks_u32_index += step_x;
 	}
 
 	// console.log('chunk_save', chunk.x_abs, chunk.z_abs);
 	localStorage_.setItem(
-		world_chunk_key(model, chunk),
+		world_chunk_key(
+			model,
+			chunk.x_abs, chunk.z_abs, y
+		),
 		compress(chunk_data_tmp_u8)
 	);
 	chunk.dirty = false;
@@ -273,100 +336,109 @@ const world_chunk_load = model => {
 	while (model.chunks_checklist_index < chunks_checklist_length) {
 		const checklist_item = chunks_checklist[model.chunks_checklist_index++];
 		const chunk = chunks[checklist_item.chunks_index];
-		const {x, z} = chunk;
+		const {
+			loaded,
+			x, y, z
+		} = chunk;
 		const x_abs = offset_x + checklist_item.offset_x + x;
 		const z_abs = offset_z + checklist_item.offset_z + z;
 		if (
-			!chunk.loaded ||
+			!loaded ||
 			x_abs !== chunk.x_abs ||
 			z_abs !== chunk.z_abs
 		) {
 			if (chunk.dirty) world_chunk_save(model, chunk);
 			// console.log('chunk_load', x_abs, z_abs);
-			chunk.x_abs = x_abs;
-			chunk.z_abs = z_abs;
 			chunk.loaded = true;
 			const chunk_stored = decompress(
 				localStorage_.getItem(
-					world_chunk_key(model, chunk)
+					world_chunk_key(
+						model,
+						chunk.x_abs = x_abs,
+						chunk.z_abs = z_abs,
+						y
+					)
 				),
 				chunk_data_tmp_u8
 			);
-			const {blocks_u32} = model;
-			const blocks_offset_x = x << CHUNK_WIDTH_L2;
-			const blocks_offset_z = z << CHUNK_WIDTH_L2;
-			if (chunk_stored) {
+			if (
+				loaded ||
+				y === 0 ||
+				chunk_stored
+			) {
+				const {
+					blocks_u32,
+					size_l2,
+				} = model;
+				const step_x = (
+					(
+						1 << (CHUNK_WIDTH_L2 + CHUNK_HEIGHT_L2 - 2) << size_l2
+					) - (
+						1 << (CHUNK_WIDTH_L2 + CHUNK_HEIGHT_L2 - 2)
+					)
+				);
+				let blocks_u32_index = world_chunk_index_r2(
+					size_l2,
+					x, z, y
+				);
+
+				if (chunk_stored)
 				// insert loaded chunk
-				for (let x = 0, chunk_stored_u32_index = 0; x < CHUNK_WIDTH; ++x) {
-					blocks_u32.set(
-						chunk_data_tmp.subarray(
-							chunk_stored_u32_index,
-							(
-								chunk_stored_u32_index += (1 << (CHUNK_WIDTH_L2 + CHUNK_HEIGHT_L2 - 2))
-							)
-						),
-						world_block_index_y0_r2(model, blocks_offset_x + x, blocks_offset_z)
-					);
+				for (let x = 0, chunk_data_index = -1; x < CHUNK_WIDTH; ++x) {
+					for (let z = 0; z < CHUNK_WIDTH; ++z) {
+						blocks_u32[blocks_u32_index] = chunk_data_tmp[++chunk_data_index];
+						blocks_u32[++blocks_u32_index] = chunk_data_tmp[++chunk_data_index];
+						blocks_u32[++blocks_u32_index] = chunk_data_tmp[++chunk_data_index];
+						blocks_u32[++blocks_u32_index] = chunk_data_tmp[++chunk_data_index];
+						blocks_u32_index += ((CHUNK_HEIGHT - CHUNK_WIDTH) >> 2) + 1;
+					}
+					blocks_u32_index += step_x;
 				}
-			}
-			else {
+				else
 				// generate chunk
 				for (let x = 0; x < CHUNK_WIDTH; ++x) {
-					let i = world_block_index_y0_r2(model, blocks_offset_x + x, blocks_offset_z);
 					for (let z = 0; z < CHUNK_WIDTH; ++z) {
-						blocks_u32.set(chunk_template, i);
-						i += 1 << (CHUNK_HEIGHT_L2 - 2);
+						blocks_u32[blocks_u32_index] = (
+							y > 0
+							?	0
+							:	BLOCK_TYPE_BEDROCK |
+								BLOCK_TYPE_STONE << 8 |
+								BLOCK_TYPE_STONE << 16 |
+								BLOCK_TYPE_DIRT << 24
+						);
+						blocks_u32[++blocks_u32_index] = (
+							y > 0
+							?	0
+							:	BLOCK_TYPE_DIRT |
+								BLOCK_TYPE_DIRT << 8 |
+								BLOCK_TYPE_GRASS << 16
+						);
+						if (loaded) {
+							blocks_u32[++blocks_u32_index] = 0;
+							blocks_u32[++blocks_u32_index] = 0;
+							blocks_u32_index += ((CHUNK_HEIGHT - CHUNK_WIDTH) >> 2) + 1;
+						}
+						else {
+							blocks_u32_index += ((CHUNK_HEIGHT - CHUNK_WIDTH) >> 2) + 3;
+						}
 					}
+					blocks_u32_index += step_x;
 				}
-				// chunk border marking
-				/*
-					for (let i = 0; i < CHUNK_WIDTH; i += 2) {
+				if ((x_abs | z_abs | y) === 0) {
+					// block palette
+					for (let i = 1; i < BLOCK_COLORS_LENGTH; ++i)
 						world_block_set(
 							model,
-							blocks_offset_x + i,
-							FLATMAP_LAYERS_LENGTH - 1,
-							blocks_offset_z,
-							BLOCK_TYPE_DIRT
+							i % 9,
+							FLATMAP_LAYERS_LENGTH,
+							Math_floor(i / 9),
+							i
 						);
-						world_block_set(
-							model,
-							blocks_offset_x,
-							FLATMAP_LAYERS_LENGTH - 1,
-							blocks_offset_z + i,
-							BLOCK_TYPE_DIRT
-						);
-					}
 					chunk.dirty = false;
-				*/
-				// checkerboard
-				/*
-					if ((x_abs + z_abs) % 2 > 0)
-					for (let x = 0; x < CHUNK_WIDTH; ++x)
-					for (let z = 0; z < CHUNK_WIDTH; ++z) {
-						world_block_set(
-							model,
-							blocks_offset_x + x,
-							FLATMAP_LAYERS_LENGTH - 1,
-							blocks_offset_z + z,
-							BLOCK_TYPE_DIRT
-						);
-					}
-					chunk.dirty = false;
-				*/
+				}
+				return;
 			}
-			if ((chunk.x | chunk.z) === 0) {
-				// block palette
-				for (let i = 1; i < BLOCK_COLORS_LENGTH; ++i)
-					world_block_set(
-						model,
-						i % 9,
-						FLATMAP_LAYERS_LENGTH,
-						Math_floor(i / 9),
-						i
-					);
-				chunk.dirty = false;
-			}
-			return;
+			// if no work neccessary, continue with next chunk
 		}
 	}
 }
