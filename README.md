@@ -4,7 +4,7 @@
 
 Minecraft, but based on ray tracing and written in JavaScript, following my own rules.
 
-[Try it out now!](https://l3p3.de/minicraft)
+[>>> START MINICRAFT <<<](https://l3p3.de/minicraft)
 
 [User manual](https://github.com/L3P3/minicraft/wiki)
 
@@ -37,21 +37,23 @@ Heavily inspired by and somewhat based on the work of [@xNotch](https://github.c
 - [x] load/save chunks
 - [x] basic mobile view
 - [x] chat/terminal
+- [x] more blocks
+- [x] higher world
 - [ ] world edit
+- [ ] inventory
+- [ ] styled ui
 - [ ] multiple worlds
 - [ ] entity models
 - [ ] collision
-- [ ] styled ui
 - [ ] good mobile view
-- [ ] more blocks
-- [ ] migrate to typescript?
-- [ ] support older browsers
-- [ ] items/inventory
-- [ ] multi-threading
 - [ ] download/upload worlds
 - [ ] multiplayer?
+- [ ] migrate to typescript?
+- [ ] support older browsers
+- [ ] multi-threading
 - [ ] time of day
 - [ ] sky elements
+- [ ] non-cubic blocks
 - [ ] visible entities
 - [ ] particles
 - [ ] use gpu?
@@ -60,26 +62,29 @@ Heavily inspired by and somewhat based on the work of [@xNotch](https://github.c
 
 ## How to use while developing
 
-I highly recommend using Visual Studio Code and the extension "Live Server". Then open "app-dev.html" to see the result.
+I highly recommend using Visual Studio Code and the extension "Live Server". Start it via "Go Live" and open "http://localhost:5500/app-dev.html" to see the result.
 
 ## Build instructions
 
-```
-npm install
-npm run build
-```
+After cloning, you need to run `npm install` once to install the build tools.
+
+To bundle the app, run `npm run build`. The result will be put into the `/dist` directory and can be tested at "http://localhost:5500/app-prod.html".
 
 ## My tools
 
-- Windows XP
-- Mypal browser + its devtools
-- VS Code via [code-server](https://github.com/cdr/code-server)
-- Live Server extension
-- [lui web framework](https://github.com/L3P3/lui)
+- Browser + DevTools for testing and debugging
+- [code-server](https://github.com/cdr/code-server) for development on any device
+- [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) for developer preview
+- [lui](https://github.com/L3P3/lui) for DOM handling
+- [Closure Compiler](https://github.com/google/closure-compiler) for packing JS
+- [cssnano](https://cssnano.co) for packing CSS
+- [GitHub Actions](https://github.com/features/actions) for automatic building
+- [jsDelivr](https://www.jsdelivr.com) for distribution
+- [GitHub](https://github.com) for everything else
 
 ## Contribution
 
-This is not really supposed to be a community project, do not assume it would be easy to get pull requests merged by me. But I am really happy to answer any questions or getting any kind of feedback. Feel free to open issues or suggest changes by opening a pull request!
+I am really happy to answer any questions or getting any kind of feedback. Feel free to open issues or suggest changes by opening a pull request!
 
 ## License
 
