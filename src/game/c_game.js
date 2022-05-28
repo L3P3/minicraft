@@ -9,6 +9,7 @@ import {
 	now,
 } from '../etc/lui.js';
 
+import Messages from './c_messages.js';
 import Settings from './c_settings.js';
 import Terminal from './c_terminal.js';
 import Touch from './c_touch.js';
@@ -41,6 +42,7 @@ export default function Game({
 	ref,
 }) {
 	const model = hook_memo(game_create);
+	const time_now = now();
 
 	const frame = hook_dom(
 		'div[className=game]',
@@ -123,7 +125,7 @@ export default function Game({
 
 	hook_effect(now => (
 		game_render(model, now)
-	), [now()]);
+	), [time_now]);
 
 	hook_rerender();
 
@@ -132,6 +134,11 @@ export default function Game({
 			R: hook_static(canvas_element => (
 				game_start(model, canvas_element)
 			)),
+		}),
+		model.menu !== MENU_TERMINAL &&
+		node(Messages, {
+			messages: model.messages,
+			time_now,
 		}),
 		model.renderer &&
 		model.flag_diagnostics &&

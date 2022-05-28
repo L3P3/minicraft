@@ -1,5 +1,6 @@
 import {
 	BLOCK_TYPE_BRICKS,
+	MOUSE_MODE_NORMAL,
 } from '../etc/constants.js';
 import {
 	Math_cos,
@@ -17,7 +18,10 @@ export const player_create = world => ({
 	block_focus_x: 0,
 	block_focus_y: -1,
 	block_focus_z: 0,
+	block_select_a: null,
+	block_select_b: null,
 	holds: BLOCK_TYPE_BRICKS,
+	mouse_mode: MOUSE_MODE_NORMAL,
 	position_x: world.spawn_x,
 	position_y: world.spawn_y,
 	position_z: world.spawn_z,

@@ -27,7 +27,6 @@ const buttons_top = [
 	['pick', KEY_MOUSE_MIDDLE],
 	['up', KEY_MOVE_UP],
 	['down', KEY_MOVE_DOWN],
-	['R', 82],
 	['T', 84],
 	['F3', 114],
 	['...', 27],

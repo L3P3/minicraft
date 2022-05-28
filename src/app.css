@@ -171,7 +171,8 @@ div {
 	display: flex;
 	flex-direction: column;
 }
-.game > .terminal > .history > :first-child {
+.game > .terminal > .history > :first-child,
+.game > .messages > :first-child {
 	margin-top: auto;
 }
 .game > .terminal > input {
@@ -179,4 +180,20 @@ div {
 	background: black;
 	color: inherit;
 	font: inherit;
+}
+.game > .messages {
+	position: absolute;
+	left: 1rem;
+	top: 1rem;
+	right: 1rem;
+	bottom: 12rem;
+	overflow-y: hidden;
+	display: flex;
+	flex-direction: column;
+	font-family: 'Courier New', Courier, monospace;
+}
+.game > .messages > div {
+	width: fit-content;
+	background: rgba(0, 0, 0, .7);
+	padding: 1px;
 }

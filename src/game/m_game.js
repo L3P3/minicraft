@@ -11,7 +11,6 @@ import {
 	BLOCK_TYPE_FACE_W,
 	CHUNK_HEIGHT,
 	CHUNK_WIDTH_L2,
-	COORDINATE_OFFSET,
 	KEY_MOUSE_LEFT,
 	KEY_MOUSE_MIDDLE,
 	KEY_MOUSE_RIGHT,
@@ -24,6 +23,8 @@ import {
 	MENU_NONE,
 	MENU_SETTINGS,
 	MENU_TERMINAL,
+	MOUSE_MODE_SELECT,
+	MOUSE_MODE_NORMAL,
 } from '../etc/constants.js';
 import {
 	DEBUG, VERSION,
@@ -238,52 +239,86 @@ const game_movement_z_update = model => (
 */
 export const game_key = (model, code, state) => {
 	//console.log('KEY', code, state);
-	const {keys_active} = model;
+	const {
+		keys_active,
+		player,
+	} = model;
 	if (state) {
 		if (keys_active.has(code)) return false;
 		keys_active.add(code);
+		const {
+			block_focus_x,
+			block_focus_y,
+			block_focus_z,
+		} = player;
 		switch (code) {
 			case KEY_MOUSE_LEFT:
-				model.player.block_focus_y >= 0 &&
-					world_block_set(
-						model.world,
-						model.player.block_focus_x,
-						model.player.block_focus_y,
-						model.player.block_focus_z,
-						BLOCK_TYPE_AIR
-					);
+				if (block_focus_y >= 0) {
+					if (player.mouse_mode === MOUSE_MODE_NORMAL)
+						world_block_set(
+							model.world,
+							block_focus_x,
+							block_focus_y,
+							block_focus_z,
+							BLOCK_TYPE_AIR
+						);
+					else {
+						game_block_select(
+							model,
+							[
+								block_focus_x,
+								block_focus_y,
+								block_focus_z,
+							],
+							false
+						);
+					}
+				}
 				break;
 			case KEY_MOUSE_MIDDLE:
 			case 71: // G
-				if (model.player.block_focus_y >= 0)
-						model.player.holds = world_block_get(
+				if (block_focus_y >= 0)
+						player.holds = world_block_get(
 							model.world,
-							model.player.block_focus_x,
-							model.player.block_focus_y,
-							model.player.block_focus_z
+							block_focus_x,
+							block_focus_y,
+							block_focus_z
 						);
 				break;
 			case KEY_MOUSE_RIGHT:
-				if (model.player.block_focus_y >= 0) {
-					let x = model.player.block_focus_x;
-					let y = model.player.block_focus_y;
-					let z = model.player.block_focus_z;
-					switch (model.player.block_focus_face) {
-						case BLOCK_TYPE_FACE_W: --x; break;
-						case BLOCK_TYPE_FACE_E: ++x; break;
-						case BLOCK_TYPE_FACE_B: --y; break;
-						case BLOCK_TYPE_FACE_T: ++y; break;
-						case BLOCK_TYPE_FACE_S: --z; break;
-						default: ++z;
+				if (block_focus_y >= 0) {
+					if (player.mouse_mode === MOUSE_MODE_NORMAL) {
+						let x = block_focus_x;
+						let y = block_focus_y;
+						let z = block_focus_z;
+						switch (player.block_focus_face) {
+							case BLOCK_TYPE_FACE_W: --x; break;
+							case BLOCK_TYPE_FACE_E: ++x; break;
+							case BLOCK_TYPE_FACE_B: --y; break;
+							case BLOCK_TYPE_FACE_T: ++y; break;
+							case BLOCK_TYPE_FACE_S: --z; break;
+							default: ++z;
+						}
+						y >= 0 && y < CHUNK_HEIGHT &&
+							world_block_set(
+								model.world,
+								x & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
+								y,
+								z & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
+								player.holds
+							);
 					}
-					y >= 0 && y < CHUNK_HEIGHT &&
-						world_block_set(
-							model.world,
-							x & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
-							y,
-							z & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
-							model.player.holds
+					else {
+						game_block_select(
+							model,
+							[
+								block_focus_x,
+								block_focus_y,
+								block_focus_z,
+							],
+							true
 						);
+					}
 				}
 				break;
 			case 27: // ESC
@@ -402,10 +437,56 @@ export const game_message_send = (model, value) => {
 			case 'version':
 				game_message_print(model, 'Minicraft ' + VERSION);
 				break;
+			case '/exit':
+				model.player.mouse_mode = MOUSE_MODE_NORMAL;
+				game_message_print(model, 'normal mouse mode');
+				break;
+			case '/expand':
+				if (game_block_assert(model)) {
+					if (args[0] === 'vert') {
+						model.player.block_select_a[1] = 0;
+						model.player.block_select_b[1] = CHUNK_HEIGHT - 1;
+						game_message_print(model, 'selection expanded');
+					}
+					else {
+						game_message_print(model, 'only vert supported');
+					}
+				}
+				break;
+			case '/pos1':
+			case '/pos2':
+				game_block_select(
+					model,
+					[
+						Math_floor(model.player.position_x),
+						Math_floor(model.player.position_y),
+						Math_floor(model.player.position_z),
+					],
+					command === '/pos2'
+				);
+				break;
 			case '/regen':
 				world_chunk_reset(model.world);
 				game_message_print(model, 'regenerate chunk');
 				model.renderer.flag_dirty = true;
+				break;
+			case '/show':
+				game_message_print(
+					model,
+					`first: ${
+						model.player.block_select_a
+						?	model.player.block_select_a.join(' ')
+						:	'none'
+					}, second: ${
+						model.player.block_select_b
+						?	model.player.block_select_b.join(' ')
+						:	'none'
+					}`
+				);
+				break;
+			case '/wand':
+				model.player.mouse_mode = MOUSE_MODE_SELECT;
+				game_message_print(model, 'primary+secondary button for selection');
 				break;
 			default:
 				game_message_print(model, 'unknown command: ' + command)
@@ -417,12 +498,38 @@ export const game_message_send = (model, value) => {
 }
 
 const game_message_print = (model, value) => {
-	model.messages = [
-		...model.messages.slice(-30),
-		{
-			id: ++message_id_counter,
-			time: now(),
-			value,
-		},
-	];
+	(
+		model.messages = model.messages.slice(-49)
+	).push({
+		id: ++message_id_counter,
+		time: now(),
+		value,
+	});
+}
+
+export const game_block_assert = model => {
+	if (
+		!model.player.block_select_a ||
+		!model.player.block_select_b
+	) {
+		game_message_print(model, 'selection required');
+		return false;
+	}
+	return true;
+}
+export const game_block_select = (model, block, secondary) => {
+	if (secondary)
+		model.player.block_select_b = block;
+	else
+		model.player.block_select_a = block;
+	game_message_print(
+		model,
+		`${
+			secondary
+			?	'second'
+			:	'first'
+		} position: ${
+			block.join(' ')
+		}`
+	);
 }
