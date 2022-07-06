@@ -31,6 +31,10 @@ declare namespace lui {
 	*/
 	interface Attrs extends Omit<Partial<HTMLElement>, 'style'> {
 		/**
+			dataset properties and their values
+		*/
+		D?: { [key: string]: any },
+		/**
 			CSS classes and their conditions
 		*/
 		F?: { [key: string]: boolean },
@@ -104,11 +108,6 @@ declare namespace lui {
 	export function hook_effect<T extends any[]>(callback: (...deps: T) => (void | ((...deps: T) => void)), deps?: T): void;
 
 	/**
-		Returns whether the component is being rendered for the first time
-	*/
-	export function hook_first(): boolean;
-
-	/**
 		hook_sub over variable-length array items
 	*/
 	export function hook_map<T extends any[], U extends NodeData, V>(getter: (item: U, ...deps: T) => V, data: U[], deps?: T): V[]
@@ -119,6 +118,16 @@ declare namespace lui {
 	export function hook_memo<T extends any[], U>(getter: (...deps: T) => U, deps?: T): U;
 
 	/**
+		Model state with set of methods, `init` returning the initial state
+	*/
+	export function hook_model<T, U extends {
+		init: () => T,
+		[key: string]: (current?: T, arg?: any) => T
+	}>(mutations: U): [value: T, methods: {
+		[method in keyof U]: (arg?: Parameters<U[method]>[1]) => void
+	}];
+
+	/**
 		List of changed properties since previous rendering
 	*/
 	export function hook_object_changes(object: Object): string[];
@@ -127,16 +136,6 @@ declare namespace lui {
 		Returns the value from previous rendering
 	*/
 	export function hook_prev<T>(value: T, initial?: T): T;
-
-	/**
-		Model state with set of methods, the first returning the initial state
-	*/
-	export function hook_reducer<T, U extends any[]>(mutations: ((current: T, ...args: U) => T)[]): [value: T, dispatch: (index: number, ...args: U) => void];
-
-	/**
-		Model state with just one method
-	*/
-	export function hook_reducer_f<T, U extends any[]>(reducer: (current: T, ...args: U) => T, initializer?: () => T): [value: T, dispatch: (...args: U) => void];
 
 	/**
 		Request rerendering for the next display refresh

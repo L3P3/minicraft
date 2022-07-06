@@ -102,11 +102,6 @@ lui.hook_dom = function(descriptor, attributes){}
 lui.hook_effect = function(effect, deps){}
 
 /**
-	@return {boolean}
-*/
-lui.hook_first = function(){}
-
-/**
 	@template T
 	@param {function(?):T} getter
 	@param {TYPE_NODEDATA} data
@@ -124,6 +119,12 @@ lui.hook_map = function(getter, data, deps){}
 lui.hook_memo = function(getter, deps){}
 
 /**
+	@param {!Object<string, Function>} reducer
+	@return {!Array}
+*/
+lui.hook_model = function(reducer){}
+
+/**
 	@param {!Object<string, *>} object
 	@return {!Array<string>}
 */
@@ -136,19 +137,6 @@ lui.hook_object_changes = function(object){}
 	@return {T}
 */
 lui.hook_prev = function(value, initial){}
-
-/**
-	@param {!Array<Function>} reducer
-	@return {!Array}
-*/
-lui.hook_reducer = function(reducer){}
-
-/**
-	@param {Function} reducer
-	@param {?Function=} init
-	@return {!Array}
-*/
-lui.hook_reducer_f = function(reducer, init){}
 
 /**
 	@return {void}

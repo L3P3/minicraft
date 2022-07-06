@@ -6,12 +6,8 @@ import {
 	localStorage_,
 } from './helpers.js';
 
-export const ACTION_SAVE = 1;
-export const ACTION_CONFIG_SET = 2;
-
-export const actions = [
-	// INITIAL
-	() => {
+export const reducers = {
+	init: () => {
 		const config = {
 			flag_textures: true,
 			mouse_sensitivity: 3,
@@ -37,8 +33,7 @@ export const actions = [
 			config,
 		};
 	},
-	// SAVE
-	state => {
+	config_save: state => {
 		const {config} = state;
 		localStorage_.setItem('minicraft.config', JSON_.stringify({
 			'version': VERSION,
@@ -50,12 +45,17 @@ export const actions = [
 		}));
 		return state;
 	},
-	// CONFIG_SET
-	(state, patch) => ({
+	config_reduce: (state, reducer) => (
+		reducers.config_set(
+			state,
+			reducer(state.config)
+		)
+	),
+	config_set: (state, patch) => ({
 		...state,
 		config: {
 			...state.config,
 			...patch,
 		},
 	}),
-];
+};

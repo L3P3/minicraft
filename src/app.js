@@ -1,6 +1,6 @@
 import {
 	hook_effect,
-	hook_reducer,
+	hook_model,
 	hook_static,
 	lui_,
 	node,
@@ -9,8 +9,7 @@ import {
 import Game from './game/c_game.js';
 
 import {
-	actions,
-	ACTION_SAVE,
+	reducers,
 } from './etc/state.js';
 import {
 	handler_noop,
@@ -21,7 +20,7 @@ import {
 } from './game/m_game.js';
 
 lui_.init(() => {
-	const [state, dispatch] = hook_reducer(actions);
+	const [state, actions] = hook_model(reducers);
 
 	const ref = hook_static({
 		game: null,
@@ -29,7 +28,7 @@ lui_.init(() => {
 
 	hook_effect(() => {
 		onbeforeunload = () => {
-			dispatch(ACTION_SAVE);
+			actions.config_save();
 			if (ref.game) game_save(ref.game);
 		};
 	});
@@ -54,8 +53,8 @@ lui_.init(() => {
 		ondragstart: handler_noop,
 	}, [
 		node(Game, {
+			actions,
 			config: state.config,
-			dispatch,
 			ref,
 		}),
 	]];

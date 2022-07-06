@@ -1,5 +1,4 @@
 import {
-	hook_callback,
 	hook_dom,
 	hook_static,
 	node_dom,
@@ -9,15 +8,15 @@ import {
 	MENU_NONE,
 } from '../etc/constants.js';
 import {
-	ACTION_CONFIG_SET,
-} from '../etc/state.js';
-import {
 	game_mouse_catch,
 } from './m_game.js';
 
 export default function Settings({
+	actions: {
+		config_reduce,
+		config_set,
+	},
 	config,
-	dispatch,
 	game,
 }) {
 	hook_dom('div[className=menu]');
@@ -30,17 +29,17 @@ export default function Settings({
 					'Oberflächen: ' +
 					(config.flag_textures ? 'Texturiert' : 'Einfarbig')
 				),
-				onclick: hook_callback(current => {
-					dispatch(ACTION_CONFIG_SET, {
-						flag_textures: !current,
-					});
-				}, [config.flag_textures]),
+				onclick: hook_static(() => (
+					config_reduce(config => ({
+						flag_textures: !config.flag_textures,
+					}))
+				)),
 			}),
 			node_dom('label[innerText=Auflösung:]', null, [
 				node_dom('input[type=range][min=1][max=100][step=1]', {
 					value: 101 - config.resolution_scaling,
 					onchange: hook_static(event => (
-						dispatch(ACTION_CONFIG_SET, {
+						config_set({
 							resolution_scaling: 101 - Number(event.target.value),
 						})
 					)),
@@ -50,7 +49,7 @@ export default function Settings({
 				node_dom('input[type=range][min=1][max=180][step=1]', {
 					value: config.view_angle,
 					onchange: hook_static(event => (
-						dispatch(ACTION_CONFIG_SET, {
+						config_set({
 							view_angle: Number(event.target.value),
 						})
 					)),
@@ -60,7 +59,7 @@ export default function Settings({
 				node_dom('input[type=range][min=1][max=128][step=1]', {
 					value: config.view_distance,
 					onchange: hook_static(event => (
-						dispatch(ACTION_CONFIG_SET, {
+						config_set({
 							view_distance: Number(event.target.value),
 						})
 					)),
@@ -70,7 +69,7 @@ export default function Settings({
 				node_dom('input[type=range][min=1][max=15][step=1]', {
 					value: config.mouse_sensitivity,
 					onchange: hook_static(event => (
-						dispatch(ACTION_CONFIG_SET, {
+						config_set({
 							mouse_sensitivity: Number(event.target.value),
 						})
 					)),

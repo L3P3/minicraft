@@ -37,8 +37,8 @@ import {
 } from './m_game.js';
 
 export default function Game({
+	actions,
 	config,
-	dispatch,
 	ref,
 }) {
 	const model = hook_memo(game_create);
@@ -123,8 +123,8 @@ export default function Game({
 			document_.exitPointerLock()
 	), [model.flag_paused || model.menu]);
 
-	hook_effect(now => (
-		game_render(model, now)
+	hook_effect(() => (
+		game_render(model, time_now)
 	), [time_now]);
 
 	hook_rerender();
@@ -152,8 +152,8 @@ export default function Game({
 		}),
 		model.menu === MENU_SETTINGS &&
 		node(Settings, {
+			actions,
 			config,
-			dispatch,
 			game: model,
 		}),
 		model.menu === MENU_TERMINAL &&
