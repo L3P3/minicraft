@@ -1,3 +1,8 @@
+@font-face {
+	font-family: Minecraft;
+	src: url(https://cdn.jsdelivr.net/gh/IdreesInc/Minecraft-Font@aee92fc6370e254af7c49dc91c6bdd77b0c82fe3/Minecraft.otf);
+}
+
 html {
 	height: 100%;
 }
@@ -5,7 +10,7 @@ body {
 	margin: 0;
 	height: 100%;
 
-	font-family: sans-serif;
+	font-family: Minecraft, sans-serif;
 	background: #333;
 	color: #ddd;
 	user-select: none;
@@ -16,6 +21,10 @@ body {
 div {
 	box-sizing: border-box;
 }
+button {
+	font-family: inherit;
+}
+
 .game {
 	position: relative;
 	width: 100%;
@@ -163,7 +172,7 @@ div {
 	flex-direction: column;
 	padding: 1rem;
 	gap: 1rem;
-	font-family: 'Courier New', Courier, monospace;
+	font-family: Minecraft, 'Courier New', Courier, monospace;
 }
 .game > .terminal > .history {
 	flex: 1;
