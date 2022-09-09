@@ -199,7 +199,7 @@ button {
 	overflow-y: hidden;
 	display: flex;
 	flex-direction: column;
-	font-family: 'Courier New', Courier, monospace;
+	font-family: Minecraft, 'Courier New', Courier, monospace;
 }
 .game > .messages > div {
 	width: fit-content;
