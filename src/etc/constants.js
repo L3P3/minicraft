@@ -85,6 +85,10 @@ export const KEY_MOVE_LEFT = -12;
 export const KEY_MOVE_RIGHT = -13;
 export const KEY_MOVE_UP = -14;
 export const KEY_MOVE_DOWN = -15;
+export const KEY_ROTATE_UP = -16;
+export const KEY_ROTATE_DOWN = -17;
+export const KEY_ROTATE_LEFT = -18;
+export const KEY_ROTATE_RIGHT = -19;
 
 export const MENU_NONE = 0;
 export const MENU_SETTINGS = 1;

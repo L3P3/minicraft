@@ -4,7 +4,10 @@ import {
 } from '../etc/constants.js';
 import {
 	Math_cos,
+	Math_max,
 	Math_min,
+	Math_PI,
+	Math_PI_h,
 	Math_sin,
 } from '../etc/helpers.js';
 
@@ -25,6 +28,8 @@ export const player_create = world => ({
 	position_x: world.spawn_x,
 	position_y: world.spawn_y,
 	position_z: world.spawn_z,
+	rotation_h: 0.0,
+	rotation_v: 0.0,
 	speed_x: 0.0,
 	speed_y: 0.0,
 	speed_z: 0.0,
@@ -47,7 +52,30 @@ export const player_tick = (model, delay) => {
 		Math_cos(model.angle_h) * model.accel_z
 	) * time_factor;
 
+	player_rotate(
+		model,
+		model.rotation_h * time_factor,
+		model.rotation_v * time_factor
+	);
+
 	model.position_x += model.speed_x * time_factor;
 	model.position_y += model.speed_y * time_factor;
 	model.position_z += model.speed_z * time_factor;
-};
+}
+
+export const player_rotate = (model, h, v) => {
+	model.angle_h = (
+		model.angle_h
+		+ h
+		+ Math_PI * 100
+	) % (Math_PI * 2);
+
+	model.angle_v = Math_max(
+		-Math_PI_h,
+		Math_min(
+			Math_PI_h,
+			model.angle_v
+			+ v
+		)
+	);
+}

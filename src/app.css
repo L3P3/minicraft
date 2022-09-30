@@ -88,6 +88,10 @@ button {
 	grid-template-rows: repeat(3, 1fr);
 	gap: .2rem;
 }
+.game > .touch > .move.sec {
+	left: auto;
+	right: 1rem;
+}
 .game > .touch > .move > * {
 	position: relative;
 	overflow: hidden;

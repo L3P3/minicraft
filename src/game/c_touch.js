@@ -14,6 +14,10 @@ import {
 	KEY_MOVE_LEFT,
 	KEY_MOVE_RIGHT,
 	KEY_MOVE_UP,
+	KEY_ROTATE_DOWN,
+	KEY_ROTATE_LEFT,
+	KEY_ROTATE_RIGHT,
+	KEY_ROTATE_UP,
 } from '../etc/constants.js';
 import {
 	touch_id_get,
@@ -23,7 +27,6 @@ import {
 } from './m_game.js';
 
 const buttons_top = [
-	['place', KEY_MOUSE_RIGHT], // TODO
 	['pick', KEY_MOUSE_MIDDLE],
 	['up', KEY_MOVE_UP],
 	['down', KEY_MOVE_DOWN],
@@ -38,11 +41,29 @@ const buttons_move = [
 	['right', KEY_MOVE_RIGHT],
 	['center', KEY_MOUSE_LEFT],
 ];
+const buttons_rotate = [
+	['up', KEY_ROTATE_UP],
+	['down', KEY_ROTATE_DOWN],
+	['left', KEY_ROTATE_LEFT],
+	['right', KEY_ROTATE_RIGHT],
+	['center', KEY_MOUSE_RIGHT],
+];
 
 export default function Touch({
 	game,
 }) {
 	const {keys_active} = game;
+	
+	const move_button = ([name, code]) => node_dom('div', {
+		D: {
+			code,
+		},
+		F: {
+			'button': true,
+			[name]: true,
+			'active': keys_active.has(code),
+		},
+	});
 
 	hook_dom(
 		'div[className=touch]',
@@ -82,18 +103,10 @@ export default function Touch({
 			)
 		),
 		node_dom('div[className=move]', null,
-			buttons_move.map(([name, code]) =>
-				node_dom('div', {
-					D: {
-						code,
-					},
-					F: {
-						'button': true,
-						[name]: true,
-						'active': keys_active.has(code),
-					},
-				})
-			)
+			buttons_move.map(move_button)
+		),
+		node_dom('div[className=move sec]', null,
+			buttons_rotate.map(move_button)
 		),
 	];
 }

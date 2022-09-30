@@ -20,6 +20,10 @@ import {
 	KEY_MOVE_FRONT,
 	KEY_MOVE_RIGHT,
 	KEY_MOVE_UP,
+	KEY_ROTATE_DOWN,
+	KEY_ROTATE_LEFT,
+	KEY_ROTATE_RIGHT,
+	KEY_ROTATE_UP,
 	MENU_NONE,
 	MENU_SETTINGS,
 	MENU_TERMINAL,
@@ -27,20 +31,20 @@ import {
 	MOUSE_MODE_NORMAL,
 } from '../etc/constants.js';
 import {
-	DEBUG, VERSION,
+	DEBUG,
+	VERSION,
 } from '../etc/env.js';
 import {
 	clearInterval_,
 	Math_floor,
 	Math_max,
-	Math_min,
 	Math_PI,
-	Math_PI_h,
 	Math_round,
 	setInterval_,
 } from '../etc/helpers.js';
 import {
 	player_create,
+	player_rotate,
 	player_tick,
 } from './m_player.js';
 import {
@@ -168,20 +172,10 @@ export const game_mouse_move = (model, event) => {
 			model.resolution_raw_x,
 			model.resolution_raw_y
 		);
-		model.player.angle_h = (
-			model.player.angle_h
-			+ event.movementX * factor
-			+ Math_PI * 100
-		) % (Math_PI * 2);
-		model.player.angle_v = (
-			Math_max(
-				-Math_PI_h,
-				Math_min(
-					Math_PI_h,
-					model.player.angle_v
-					- event.movementY * factor
-				)
-			)
+		player_rotate(
+			model.player,
+			event.movementX * factor,
+			-event.movementY * factor
 		);
 	}
 }
@@ -233,6 +227,24 @@ const game_movement_z_update = model => (
 		model.has(87)
 	)
 );
+/**
+	@noinline
+*/
+const game_rotation_h_update = model => (
+	model.player.rotation_h = game_movement_calc(
+		model.keys_active.has(KEY_ROTATE_LEFT),
+		model.keys_active.has(KEY_ROTATE_RIGHT)
+	)
+);
+/**
+	@noinline
+*/
+const game_rotation_v_update = model => (
+	model.player.rotation_v = game_movement_calc(
+		model.keys_active.has(KEY_ROTATE_DOWN),
+		model.keys_active.has(KEY_ROTATE_UP)
+	)
+);
 
 /**
 	@return {boolean} true if state changed
@@ -252,143 +264,159 @@ export const game_key = (model, code, state) => {
 			block_focus_z,
 		} = player;
 		switch (code) {
-			case KEY_MOUSE_LEFT:
-				if (block_focus_y >= 0) {
-					if (player.mouse_mode === MOUSE_MODE_NORMAL)
-						world_block_set(
-							model.world,
+		case KEY_ROTATE_LEFT:
+		case KEY_ROTATE_RIGHT:
+			game_rotation_h_update(model);
+			break;
+		case KEY_ROTATE_DOWN:
+		case KEY_ROTATE_UP:
+			game_rotation_v_update(model);
+			break;
+		case KEY_MOUSE_LEFT:
+			if (block_focus_y >= 0) {
+				if (player.mouse_mode === MOUSE_MODE_NORMAL)
+					world_block_set(
+						model.world,
+						block_focus_x,
+						block_focus_y,
+						block_focus_z,
+						BLOCK_TYPE_AIR
+					);
+				else {
+					game_block_select(
+						model,
+						[
 							block_focus_x,
 							block_focus_y,
 							block_focus_z,
-							BLOCK_TYPE_AIR
-						);
-					else {
-						game_block_select(
-							model,
-							[
-								block_focus_x,
-								block_focus_y,
-								block_focus_z,
-							],
-							false
-						);
-					}
+						],
+						false
+					);
 				}
-				break;
-			case KEY_MOUSE_MIDDLE:
-			case 71: // G
-				if (block_focus_y >= 0)
-						player.holds = world_block_get(
+			}
+			break;
+		case KEY_MOUSE_MIDDLE:
+		case 71: // G
+			if (block_focus_y >= 0)
+					player.holds = world_block_get(
+						model.world,
+						block_focus_x,
+						block_focus_y,
+						block_focus_z
+					);
+			break;
+		case KEY_MOUSE_RIGHT:
+			if (block_focus_y >= 0) {
+				if (player.mouse_mode === MOUSE_MODE_NORMAL) {
+					let x = block_focus_x;
+					let y = block_focus_y;
+					let z = block_focus_z;
+					switch (player.block_focus_face) {
+						case BLOCK_TYPE_FACE_W: --x; break;
+						case BLOCK_TYPE_FACE_E: ++x; break;
+						case BLOCK_TYPE_FACE_B: --y; break;
+						case BLOCK_TYPE_FACE_T: ++y; break;
+						case BLOCK_TYPE_FACE_S: --z; break;
+						default: ++z;
+					}
+					y >= 0 && y < CHUNK_HEIGHT &&
+						world_block_set(
 							model.world,
-							block_focus_x,
-							block_focus_y,
-							block_focus_z
+							x & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
+							y,
+							z & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
+							player.holds
 						);
-				break;
-			case KEY_MOUSE_RIGHT:
-				if (block_focus_y >= 0) {
-					if (player.mouse_mode === MOUSE_MODE_NORMAL) {
-						let x = block_focus_x;
-						let y = block_focus_y;
-						let z = block_focus_z;
-						switch (player.block_focus_face) {
-							case BLOCK_TYPE_FACE_W: --x; break;
-							case BLOCK_TYPE_FACE_E: ++x; break;
-							case BLOCK_TYPE_FACE_B: --y; break;
-							case BLOCK_TYPE_FACE_T: ++y; break;
-							case BLOCK_TYPE_FACE_S: --z; break;
-							default: ++z;
-						}
-						y >= 0 && y < CHUNK_HEIGHT &&
-							world_block_set(
-								model.world,
-								x & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
-								y,
-								z & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
-								player.holds
-							);
-					}
-					else {
-						game_block_select(
-							model,
-							[
-								block_focus_x,
-								block_focus_y,
-								block_focus_z,
-							],
-							true
-						);
-					}
-				}
-				break;
-			case 27: // ESC
-				if (model.menu) {
-					model.flag_paused = false;
-					model.menu = MENU_NONE;
 				}
 				else {
-					model.flag_paused = true;
-					model.menu = MENU_SETTINGS;
+					game_block_select(
+						model,
+						[
+							block_focus_x,
+							block_focus_y,
+							block_focus_z,
+						],
+						true
+					);
 				}
-				break;
-			case KEY_MOVE_DOWN:
-			case KEY_MOVE_UP:
-			case 16: // SHIFT
-			case 32: // SPACE
-				game_movement_y_update(model);
-				break;
-			case KEY_MOVE_LEFT:
-			case KEY_MOVE_RIGHT:
-			case 65: // A
-			case 68: // D
-				game_movement_x_update(model);
-				break;
-			case 80: // P
-				model.flag_paused = !model.flag_paused;
-				break;
-			case KEY_MOVE_BACK:
-			case KEY_MOVE_FRONT:
-			case 83: // S
-			case 87: // W
-				game_movement_z_update(model);
-				break;
-			case 84: // T
-				if (!model.menu) {
-					model.menu = MENU_TERMINAL;
-					for (const code of keys_active)
-						game_key(model, code, false);
-				}
-				break;
-			case 114: // F3
-				model.flag_diagnostics = !model.flag_diagnostics;
-				break;
-			case 116: // F5
-				if (DEBUG)
-					location.reload();
-			default:
-				return false;
+			}
+			break;
+		case 27: // ESC
+			if (model.menu) {
+				model.flag_paused = false;
+				model.menu = MENU_NONE;
+			}
+			else {
+				model.flag_paused = true;
+				model.menu = MENU_SETTINGS;
+			}
+			break;
+		case KEY_MOVE_DOWN:
+		case KEY_MOVE_UP:
+		case 16: // SHIFT
+		case 32: // SPACE
+			game_movement_y_update(model);
+			break;
+		case KEY_MOVE_LEFT:
+		case KEY_MOVE_RIGHT:
+		case 65: // A
+		case 68: // D
+			game_movement_x_update(model);
+			break;
+		case 80: // P
+			model.flag_paused = !model.flag_paused;
+			break;
+		case KEY_MOVE_BACK:
+		case KEY_MOVE_FRONT:
+		case 83: // S
+		case 87: // W
+			game_movement_z_update(model);
+			break;
+		case 84: // T
+			if (!model.menu) {
+				model.menu = MENU_TERMINAL;
+				for (const code of keys_active)
+					game_key(model, code, false);
+			}
+			break;
+		case 114: // F3
+			model.flag_diagnostics = !model.flag_diagnostics;
+			break;
+		case 116: // F5
+			if (DEBUG)
+				location.reload();
+		default:
+			return false;
 		}
 	}
 	else {
 		if (!keys_active.delete(code)) return false;
 		switch (code) {
-			case KEY_MOVE_DOWN:
-			case KEY_MOVE_UP:
-			case 16: // SHIFT
-			case 32: // SPACE
-				game_movement_y_update(model);
-				break;
-			case KEY_MOVE_LEFT:
-			case KEY_MOVE_RIGHT:
-			case 65: // A
-			case 68: // D
-				game_movement_x_update(model);
-				break;
-			case KEY_MOVE_BACK:
-			case KEY_MOVE_FRONT:
-			case 83: // S
-			case 87: // W
-				game_movement_z_update(model);
+		case KEY_MOVE_DOWN:
+		case KEY_MOVE_UP:
+		case 16: // SHIFT
+		case 32: // SPACE
+			game_movement_y_update(model);
+			break;
+		case KEY_MOVE_LEFT:
+		case KEY_MOVE_RIGHT:
+		case 65: // A
+		case 68: // D
+			game_movement_x_update(model);
+			break;
+		case KEY_MOVE_BACK:
+		case KEY_MOVE_FRONT:
+		case 83: // S
+		case 87: // W
+			game_movement_z_update(model);
+			break;
+		case KEY_ROTATE_LEFT:
+		case KEY_ROTATE_RIGHT:
+			game_rotation_h_update(model);
+			break;
+		case KEY_ROTATE_DOWN:
+		case KEY_ROTATE_UP:
+			game_rotation_v_update(model);
 		}
 	}
 	model.keys_active_check = [...keys_active].join(',');
