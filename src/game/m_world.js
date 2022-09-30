@@ -194,6 +194,7 @@ const world_chunk_load_setup = model => {
 	let chunks_checklist = chunks_checklists.get(key);
 	if (chunks_checklist == null) {
 		const size = 1 << size_l2;
+		const size_h_p2 = number_square(size * .5);
 		chunks_checklists.set(key, chunks_checklist = (
 			model.chunks
 			.map(({x, y, z}, chunks_index) => {
@@ -240,6 +241,7 @@ const world_chunk_load_setup = model => {
 					offset_z,
 				};
 			})
+			.filter(({dist}) => dist <= size_h_p2)
 			.sort((a, b) => a.dist - b.dist)
 		));
 		// console.log('checklist', key, chunks_checklist);
