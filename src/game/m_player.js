@@ -25,6 +25,7 @@ export const player_create = world => ({
 	block_select_b: null,
 	holds: BLOCK_TYPE_BRICKS,
 	mouse_mode: MOUSE_MODE_NORMAL,
+	name: 'Gast',
 	position_x: world.spawn_x,
 	position_y: world.spawn_y,
 	position_z: world.spawn_z,

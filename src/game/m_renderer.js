@@ -68,7 +68,10 @@ tiles_image.src = ASSETS + 'blocks.png';
 export const renderer_create = (game, canvas_element) => {
 	const model = {
 		canvas_element,
-		canvas_context: null,
+		canvas_context: canvas_element.getContext('2d', {
+			alpha: false,
+			desynchronized: true,
+		}),
 		canvas_surface: null,
 		diagnostics: '',
 		flag_dirty: false,
@@ -467,17 +470,11 @@ export const renderer_render = (model, now) => {
 }
 
 export const renderer_canvas_init = model => {
-	const width = model.canvas_element.width = model.game.resolution_x;
-	const height = model.canvas_element.height = model.game.resolution_y;
-	const data = (
-		model.canvas_surface = (
-			model.canvas_context = model.canvas_element.getContext('2d')
-		).createImageData(width, height)
-	).data;
+	(
+		model.canvas_surface = model.canvas_context.createImageData(
+			model.canvas_element.width = model.game.resolution_x,
+			model.canvas_element.height = model.game.resolution_y
+		)
+	).data.fill(0xff);
 	model.canvas_context.fillStyle = 'rgba(255,255,255,.5)';
-
-	// set alpha to 255
-	const data_length = data.length;
-	for (let i = 3; i < data_length; i += 4)
-		data[i] = 0xff;
 }

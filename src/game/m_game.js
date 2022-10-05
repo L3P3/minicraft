@@ -454,7 +454,15 @@ export const game_message_send = (model, value) => {
 				model.menu = MENU_NONE;
 				break;
 			case 'help':
-				game_message_print(model, 'commands: clear, exit, help, spawn, version, /regen');
+				game_message_print(model, 'commands: clear, exit, help, save, spawn, version, /regen');
+				break;
+			case 'save':
+				game_save(model);
+				game_message_print(model, 'world saved.');
+				break;
+			case 'smart':
+				model.player.name = 'LFF5644';
+				game_message_print(model, 'lff.smart: true');
 				break;
 			case 'spawn':
 				model.player.position_x = model.world.spawn_x;
@@ -521,7 +529,7 @@ export const game_message_send = (model, value) => {
 		}
 	}
 	else {
-		game_message_print(model, '<me> ' + value);
+		game_message_print(model, `<${model.player.name}> ` + value);
 	}
 }
 
