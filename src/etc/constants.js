@@ -31,6 +31,7 @@ export const BLOCK_TYPE_DIAMOND_BLOCK = 21;
 export const BLOCK_TYPE_EMERALD_BLOCK = 22;
 export const BLOCK_TYPE_REDSTONE_BLOCK = 23;
 export const BLOCK_TYPE_QUARTZ_BLOCK = 24;
+export const BLOCK_TYPE_MAX = 24;
 
 // B G R
 export const BLOCK_COLORS = [

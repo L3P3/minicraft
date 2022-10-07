@@ -29,6 +29,7 @@ import {
 	MENU_TERMINAL,
 	MOUSE_MODE_SELECT,
 	MOUSE_MODE_NORMAL,
+	BLOCK_TYPE_MAX,
 } from '../etc/constants.js';
 import {
 	DEBUG,
@@ -40,6 +41,7 @@ import {
 	Math_max,
 	Math_PI,
 	Math_round,
+	Number_,
 	setInterval_,
 } from '../etc/helpers.js';
 import {
@@ -439,8 +441,21 @@ const game_tick = model => {
 
 	world_offset_update(model.world, model.player, false);
 }
+const coord_part_parse = (base, value) => (
+	value = (
+		value.startsWith('~')
+		?	base + Number_(value.substr(1))
+		:	Number_(value)
+	),
+	isNaN(value)
+	?	base
+	:	value
+);
 
 export const game_message_send = (model, value) => {
+	const {
+		player,
+	} = model;
 	if (!value) {}
 	else if (value.charAt(0) === '/') {
 		const args = value.substr(1).split(' ');
@@ -453,35 +468,66 @@ export const game_message_send = (model, value) => {
 				model.flag_paused = false;
 				model.menu = MENU_NONE;
 				break;
+			case 'give': {
+					const value = parseInt(args[0]);
+					if (
+						!isNaN(value) &&
+						value > 0 &&
+						value < BLOCK_TYPE_MAX + 1
+					) {
+						player.holds = value;
+						game_message_print(model, 'selected block ' + value);
+					}
+					else {
+						game_message_print(model, 'invalid block id');
+					}
+				}
+				break;
 			case 'help':
-				game_message_print(model, 'commands: clear, exit, help, save, spawn, version, /regen');
+				game_message_print(model, 'commands: clear, exit, give, help, save, spawn, tp, version, /regen');
 				break;
 			case 'save':
 				game_save(model);
 				game_message_print(model, 'world saved.');
 				break;
 			case 'smart':
-				model.player.name = 'LFF5644';
+				player.name = 'LFF5644';
 				game_message_print(model, 'lff.smart: true');
 				break;
 			case 'spawn':
-				model.player.position_x = model.world.spawn_x;
-				model.player.position_y = model.world.spawn_y;
-				model.player.position_z = model.world.spawn_z;
+				player.position_x = model.world.spawn_x;
+				player.position_y = model.world.spawn_y;
+				player.position_z = model.world.spawn_z;
 				model.renderer.flag_dirty = true;
+				break;
+			case 'teleport':
+			case 'tp':
+				if (args.length === 3) {
+					game_message_print(model, `teleported to ${
+						player.position_x = coord_part_parse(player.position_x, args[0])
+					} ${
+						player.position_y = coord_part_parse(player.position_y, args[1])
+					} ${
+						player.position_z = coord_part_parse(player.position_z, args[2])
+					}`);
+					model.renderer.flag_dirty = true;
+				}
+				else {
+					game_message_print(model, 'PITCH');
+				}
 				break;
 			case 'version':
 				game_message_print(model, 'Minicraft ' + VERSION);
 				break;
 			case '/exit':
-				model.player.mouse_mode = MOUSE_MODE_NORMAL;
+				player.mouse_mode = MOUSE_MODE_NORMAL;
 				game_message_print(model, 'normal mouse mode');
 				break;
 			case '/expand':
 				if (game_block_assert(model)) {
 					if (args[0] === 'vert') {
-						model.player.block_select_a[1] = 0;
-						model.player.block_select_b[1] = CHUNK_HEIGHT - 1;
+						player.block_select_a[1] = 0;
+						player.block_select_b[1] = CHUNK_HEIGHT - 1;
 						game_message_print(model, 'selection expanded');
 					}
 					else {
@@ -494,9 +540,9 @@ export const game_message_send = (model, value) => {
 				game_block_select(
 					model,
 					[
-						Math_floor(model.player.position_x),
-						Math_floor(model.player.position_y),
-						Math_floor(model.player.position_z),
+						Math_floor(player.position_x),
+						Math_floor(player.position_y),
+						Math_floor(player.position_z),
 					],
 					command === '/pos2'
 				);
@@ -510,18 +556,18 @@ export const game_message_send = (model, value) => {
 				game_message_print(
 					model,
 					`first: ${
-						model.player.block_select_a
-						?	model.player.block_select_a.join(' ')
+						player.block_select_a
+						?	player.block_select_a.join(' ')
 						:	'none'
 					}, second: ${
-						model.player.block_select_b
-						?	model.player.block_select_b.join(' ')
+						player.block_select_b
+						?	player.block_select_b.join(' ')
 						:	'none'
 					}`
 				);
 				break;
 			case '/wand':
-				model.player.mouse_mode = MOUSE_MODE_SELECT;
+				player.mouse_mode = MOUSE_MODE_SELECT;
 				game_message_print(model, 'primary+secondary button for selection');
 				break;
 			default:
@@ -529,7 +575,7 @@ export const game_message_send = (model, value) => {
 		}
 	}
 	else {
-		game_message_print(model, `<${model.player.name}> ` + value);
+		game_message_print(model, `<${player.name}> ` + value);
 	}
 }
 

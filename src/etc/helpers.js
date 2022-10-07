@@ -21,6 +21,7 @@ export const localStorage_ = localStorage;
 export const Uint8Array_ = Uint8Array;
 export const Uint32Array_ = Uint32Array;
 export const Map_ = Map;
+export const Number_ = Number;
 export const setTimeout_ = setTimeout;
 export const setInterval_ = setInterval;
 export const clearInterval_ = clearInterval;
