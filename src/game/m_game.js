@@ -469,11 +469,12 @@ export const game_message_send = (model, value) => {
 				model.menu = MENU_NONE;
 				break;
 			case 'give': {
-					const value = parseInt(args[0]);
+					const value = Number_(args[0]);
 					if (
 						!isNaN(value) &&
 						value > 0 &&
-						value < BLOCK_TYPE_MAX + 1
+						value < BLOCK_TYPE_MAX + 1 &&
+						value % 1 === 0
 					) {
 						player.holds = value;
 						game_message_print(model, 'selected block ' + value);
