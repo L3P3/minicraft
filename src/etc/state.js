@@ -31,10 +31,14 @@ export const reducers = {
 		}
 		return {
 			config,
+			config_saved: config,
 		};
 	},
 	config_save: state => {
-		const {config} = state;
+		const {
+			config,
+		} = state;
+		if (config === state.config_saved) return state;
 		localStorage_.setItem('minicraft.config', JSON_.stringify({
 			'version': VERSION,
 			'flag_textures': config.flag_textures,
@@ -43,7 +47,10 @@ export const reducers = {
 			'view_angle': config.view_angle,
 			'view_distance': config.view_distance,
 		}));
-		return state;
+		return {
+			...state,
+			config_saved: config,
+		};
 	},
 	config_reduce: (state, reducer) => (
 		reducers.config_set(

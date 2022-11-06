@@ -24,6 +24,7 @@ export const Map_ = Map;
 export const Number_ = Number;
 export const setTimeout_ = setTimeout;
 export const setInterval_ = setInterval;
+export const clearTimeout_ = clearTimeout;
 export const clearInterval_ = clearInterval;
 
 /**

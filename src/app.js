@@ -27,7 +27,11 @@ lui_.init(() => {
 	});
 
 	hook_effect(() => {
-		onbeforeunload = () => {
+		let unloaded = false;
+
+		onbeforeunload = onunload = () => {
+			if (unloaded) return;
+			unloaded = true;
 			actions.config_save();
 			if (ref.game) game_save(ref.game);
 		};

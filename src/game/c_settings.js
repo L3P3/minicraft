@@ -1,5 +1,6 @@
 import {
 	hook_dom,
+	hook_effect,
 	hook_static,
 	node_dom,
 } from '../etc/lui.js';
@@ -8,17 +9,33 @@ import {
 	MENU_NONE,
 } from '../etc/constants.js';
 import {
+	clearTimeout_,
+	setTimeout_,
+} from '../etc/helpers.js';
+import {
 	game_mouse_catch,
+	game_save,
 } from './m_game.js';
 
 export default function Settings({
 	actions: {
 		config_reduce,
+		config_save,
 		config_set,
 	},
 	config,
 	game,
 }) {
+	hook_effect(() => (
+		game_save(game),
+		config_save
+	));
+	hook_effect(() => {
+		const timeout = setTimeout_(config_save, 1e3);
+
+		return () => clearTimeout_(timeout);
+	}, [config]);
+
 	hook_dom('div[className=menu]');
 
 	return [

@@ -230,6 +230,7 @@ function open(url){}
 
 function onbeforeinstallprompt(){}
 function onbeforeunload(){}
+function onunload(){}
 function onerror(error){}
 function onkeydown(event){}
 function oncontextmenu(){}
