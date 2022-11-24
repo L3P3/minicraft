@@ -72,7 +72,7 @@ async function build_js() {
 			'rewrite_polyfills false',
 			'strict_mode_input',
 			'use_types_for_optimization',
-			'warning_level VERBOSE'
+			'warning_level VERBOSE',
 		]
 		.join(' --')
 	))[2]);
@@ -98,7 +98,7 @@ async function build_js() {
 			'language_out ECMASCRIPT6_STRICT',
 			'rewrite_polyfills false',
 			'strict_mode_input',
-			'warning_level VERBOSE'
+			'warning_level VERBOSE',
 		]
 		.join(' --')
 	))[2]);

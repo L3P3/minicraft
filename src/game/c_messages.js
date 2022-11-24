@@ -7,12 +7,14 @@ import {Math_min} from '../etc/helpers.js';
 
 const Message = ({
 	I: {
+		minor,
 		time,
 		value,
 	},
 	time_now,
 }) => (
-	hook_dom('div', {
+	// messages will not change
+	hook_dom(minor ? 'div[className=minor]' : 'div', {
 		innerText: value,
 		S: {
 			opacity: Math_min(

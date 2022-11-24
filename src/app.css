@@ -184,9 +184,17 @@ button {
 	display: flex;
 	flex-direction: column;
 }
+.game > .terminal > .history > * {
+	padding: 1px;
+}
 .game > .terminal > .history > :first-child,
 .game > .messages > :first-child {
 	margin-top: auto;
+}
+.game > .terminal > .history > .minor,
+.game > .messages > .minor {
+	font-style: italic;
+	color: #999;
 }
 .game > .terminal > input {
 	border: none;
@@ -205,7 +213,7 @@ button {
 	flex-direction: column;
 	font-family: Minecraft, 'Courier New', Courier, monospace;
 }
-.game > .messages > div {
+.game > .messages > * {
 	width: fit-content;
 	background: rgba(0, 0, 0, .7);
 	padding: 1px;

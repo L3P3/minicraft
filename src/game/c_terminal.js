@@ -19,10 +19,12 @@ import {
 
 const Message = ({
 	I: {
+		minor,
 		value,
 	}
 }) => (
-	hook_dom('div', {
+	// messages will not change
+	hook_dom(minor ? 'div[className=minor]' : 'div', {
 		innerText: value,
 	}),
 	null

@@ -78,6 +78,7 @@ export default function Game({
 	const pointer_locked = document_.pointerLockElement === frame;
 
 	hook_effect(() => (
+		model.actions = actions,
 		model.frame_element = frame,
 		ref.game = model,
 		() => (

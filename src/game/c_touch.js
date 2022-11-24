@@ -53,7 +53,7 @@ export default function Touch({
 	game,
 }) {
 	const {keys_active} = game;
-	
+
 	const move_button = ([name, code]) => node_dom('div', {
 		D: {
 			code,
