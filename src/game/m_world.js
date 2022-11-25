@@ -141,14 +141,22 @@ export const world_data_init = (model, player, size_l2) => {
 			z_abs: 0,
 		});
 
-	model.blocks = new Uint8Array_((
-		model.blocks_u32 = new Uint32Array_(size << (
-			size_l2
-			+ CHUNK_WIDTH_L2 * 3
-			+ CHUNK_HEIGHT_FACTOR_L2
-			- 2
-		))
-	).buffer);
+	const size_new = size << (
+		size_l2
+		+ CHUNK_WIDTH_L2 * 3
+		+ CHUNK_HEIGHT_FACTOR_L2
+	);
+	if (
+		model.blocks === null ||
+		model.blocks.length < size_new
+	) {
+		model.blocks_u32 = new Uint32Array_((
+			model.blocks = new Uint8Array_(size_new)
+		).buffer);
+	}
+	else {
+		model.blocks_u32.fill(0);
+	}
 
 	world_offset_update(model, player, true);
 }
