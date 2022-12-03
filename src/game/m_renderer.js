@@ -211,16 +211,10 @@ export const renderer_render = (model, now) => {
 					if (dim === 1) offset = position_y_shifted_rest;
 					if (step_dim > 0) offset = 1 - offset;
 
-					let check_x = position_x_shifted + step_x * offset;
-					let check_y = position_y_shifted + step_y * offset;
-					let check_z = position_z_shifted + step_z * offset;
+					let check_x = position_x_shifted + step_x * offset - ((dim === 0)&(step_dim < 0)|0);
+					let check_y = position_y_shifted + step_y * offset - ((dim === 1)&(step_dim < 0)|0);
+					let check_z = position_z_shifted + step_z * offset - ((dim === 2)&(step_dim < 0)|0);
 					let check_distance = step_diagonal * offset;
-
-					// move into middle of block to prevent rounding errors causing flicker
-					// https://jsben.ch/iIvG7
-					if (dim === 0) check_x += .5 - ((step_dim < 0) | 0);
-					if (dim === 1) check_y += .5 - ((step_dim < 0) | 0);
-					if (dim === 2) check_z += .5 - ((step_dim < 0) | 0);
 
 					// add steps until collision or out of range
 					// https://jsben.ch/kM67J
@@ -310,7 +304,7 @@ export const renderer_render = (model, now) => {
 											step_dim > 0
 											?	check_x - check_z
 											:	check_z - check_x
-										) + COORDINATE_OFFSET + .5
+										) + COORDINATE_OFFSET
 									) * TILES_RESOLUTION & (TILES_RESOLUTION - 1)
 								];
 
