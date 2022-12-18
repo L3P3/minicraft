@@ -27,6 +27,7 @@ import {
 	number_toFixed2,
 	setInterval_,
 	Uint32Array_,
+	window_,
 } from '../etc/helpers.js';
 import {
 	world_block_get,
@@ -67,12 +68,14 @@ tiles_image.src = ASSETS + 'blocks.png';
 
 export const renderer_create = (game, canvas_element) => {
 	const model = {
-		canvas_element,
+		asm_instance: null,
 		canvas_context: canvas_element.getContext('2d', {
 			alpha: false,
 			desynchronized: true,
 		}),
+		canvas_element,
 		canvas_surface: null,
+		canvas_surface_data32: null,
 		diagnostics: '',
 		flag_dirty: false,
 		fps: 0,
@@ -91,12 +94,526 @@ export const renderer_destroy = model => (
 	clearInterval_(model.fps_interval)
 );
 
+/**
+	@noinline
+	@preserve
+*/
+const asm_core = function(stdlib, foreign, heap) {
+	'use asm';
+	var world = new stdlib.Uint8Array(heap);
+
+	var Math_abs = stdlib.Math.abs;
+	var Math_floor = stdlib.Math.floor;
+	var Math_sqrt = stdlib.Math.sqrt;
+
+	var pixel_set = foreign.a;
+	var focus_set = foreign.b;
+	var resolution_x = foreign.c|0;
+	var resolution_y = foreign.d|0;
+	var resolution_x_h = foreign.e|0;
+	var resolution_y_h = foreign.f|0;
+	var world_width_l2 = foreign.j|0;
+	var world_width_m1 = foreign.k|0;
+	var texture_pixel_get = foreign.l;
+
+	function render(
+		view_distance,
+		resolution_x_1d__fov_x,
+		resolution_y_1d__fov_y,
+		angle_h_cos,
+		angle_h_sin,
+		angle_v_cos,
+		angle_v_sin,
+		block_focus_x,
+		block_focus_y,
+		block_focus_z,
+		position_x,
+		position_y,
+		position_z
+	) {
+		view_distance = +view_distance;
+		resolution_x_1d__fov_x = +resolution_x_1d__fov_x;
+		resolution_y_1d__fov_y = +resolution_y_1d__fov_y;
+		angle_h_cos = +angle_h_cos;
+		angle_h_sin = +angle_h_sin;
+		angle_v_cos = +angle_v_cos;
+		angle_v_sin = +angle_v_sin;
+		block_focus_x = block_focus_x|0;
+		block_focus_y = block_focus_y|0;
+		block_focus_z = block_focus_z|0;
+		position_x = +position_x;
+		position_y = +position_y;
+		position_z = +position_z;
+
+		var block = 0;
+		var canvas_surface_data_index = 0;
+		var canvas_x = 0;
+		var canvas_y = 0;
+		var check_a = 0;
+		var check_b = 0.0;
+		var check_b_int = 0;
+		var check_c = 0.0;
+		var check_c_int = 0;
+		var check_distance = 0.0;
+		var check_distance_min = 0.0;
+		var focus_distance_min = 0.0;
+		var pixel_color = 0;
+		var position_x_shifted = 0.0;
+		var position_x_shifted_int = 0;
+		var position_x_shifted_rest = 0.0;
+		var position_y_int = 0;
+		var position_y_rest = 0.0;
+		var position_z_shifted = 0.0;
+		var position_z_shifted_int = 0;
+		var position_z_shifted_rest = 0.0;
+		var step_a = 0;
+		var step_b = 0.0;
+		var step_c = 0.0;
+		var step_diagonal = 0.0;
+		var step_x = 0.0;
+		var step_y = 0.0;
+		var step_y_normal = 0.0;
+		var step_z = 0.0;
+		var step_x_base = 0.0;
+		var step_z_base = 0.0;
+		var tmp = 0.0;
+
+		focus_distance_min = 5.0; // PLAYER_FOCUS_DISTANCE
+		position_x_shifted = position_x + 65536.0; // +COORDINATE_OFFSET
+		position_z_shifted = position_z + 65536.0;
+		position_x_shifted_int = ~~Math_floor(position_x_shifted);
+		position_y_int = ~~Math_floor(position_y);
+		position_z_shifted_int = ~~Math_floor(position_z_shifted);
+		position_x_shifted_rest = position_x_shifted % 1.0;
+		position_y_rest = position_y - +(position_y_int|0);
+		position_z_shifted_rest = position_z_shifted % 1.0;
+
+		do {
+			// canvas_y_relative
+			tmp = +((resolution_y_h - canvas_y)|0) * resolution_y_1d__fov_y;
+			step_y = tmp * angle_v_cos - angle_v_sin;
+			step_y_normal = 1.0 / Math_abs(step_y);
+			// angle_v
+			tmp = tmp * angle_v_sin + angle_v_cos;
+			step_x_base = angle_h_sin * tmp;
+			step_z_base = angle_h_cos * tmp;
+
+			canvas_x = 0;
+			do {
+				// canvas_x_relative
+				tmp = +((canvas_x - resolution_x_h)|0) * resolution_x_1d__fov_x;
+				step_x = step_x_base + angle_h_cos * tmp;
+				step_z = step_z_base - angle_h_sin * tmp;
+
+				pixel_color = 4294947204; // SKY_COLOR
+				check_distance_min = view_distance;
+
+				// Y
+				// check_y
+				check_a = position_y_int;
+				// step_y
+				step_a = step_y < 0.0 ? -1 : 1;
+				// step_x
+				step_b = step_x * step_y_normal;
+				// step_z
+				step_c = step_z * step_y_normal;
+				step_diagonal = Math_sqrt(
+					step_b * step_b +
+					step_c * step_c +
+					1.0
+				);
+
+				// calculate start position
+				// offset
+				tmp = step_y < 0.0 ? position_y_rest : 1.0 - position_y_rest;
+				// check_x
+				check_b = position_x_shifted + step_b * tmp;
+				// check_z
+				check_c = position_z_shifted + step_c * tmp;
+				check_distance = step_diagonal * tmp;
+
+				// add steps until collision or out of range
+				stepping: while (check_distance < check_distance_min) {
+					// move on
+					check_a = (check_a + step_a)|0;
+
+					// check for collision
+					switch (
+						((step_a|0) < 0) << 2 |
+						((check_a|0) < 0) << 1 |
+						((check_a|0) >= 64) // CHUNK_HEIGHT
+					) {
+					case 1: // step_y > 0.0 && check_y >= CHUNK_HEIGHT
+					case 6: // step_y < 0.0 && check_y < 0.0
+						// will never reach a block
+						break stepping;
+					case 2: // step_y > 0.0 && check_y < 0.0
+					case 5: // step_y < 0.0 && check_y >= CHUNK_HEIGHT
+						// will maybe reach a block
+						break;
+					default:
+						// inside world
+						check_b_int = ~~Math_floor(check_b) & world_width_m1;
+						check_c_int = ~~Math_floor(check_c) & world_width_m1;
+						block = world[
+							(
+								(check_b_int << world_width_l2) |
+								check_c_int
+							) << 6 | // CHUNK_HEIGHT_L2
+							check_a
+						]|0;
+						if (block) {
+							// collision
+
+							if (
+								((canvas_y|0) == (resolution_y_h|0)) &
+								((canvas_x|0) == (resolution_x_h|0)) &
+								(check_distance < focus_distance_min)
+							) {
+								// set focus
+								focus_set(
+									check_b_int|0,
+									check_a|0,
+									check_c_int|0,
+									((step_a|0) < 0) | 2
+								);
+								focus_distance_min = check_distance;
+							}
+
+							switch(block|0) {
+							case 7: // TILE_LOG_SIDE
+								block = 25; // TILE_LOG_TOP
+								break;
+							case 14: // TILE_BOOKSHELF
+								block = 4; // TILE_PLANKS
+								break;
+							case 2: // TILE_GRASS_TOP
+								if ((step_a|0) > 0) {
+									break;
+								}
+							default:
+								// shift so that block id 1 => tile 0
+								block = (block - 1)|0;
+							}
+
+							// get pixel color
+							block = texture_pixel_get(
+								block << 8 | // TILES_RESOLUTION_LOG2 * 2
+								// y
+								(
+									~~Math_floor(check_c * 16.0) & 15 // TILES_RESOLUTION
+							 	) << 4 |
+								// x
+								~~Math_floor(check_b * 16.0) & 15
+							)|0;
+
+							if (block >>> 24) {
+								// solid pixel
+								pixel_color = block;
+								check_distance_min = check_distance;
+								break stepping;
+							}
+						}
+					}
+
+					// no collision yet
+					check_b = +(check_b + step_b);
+					check_c = +(check_c + step_c);
+					check_distance = +(check_distance + step_diagonal);
+				}
+
+				// X
+				// check_x
+				check_a = position_x_shifted_int;
+				// step_normal
+				tmp = 1.0 / Math_abs(step_x);
+				// step_x
+				step_a = step_x < 0.0 ? -1 : 1;
+				// step_y
+				step_b = step_y * tmp;
+				// step_z
+				step_c = step_z * tmp;
+				step_diagonal = Math_sqrt(
+					step_b * step_b +
+					step_c * step_c +
+					1.0
+				);
+
+				// calculate start position
+				// offset
+				tmp = step_x < 0.0 ? position_x_shifted_rest : 1.0 - position_x_shifted_rest;
+				// check_y
+				check_b = position_y + step_b * tmp;
+				// check_z
+				check_c = position_z_shifted + step_c * tmp;
+				check_distance = step_diagonal * tmp;
+
+				// add steps until collision or out of range
+				stepping: while (check_distance < check_distance_min) {
+					// move on
+					check_a = (check_a + step_a)|0;
+
+					// check for collision
+					switch (
+						(step_b < 0.0) << 2 |
+						(check_b < 0.0) << 1 |
+						(check_b >= 64.0) // CHUNK_HEIGHT
+					) {
+					case 1: // step_y > 0.0 && check_y >= CHUNK_HEIGHT
+					case 6: // step_y < 0.0 && check_y < 0.0
+						// will never reach a block
+						break stepping;
+					case 2: // step_y > 0.0 && check_y < 0.0
+					case 5: // step_y < 0.0 && check_y >= CHUNK_HEIGHT
+						// will maybe reach a block
+						break;
+					default:
+						// inside world
+						check_b_int = ~~Math_floor(check_b);
+						check_c_int = ~~Math_floor(check_c) & world_width_m1;
+						block = world[
+							(
+								((check_a & world_width_m1) << world_width_l2) |
+								check_c_int
+							) << 6 | // CHUNK_HEIGHT_L2
+							check_b_int
+						]|0;
+						if (block) {
+							// collision
+
+							if (
+								((canvas_y|0) == (resolution_y_h|0)) &
+								((canvas_x|0) == (resolution_x_h|0)) &
+								(check_distance < focus_distance_min)
+							) {
+								// set focus
+								focus_set(
+									check_a & world_width_m1,
+									check_b_int|0,
+									check_c_int|0,
+									(step_x < 0.0) | 0
+								);
+								focus_distance_min = check_distance;
+							}
+
+							if ((block|0) == 2) { // TILE_GRASS_TOP
+								block = 24; // TILE_GRASS_SIDE
+							}
+							else {
+								// shift so that block id 1 => tile 0
+								block = (block - 1)|0;
+							}
+
+							// get pixel color
+							block = texture_pixel_get(
+								block << 8 | // TILES_RESOLUTION_LOG2 * 2
+								// y
+								(
+									~~Math_floor(check_b * 16.0) & 15 // TILES_RESOLUTION
+							 	) << 4 |
+								// x
+								~~Math_floor(
+									(
+										(step_a|0) < 0
+										?	check_c + 65536.0
+										:	-check_c + 65536.0
+									) * 16.0
+								) & 15
+							)|0;
+
+							if (block >>> 24) {
+								// solid pixel
+								pixel_color = block;
+								check_distance_min = check_distance;
+								break stepping;
+							}
+						}
+					}
+
+					// no collision yet
+					check_b = +(check_b + step_b);
+					check_c = +(check_c + step_c);
+					check_distance = +(check_distance + step_diagonal);
+				}
+
+				// Z
+				// check_z
+				check_a = position_z_shifted_int;
+				// step_normal
+				tmp = 1.0 / Math_abs(step_z);
+				// step_z
+				step_a = step_z < 0.0 ? -1 : 1;
+				// step_y
+				step_b = step_y * tmp;
+				// step_x
+				step_c = step_x * tmp;
+				step_diagonal = Math_sqrt(
+					step_b * step_b +
+					step_c * step_c +
+					1.0
+				);
+
+				// calculate start position
+				// offset
+				tmp = step_z < 0.0 ? position_z_shifted_rest : 1.0 - position_z_shifted_rest;
+				// check_y
+				check_b = position_y + step_b * tmp;
+				// check_x
+				check_c = position_x_shifted + step_c * tmp;
+				check_distance = step_diagonal * tmp;
+
+				// add steps until collision or out of range
+				stepping: while (check_distance < check_distance_min) {
+					// move on
+					check_a = (check_a + step_a)|0;
+
+					// check for collision
+					switch (
+						(step_b < 0.0) << 2 |
+						(check_b < 0.0) << 1 |
+						(check_b >= 64.0) // CHUNK_HEIGHT
+					) {
+					case 1: // step_y > 0.0 && check_y >= CHUNK_HEIGHT
+					case 6: // step_y < 0.0 && check_y < 0.0
+						// will never reach a block
+						break stepping;
+					case 2: // step_y > 0.0 && check_y < 0.0
+					case 5: // step_y < 0.0 && check_y >= CHUNK_HEIGHT
+						// will maybe reach a block
+						break;
+					default:
+						// inside world
+						check_b_int = ~~Math_floor(check_b);
+						check_c_int = ~~Math_floor(check_c) & world_width_m1;
+						block = world[
+							(
+								(check_c_int << world_width_l2) |
+								check_a & world_width_m1
+							) << 6 | // CHUNK_HEIGHT_L2
+							check_b_int
+						]|0;
+						if (block) {
+							// collision
+
+							if (
+								((canvas_y|0) == (resolution_y_h|0)) &
+								((canvas_x|0) == (resolution_x_h|0)) &
+								(check_distance < focus_distance_min)
+							) {
+								// set focus
+								focus_set(
+									check_c_int|0,
+									check_b_int|0,
+									check_a & world_width_m1,
+									(step_z < 0.0) | 4
+								);
+								focus_distance_min = check_distance;
+							}
+
+							if ((block|0) == 2) { // TILE_GRASS_TOP
+								block = 24; // TILE_GRASS_SIDE
+							}
+							else {
+								// shift so that block id 1 => tile 0
+								block = (block - 1)|0;
+							}
+
+							// get pixel color
+							block = texture_pixel_get(
+								block << 8 | // TILES_RESOLUTION_LOG2 * 2
+								// y
+								(
+									~~Math_floor(check_b * 16.0) & 15 // TILES_RESOLUTION
+							 	) << 4 |
+								// x
+								~~Math_floor(
+									(
+										(step_a|0) < 0
+										?	-check_c + 65536.0
+										:	check_c + 65536.0
+									) * 16.0
+								) & 15
+							)|0;
+
+							if (block >>> 24) {
+								// solid pixel
+								pixel_color = block;
+								check_distance_min = check_distance;
+								break stepping;
+							}
+						}
+					}
+
+					// no collision yet
+					check_b = +(check_b + step_b);
+					check_c = +(check_c + step_c);
+					check_distance = +(check_distance + step_diagonal);
+				}
+
+				pixel_set(canvas_surface_data_index|0, pixel_color|0);
+				canvas_surface_data_index = (canvas_surface_data_index + 1)|0;
+
+				canvas_x = (canvas_x + 1)|0;
+			}
+			while ((canvas_x|0) < (resolution_x|0));
+			canvas_y = (canvas_y + 1)|0;
+		}
+		while ((canvas_y|0) < (resolution_y|0));
+	}
+
+	return {
+		z: render
+	};
+};
+
+export const asm_link = model => {
+	const {
+		canvas_surface_data32,
+		game,
+	} = model;
+	const {
+		player,
+		resolution_x,
+		resolution_y,
+		world,
+	} = game;
+	const pixel_set = (index, color) => {
+		canvas_surface_data32[index] = color;
+	};
+	const focus_set = (x, y, z, face) => {
+		player.block_focus_x = x;
+		player.block_focus_y = y;
+		player.block_focus_z = z;
+		player.block_focus_face = face;
+	};
+	const texture_pixel_get = index => (
+		tiles_data !== null
+		?	tiles_data[index]
+		:	BLOCK_COLORS[index >>> (TILES_RESOLUTION_LOG2 * 2)]
+	);
+	const world_width_l2 = world.size_l2 + CHUNK_WIDTH_L2;
+
+	model.asm_instance = asm_core(
+		window_,
+		{
+			'a': pixel_set,
+			'b': focus_set,
+			'c': resolution_x,
+			'd': resolution_y,
+			'e': resolution_x >> 1,
+			'f': resolution_y >> 1,
+			'j': world_width_l2,
+			'k': (1 << world_width_l2) - 1,
+			'l': texture_pixel_get,
+		},
+		world.blocks.buffer
+	)['z'];
+}
+
 export const renderer_render = (model, now) => {
 	++model.fps_counter;
 
 	const {
-		canvas_context,
-		canvas_surface,
 		game,
 	} = model;
 	const {
@@ -107,19 +624,12 @@ export const renderer_render = (model, now) => {
 		world,
 	} = game;
 
-	//let check_count = 0;
-
 	if (
 		!game.flag_paused ||
 		model.flag_dirty
 	) {
 		model.flag_dirty = false;
 
-		const canvas_surface_data = canvas_surface.data;
-
-		const {
-			view_distance,
-		} = config;
 		const {
 			angle_h,
 			angle_v,
@@ -130,266 +640,33 @@ export const renderer_render = (model, now) => {
 			position_y,
 			position_z,
 		} = player;
-		const {
-			blocks,
-			size_l2,
-		} = world;
-		const flag_textures = config.flag_textures && tiles_data !== null;
-		tiles_data = /** @type {Uint32Array!} */ (tiles_data);
-		const resolution_x_1d = 1 / resolution_x;
-		const resolution_y_1d = 1 / resolution_y;
-		const resolution_x_h = resolution_x >> 1;
-		const resolution_y_h = resolution_y >> 1;
-		const resolution_min = Math_min(resolution_x, resolution_y);
-		const cursor_cross = resolution_min > 32;
-		const pixel_focus_x = resolution_x_h;
-		const pixel_focus_y = resolution_y_h;
-		const angle_h_cos = Math_cos(angle_h);
-		const angle_h_sin = Math_sin(angle_h);
-		const angle_v_cos = Math_cos(-angle_v);
-		const angle_v_sin = Math_sin(-angle_v);
-		const fov = config.view_angle / 45;// TODO
-		const fov_x = resolution_x < resolution_y ? fov * resolution_x * resolution_y_1d : fov;
-		const fov_y = resolution_y < resolution_x ? fov * resolution_y * resolution_x_1d : fov;
-		const resolution_x_1d__fov_x = resolution_x_1d * fov_x;
-		const resolution_y_1d__fov_y = resolution_y_1d * fov_y;
-		const position_x_shifted = position_x + COORDINATE_OFFSET;
-		const position_y_shifted = position_y + COORDINATE_OFFSET;
-		const position_z_shifted = position_z + COORDINATE_OFFSET;
-		const position_x_shifted_rest = position_x_shifted % 1;
-		const position_y_shifted_rest = position_y_shifted % 1;
-		const position_z_shifted_rest = position_z_shifted % 1;
-		const world_width_l2 = CHUNK_WIDTH_L2 + size_l2;
-		const world_width_m1 = (1 << world_width_l2) - 1;
 
-		let focus_distance_min = PLAYER_FOCUS_DISTANCE;
-		let canvas_surface_data_index =
-			player.block_focus_x =
-			player.block_focus_z =
-			player.block_focus_face = 0;
+		const fov = config.view_angle / 45;// TODO
+		const fov_x = resolution_x < resolution_y ? fov * resolution_x / resolution_y : fov;
+		const fov_y = resolution_y < resolution_x ? fov * resolution_y / resolution_x : fov;
+
 		player.block_focus_y = -1;
 
-		for (let canvas_y = 0; canvas_y < resolution_y; ++canvas_y) {
-			const canvas_y_relative = (resolution_y_h - canvas_y) * resolution_y_1d__fov_y;
+		model.asm_instance(
+			config.view_distance,
+			fov_x / resolution_x,
+			fov_y / resolution_y,
+			Math_cos(angle_h),
+			Math_sin(angle_h),
+			Math_cos(-angle_v),
+			Math_sin(-angle_v),
+			block_focus_x,
+			block_focus_y,
+			block_focus_z,
+			position_x,
+			position_y,
+			position_z
+		);
 
-			const step_y_raw = canvas_y_relative * angle_v_cos - angle_v_sin;
-			const step_z_rot = canvas_y_relative * angle_v_sin + angle_v_cos;
-			const step_z_rot_sin = step_z_rot * angle_h_sin;
-			const step_z_rot_cos = step_z_rot * angle_h_cos;
-
-			for (let canvas_x = 0; canvas_x < resolution_x; ++canvas_x) {
-				const canvas_x_relative = (canvas_x - resolution_x_h) * resolution_x_1d__fov_x;
-
-				const step_x_raw = step_z_rot_sin + angle_h_cos * canvas_x_relative;
-				const step_z_raw = step_z_rot_cos - angle_h_sin * canvas_x_relative;
-
-				let pixel_color = SKY_COLOR;
-				let pixel_factor = 1.0;
-
-				let check_distance_min = view_distance;
-				// step for each x, y, z
-				for (let dim = 0; dim < 3; ++dim) {
-					// https://jsben.ch/AqXcR
-					let step_dim = step_z_raw;
-					if (dim === 0) step_dim = step_x_raw;
-					if (dim === 1) step_dim = step_y_raw;
-
-					// https://jsben.ch/hKgi4
-					const step_normal = 1 / (step_dim < 0 ? -step_dim : step_dim);
-					const step_x = step_x_raw * step_normal;
-					const step_y = step_y_raw * step_normal;
-					const step_z = step_z_raw * step_normal;
-					const step_diagonal = Math_sqrt(
-						step_x * step_x +
-						step_y * step_y +
-						step_z * step_z
-					);
-
-					// calculate distance to first intersection to then start on it
-					let offset = position_z_shifted_rest;
-					if (dim === 0) offset = position_x_shifted_rest;
-					if (dim === 1) offset = position_y_shifted_rest;
-					if (step_dim > 0) offset = 1 - offset;
-
-					let check_x = position_x_shifted + step_x * offset - ((dim === 0)&(step_dim < 0)|0);
-					let check_y = position_y_shifted + step_y * offset - ((dim === 1)&(step_dim < 0)|0);
-					let check_z = position_z_shifted + step_z * offset - ((dim === 2)&(step_dim < 0)|0);
-					let check_distance = step_diagonal * offset;
-
-					// add steps until collision or out of range
-					// https://jsben.ch/kM67J
-					for (
-						let check_x_int, check_y_int, check_z_int, block;
-						check_distance < check_distance_min;
-						check_x += step_x,
-						check_y += step_y,
-						check_z += step_z,
-						check_distance += step_diagonal
-					) {
-						if (check_y < COORDINATE_OFFSET) {
-							if (step_y < 0) break;
-							continue;
-						}
-						if (check_y >= COORDINATE_OFFSET + CHUNK_HEIGHT) {
-							if (step_y > 0) break;
-							continue;
-						}
-						//++check_count;
-						if (
-							(
-								block = blocks[
-									(
-										(
-											check_x_int = check_x & world_width_m1
-										) << world_width_l2 |
-										(
-											check_z_int = check_z & world_width_m1
-										)
-									) << CHUNK_HEIGHT_L2 |
-									(
-										check_y_int = check_y & (CHUNK_HEIGHT - 1)
-									)
-								]
-							) !== BLOCK_TYPE_AIR
-						) {
-							// collision
-
-							if (
-								canvas_y === pixel_focus_y &&
-								canvas_x === pixel_focus_x &&
-								check_distance <= focus_distance_min
-							) {
-								// set focus
-								player.block_focus_x = check_x_int;
-								player.block_focus_y = check_y_int;
-								player.block_focus_z = check_z_int;
-								player.block_focus_face = (step_dim < 0) | dim << 1;
-								focus_distance_min = check_distance;
-							}
-
-							// calculate color
-							if (flag_textures) {
-								// shift so that block id 1 => tile 0
-								--block;
-
-								if (dim === 1) {
-									if (block === TILE_LOG_SIDE)
-										block = TILE_LOG_TOP;
-									else if (block === TILE_BOOKSHELF)
-										block = TILE_PLANKS;
-									else if (
-										block === TILE_GRASS_TOP &&
-										step_y > 0
-									) block = TILE_DIRT;
-								}
-								else if (block === TILE_GRASS_TOP)
-									block = TILE_GRASS_SIDE;
-
-								// pick pixel
-								const texture_pixel = tiles_data[
-									block << (TILES_RESOLUTION_LOG2 * 2) |
-									(
-										// y
-										(
-											dim === 1
-											?	check_z
-											:	check_y
-										) * TILES_RESOLUTION & (TILES_RESOLUTION - 1)
-									) << TILES_RESOLUTION_LOG2 |
-									// x
-									(
-										dim === 1
-										?	check_x
-										:	(
-											step_dim > 0
-											?	check_x - check_z
-											:	check_z - check_x
-										) + COORDINATE_OFFSET
-									) * TILES_RESOLUTION & (TILES_RESOLUTION - 1)
-								];
-
-								// transparent pixel?
-								if (texture_pixel >>> 24 === 0) continue;
-
-								// solid pixel
-								pixel_color = texture_pixel & 0xffffff;
-							}
-							else pixel_color = BLOCK_COLORS[block];
-
-							check_distance_min = check_distance;
-							pixel_factor = (
-								// fake shadow to see edges
-								(
-									dim === 0
-									?	.8
-									: dim === 2
-									?	.6
-									: step_dim > 0
-									?	.4
-									:	1
-								) +
-								// highlight if focussed
-								(
-									check_y_int !== block_focus_y ||
-									check_x_int !== block_focus_x ||
-									check_z_int !== block_focus_z
-									?	0
-									:	.2
-								)
-							);
-							break;
-						}
-
-						// no collision
-					}
-				}
-
-				canvas_surface_data[canvas_surface_data_index] =
-					(pixel_color & 0xff) * pixel_factor;
-				canvas_surface_data[++canvas_surface_data_index] =
-					((pixel_color >> 8) & 0xff) * pixel_factor;
-				canvas_surface_data[++canvas_surface_data_index] =
-					(pixel_color >> 16) * pixel_factor;
-				canvas_surface_data_index += 2;
-			}
-		}
-
-		// cursor
-		if (!cursor_cross) {
-			canvas_surface_data[
-				canvas_surface_data_index =
-					(resolution_x * pixel_focus_y + pixel_focus_x) << 2
-			] += 128;
-			canvas_surface_data[++canvas_surface_data_index] += 128;
-			canvas_surface_data[++canvas_surface_data_index] += 128;
-		}
-
-		canvas_context.putImageData(canvas_surface, 0, 0);
-
-		if (cursor_cross) {
-			const cross_width_h = Math_ceil(
-				resolution_min * .05
-			);
-			const cross_width = cross_width_h << 1;
-			canvas_context.fillRect(
-				resolution_x_h - cross_width_h,
-				resolution_y_h - 1,
-				cross_width,
-				2
-			);
-			canvas_context.fillRect(
-				resolution_x_h - 1,
-				resolution_y_h - cross_width_h,
-				2,
-				cross_width_h - 1
-			);
-			canvas_context.fillRect(
-				resolution_x_h - 1,
-				resolution_y_h + 1,
-				2,
-				cross_width_h - 1
-			);
-		}
+		model.canvas_context.putImageData(
+			model.canvas_surface,
+			0, 0
+		);
 	}
 
 	model.diagnostics = (
@@ -465,10 +742,13 @@ export const renderer_render = (model, now) => {
 
 export const renderer_canvas_init = model => {
 	(
-		model.canvas_surface = model.canvas_context.createImageData(
-			model.canvas_element.width = model.game.resolution_x,
-			model.canvas_element.height = model.game.resolution_y
-		)
-	).data.fill(0xff);
+		model.canvas_surface_data32 = new Uint32Array_((
+			model.canvas_surface = model.canvas_context.createImageData(
+				model.canvas_element.width = model.game.resolution_x,
+				model.canvas_element.height = model.game.resolution_y
+			)
+		).data.buffer)
+	).fill(0xffff0000);
 	model.canvas_context.fillStyle = 'rgba(255,255,255,.5)';
+	asm_link(model);
 }

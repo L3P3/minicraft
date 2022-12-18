@@ -77,13 +77,21 @@ async function build_js() {
 		.join(' --')
 	))[2]);
 
-	/*console.log('custom transformation...');
-	await writeFile(
-		TMP_FILE,
-		(await readFile(TMP_FILE, 'ascii'))
-		.split('const ').join('let '),
-		'ascii'
-	);*/
+	{
+		console.log('custom transformation...');
+		let tmp = await readFile(TMP_FILE, 'ascii');
+
+		tmp = tmp.split('const ').join('let ');
+
+		// remove uselessCode warning for asm.js
+		const window_alias = tmp.match(/([a-zA-Z]+)=window,/)[1];
+		tmp = tmp.replace(
+			new RegExp(`(function\\([a-zA-Z]+,[a-zA-Z]+,[a-zA-Z]+\\)\\{"use asm".+\\})\\(${window_alias},`, 'gs'),
+			`(/**@suppress{uselessCode}*/$1)(${window_alias},`
+		);
+
+		await writeFile(TMP_FILE, tmp, 'ascii');
+	}
 
 	console.log('js pass 2...');
 	console.log((await exec(

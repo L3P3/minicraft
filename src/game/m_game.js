@@ -50,6 +50,7 @@ import {
 	player_tick,
 } from './m_player.js';
 import {
+	asm_link,
 	renderer_canvas_init,
 	renderer_create,
 	renderer_destroy,
@@ -129,7 +130,7 @@ export const game_resolution_update = model => {
 }
 
 export const game_view_distance_update = model => {
-	const {player, world} = model;
+	const {renderer, world} = model;
 	const {view_distance} = model.config;
 	// TODO proper formula would be less embarrassing
 	const size_l2 = (
@@ -155,8 +156,10 @@ export const game_view_distance_update = model => {
 		2
 	);*/
 	//console.log('size_l2', world.size_l2, size_l2, 1 << (CHUNK_WIDTH_L2 + size_l2));
-	if (world.size_l2 !== size_l2)
-		world_data_init(world, player, size_l2);
+	if (world.size_l2 !== size_l2) {
+		world_data_init(world, model.player, size_l2);
+		if (renderer !== null) asm_link(renderer);
+	}
 }
 
 /**
