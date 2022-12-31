@@ -12,47 +12,12 @@ import {
 /*
 	basic ranges of printable UTF16 values (as found in LZ-string): 
 		[32, 127), [160, 55296), [63744, 65536)
-	We also have filter out string characters like:
-	" (34)
-	' (39)
-	` (44)
-	(Forward tick is safe: ´ (96))
-	So:
-	32, 33, [35, 39), [40, 44), [45, 127), [160, 55296), [63744, 65536)
 */
 
 // integer to unicode:
-const itou = i => {
-	i += 32;
-	if (i > 33 && i < 39) {
-		i++;
-	} else if (i > 38 && i < 44) {
-		i += 2;
-	} else if (i > 43 && i < 127) {
-		i += 3;
-	} else if (i > 126 && i < 55258) {
-		i += 37; // === 160 - 128 + 3
-	} else if (i > 55295) {
-		i += 8485; // === 63744 - 55296 + 37  
-	}
-	return String_fromCharCode(i);
-}
+const itou = i => String_fromCharCode(i + 160);
 
-const utoi = i => (
-	i - (
-		i > 63743
-		?	8517
-		: i > 159
-		?	69
-		: i > 46 && i < 130
-		?	35
-		: i > 40 && i < 46
-		?	34
-		: i > 34 && i < 40
-		?	33
-		:	32
-	)
-);
+const utoi = i => i - 160;
 
 const TOKEN_BYTE_NEW = 0;
 const TOKEN_END_OF_STREAM = 1;
@@ -282,22 +247,7 @@ export const decompress = (compressed, result) => {
 	return null;
 }
 
-export const testCompression = () => {
-	console.log('Testing utoi/itou functions');
-	let utoiMismatches = [];
-	for (let i = 0; i < 1 << 15; i++) {
-		let j = utoi(itou(i).charCodeAt(0));
-		if (i !== j) {
-			utoiMismatches.push({itou: i, utio: j});
-		}
-	}
-
-	if (utoiMismatches.length) {
-		console.log("Errors in itou/utoi conversion detected:", utoiMismatches);
-	} else {
-		console.log('No errors in itou/utoi conversion detected');
-	}
-
+export const test = () => {
 	let input = new Uint16Array(1 << 15);
 	for (let i = 0; i < input.length; i++) {
 		input[i] = i>>4;

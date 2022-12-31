@@ -28,6 +28,7 @@ const env_set = (version, debug) => (
 		'./src/etc/env.js',
 `export const VERSION = '${version}';
 export const DEBUG = ${debug};
+export const TEST = null;
 `,
 		'utf8'
 	)
