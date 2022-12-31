@@ -462,122 +462,122 @@ export const game_message_send = (model, value) => {
 		const args = value.substr(1).split(' ');
 		const command = args.shift();
 		switch(command) {
-			case 'clear':
-				model.messages = [];
-				break;
-			case 'exit':
-				model.flag_paused = false;
-				model.menu = MENU_NONE;
-				break;
-			case 'give': {
-					const value = Number_(args[0]);
-					if (
-						!isNaN(value) &&
-						value > 0 &&
-						value < BLOCK_TYPE_MAX + 1 &&
-						value % 1 === 0
-					) {
-						player.holds = value;
-						game_message_print(model, 'selected block ' + value, true);
-					}
-					else {
-						game_message_print(model, 'invalid block type');
-					}
-				}
-				break;
-			case 'help':
-				game_message_print(model, 'commands: clear, exit, give, help, save, spawn, tp, version, /regen');
-				break;
-			case 'me':
-				game_message_print(model, player.name + ' ' + args.join(' '), true);
-				break;
-			case 'save':
-				game_save(model);
-				model.actions.config_save();
-				game_message_print(model, 'world+config saved', true);
-				break;
-			case 'smart':
-				player.name = 'LFF5644';
-				game_message_print(model, 'lff.smart: true', true);
-				break;
-			case 'spawn':
-				player.position_x = model.world.spawn_x;
-				player.position_y = model.world.spawn_y;
-				player.position_z = model.world.spawn_z;
-				model.renderer.flag_dirty = true;
-				break;
-			case 'teleport':
-			case 'tp':
-				if (args.length === 3) {
-					game_message_print(model, `teleported to ${
-						player.position_x = coord_part_parse(player.position_x, args[0])
-					} ${
-						player.position_y = coord_part_parse(player.position_y, args[1])
-					} ${
-						player.position_z = coord_part_parse(player.position_z, args[2])
-					}`, true);
-					model.renderer.flag_dirty = true;
+		case 'clear':
+			model.messages = [];
+			break;
+		case 'exit':
+			model.flag_paused = false;
+			model.menu = MENU_NONE;
+			break;
+		case 'give': {
+				const value = Number_(args[0]);
+				if (
+					!isNaN(value) &&
+					value > 0 &&
+					value < BLOCK_TYPE_MAX + 1 &&
+					value % 1 === 0
+				) {
+					player.holds = value;
+					game_message_print(model, 'selected block ' + value, true);
 				}
 				else {
-					game_message_print(model, 'PITCH');
+					game_message_print(model, 'invalid block type');
 				}
-				break;
-			case 'version':
-				game_message_print(model, 'Minicraft ' + VERSION);
-				break;
-			case '/exit':
-				player.mouse_mode = MOUSE_MODE_NORMAL;
-				game_message_print(model, 'normal mouse mode', true);
-				break;
-			case '/expand':
-				if (game_block_assert(model)) {
-					if (args[0] === 'vert') {
-						player.block_select_a[1] = 0;
-						player.block_select_b[1] = CHUNK_HEIGHT - 1;
-						game_message_print(model, 'selection expanded', true);
-					}
-					else {
-						game_message_print(model, 'only vert supported');
-					}
-				}
-				break;
-			case '/pos1':
-			case '/pos2':
-				game_block_select(
-					model,
-					[
-						Math_floor(player.position_x),
-						Math_floor(player.position_y),
-						Math_floor(player.position_z),
-					],
-					command === '/pos2'
-				);
-				break;
-			case '/regen':
-				world_chunk_reset(model.world);
-				game_message_print(model, 'regenerate chunk', true);
+			}
+			break;
+		case 'help':
+			game_message_print(model, 'commands: clear, exit, give, help, save, spawn, tp, version, /regen');
+			break;
+		case 'me':
+			game_message_print(model, player.name + ' ' + args.join(' '), true);
+			break;
+		case 'save':
+			game_save(model);
+			model.actions.config_save();
+			game_message_print(model, 'world+config saved', true);
+			break;
+		case 'smart':
+			player.name = 'LFF5644';
+			game_message_print(model, 'lff.smart: true', true);
+			break;
+		case 'spawn':
+			player.position_x = model.world.spawn_x;
+			player.position_y = model.world.spawn_y;
+			player.position_z = model.world.spawn_z;
+			model.renderer.flag_dirty = true;
+			break;
+		case 'teleport':
+		case 'tp':
+			if (args.length === 3) {
+				game_message_print(model, `teleported to ${
+					player.position_x = coord_part_parse(player.position_x, args[0])
+				} ${
+					player.position_y = coord_part_parse(player.position_y, args[1])
+				} ${
+					player.position_z = coord_part_parse(player.position_z, args[2])
+				}`, true);
 				model.renderer.flag_dirty = true;
-				break;
-			case '/show':
-				game_message_print(
-					model,
-					`first: ${
-						player.block_select_a
-						?	player.block_select_a.join(' ')
-						:	'none'
-					}, second: ${
-						player.block_select_b
-						?	player.block_select_b.join(' ')
-						:	'none'
-					}`
-				);
-				break;
-			case '/wand':
-				player.mouse_mode = MOUSE_MODE_SELECT;
-				game_message_print(model, 'primary+secondary button for selection', true);
-				break;
-			default:
-				game_message_print(model, 'unknown command: ' + command);
+			}
+			else {
+				game_message_print(model, 'PITCH');
+			}
+			break;
+		case 'version':
+			game_message_print(model, 'Minicraft ' + VERSION);
+			break;
+		case '/exit':
+			player.mouse_mode = MOUSE_MODE_NORMAL;
+			game_message_print(model, 'normal mouse mode', true);
+			break;
+		case '/expand':
+			if (game_block_assert(model)) {
+				if (args[0] === 'vert') {
+					player.block_select_a[1] = 0;
+					player.block_select_b[1] = CHUNK_HEIGHT - 1;
+					game_message_print(model, 'selection expanded', true);
+				}
+				else {
+					game_message_print(model, 'only vert supported');
+				}
+			}
+			break;
+		case '/pos1':
+		case '/pos2':
+			game_block_select(
+				model,
+				[
+					Math_floor(player.position_x),
+					Math_floor(player.position_y),
+					Math_floor(player.position_z),
+				],
+				command === '/pos2'
+			);
+			break;
+		case '/regen':
+			world_chunk_reset(model.world);
+			game_message_print(model, 'regenerate chunk', true);
+			model.renderer.flag_dirty = true;
+			break;
+		case '/show':
+			game_message_print(
+				model,
+				`first: ${
+					player.block_select_a
+					?	player.block_select_a.join(' ')
+					:	'none'
+				}, second: ${
+					player.block_select_b
+					?	player.block_select_b.join(' ')
+					:	'none'
+				}`
+			);
+			break;
+		case '/wand':
+			player.mouse_mode = MOUSE_MODE_SELECT;
+			game_message_print(model, 'primary+secondary button for selection', true);
+			break;
+		default:
+			game_message_print(model, 'unknown command: ' + command);
 		}
 	}
 	else {
