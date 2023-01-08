@@ -1,3 +1,6 @@
+/**
+	@type {typeof import('lui/index')}
+*/
 export const lui_ = lui;
 
 export const defer = lui_.defer;

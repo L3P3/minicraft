@@ -25,9 +25,12 @@
 	],
 	"author": "L3P3 <dev@l3p3.de> (https://l3p3.de)",
 	"license": "Zlib",
+	"dependencies": {
+		"lui": "github:l3p3/lui"
+	},
 	"devDependencies": {
-		"google-closure-compiler": "latest",
 		"cssnano": "latest",
+		"google-closure-compiler": "latest",
 		"postcss": "latest"
 	}
 }
