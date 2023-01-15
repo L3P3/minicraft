@@ -4,6 +4,14 @@ import {
 
 import {
 	BLOCK_TYPE_AIR,
+	BLOCK_TYPE_BEDROCK,
+	BLOCK_TYPE_COBBLE,
+	BLOCK_TYPE_DIRT,
+	BLOCK_TYPE_GLASS,
+	BLOCK_TYPE_GRASS,
+	BLOCK_TYPE_LEAVES,
+	BLOCK_TYPE_MAX,
+	BLOCK_TYPE_STONE,
 	BLOCK_TYPE_FACE_B,
 	BLOCK_TYPE_FACE_E,
 	BLOCK_TYPE_FACE_S,
@@ -11,6 +19,9 @@ import {
 	BLOCK_TYPE_FACE_W,
 	CHUNK_HEIGHT,
 	CHUNK_WIDTH_L2,
+	GAMEMODE_CREATIVE,
+	GAMEMODE_SPECTATOR,
+	GAMEMODE_SURVIVAL,
 	KEY_MOUSE_LEFT,
 	KEY_MOUSE_MIDDLE,
 	KEY_MOUSE_RIGHT,
@@ -29,7 +40,10 @@ import {
 	MENU_TERMINAL,
 	MOUSE_MODE_SELECT,
 	MOUSE_MODE_NORMAL,
-	BLOCK_TYPE_MAX,
+	PLAYER_SLOTS,
+	STACK_SIZE,
+	KEY_MOUSE_UP,
+	KEY_MOUSE_DOWN,
 } from '../etc/constants.js';
 import {
 	DEBUG,
@@ -45,6 +59,7 @@ import {
 	setInterval_,
 } from '../etc/helpers.js';
 import {
+	player_collect,
 	player_create,
 	player_rotate,
 	player_tick,
@@ -55,6 +70,9 @@ import {
 	renderer_destroy,
 	renderer_render,
 } from './m_renderer.js';
+import {
+	stack_create,
+} from './m_stack.js';
 import {
 	world_block_get,
 	world_block_set,
@@ -276,8 +294,27 @@ export const game_key = (model, code, state) => {
 			game_rotation_v_update(model);
 			break;
 		case KEY_MOUSE_LEFT:
-			if (block_focus_y >= 0) {
-				if (player.mouse_mode === MOUSE_MODE_NORMAL)
+			if (
+				player.gamemode !== GAMEMODE_SPECTATOR &&
+				block_focus_y >= 0
+			) {
+				if (player.mouse_mode === MOUSE_MODE_NORMAL) {
+					if (player.gamemode === GAMEMODE_SURVIVAL) {
+						let id = world_block_get(
+							model.world,
+							block_focus_x,
+							block_focus_y,
+							block_focus_z
+						);
+						if (id === BLOCK_TYPE_GRASS) id = BLOCK_TYPE_DIRT;
+						else if (id === BLOCK_TYPE_STONE) id = BLOCK_TYPE_COBBLE;
+						if (
+							id === BLOCK_TYPE_BEDROCK ||
+							id !== BLOCK_TYPE_LEAVES &&
+							id !== BLOCK_TYPE_GLASS &&
+							player_collect(player, stack_create(id, 1)) !== null
+						) break;
+					}
 					world_block_set(
 						model.world,
 						block_focus_x,
@@ -285,6 +322,7 @@ export const game_key = (model, code, state) => {
 						block_focus_z,
 						BLOCK_TYPE_AIR
 					);
+				}
 				else {
 					game_block_select(
 						model,
@@ -300,17 +338,41 @@ export const game_key = (model, code, state) => {
 			break;
 		case KEY_MOUSE_MIDDLE:
 		case 71: // G
-			if (block_focus_y >= 0)
-					player.holds = world_block_get(
-						model.world,
-						block_focus_x,
-						block_focus_y,
-						block_focus_z
-					);
+			if (block_focus_y >= 0) {
+				const id = world_block_get(
+					model.world,
+					block_focus_x,
+					block_focus_y,
+					block_focus_z
+				);
+				const slots = player.inventory.slice(0, PLAYER_SLOTS);
+				const index_existing = slots.findIndex(stack =>
+					stack !== null &&
+					stack.id === id
+				);
+				if (index_existing >= 0) {
+					player.slot_index = index_existing;
+				}
+				else if (player.gamemode === GAMEMODE_CREATIVE) {
+					if (slots[player.slot_index] !== null) {
+						const index_empty = slots.indexOf(null);
+						if (index_empty >= 0) {
+							player.slot_index = index_empty;
+						}
+					}
+					player.inventory[player.slot_index] = stack_create(id);
+				}
+				player.slot_time = model.frame_last;
+			}
 			break;
 		case KEY_MOUSE_RIGHT:
-			if (block_focus_y >= 0) {
+			if (
+				player.gamemode !== GAMEMODE_SPECTATOR &&
+				block_focus_y >= 0
+			) {
 				if (player.mouse_mode === MOUSE_MODE_NORMAL) {
+					const stack = player.inventory[player.slot_index];
+					if (stack === null) break;
 					let x = block_focus_x;
 					let y = block_focus_y;
 					let z = block_focus_z;
@@ -322,14 +384,24 @@ export const game_key = (model, code, state) => {
 						case BLOCK_TYPE_FACE_S: --z; break;
 						default: ++z;
 					}
-					y >= 0 && y < CHUNK_HEIGHT &&
+					if (
+						y >= 0 &&
+						y < CHUNK_HEIGHT
+					) {
 						world_block_set(
 							model.world,
 							x & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
 							y,
 							z & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
-							player.holds
+							stack.id
 						);
+						if (
+							player.gamemode !== GAMEMODE_CREATIVE &&
+							--stack.amount <= 0
+						) {
+							player.inventory[player.slot_index] = null;
+						}
+					}
 				}
 				else {
 					game_block_select(
@@ -343,6 +415,14 @@ export const game_key = (model, code, state) => {
 					);
 				}
 			}
+			break;
+		case KEY_MOUSE_UP:
+			player.slot_index = (player.slot_index + PLAYER_SLOTS - 1) % PLAYER_SLOTS;
+			player.slot_time = model.frame_last;
+			break;
+		case KEY_MOUSE_DOWN:
+			player.slot_index = (player.slot_index + 1) % PLAYER_SLOTS;
+			player.slot_time = model.frame_last;
 			break;
 		case 27: // ESC
 			if (model.menu) {
@@ -360,6 +440,18 @@ export const game_key = (model, code, state) => {
 		case 32: // SPACE
 			game_movement_y_update(model);
 			break;
+		case 49: // 1
+		case 50: // 2
+		case 51: // 3
+		case 52: // 4
+		case 53: // 5
+		case 54: // 6
+		case 55: // 7
+		case 56: // 8
+		case 57: // 9 = PLAYER_SLOTS
+			player.slot_index = code - 49;
+			player.slot_time = model.frame_last;
+			break;
 		case KEY_MOVE_LEFT:
 		case KEY_MOVE_RIGHT:
 		case 65: // A
@@ -368,6 +460,14 @@ export const game_key = (model, code, state) => {
 			break;
 		case 80: // P
 			model.flag_paused = !model.flag_paused;
+			break;
+		case 81: // Q
+			if (
+				player.inventory[player.slot_index] !== null &&
+				--player.inventory[player.slot_index].amount <= 0
+			) {
+				player.inventory[player.slot_index] = null;
+			}
 			break;
 		case KEY_MOVE_BACK:
 		case KEY_MOVE_FRONT:
@@ -465,20 +565,57 @@ export const game_message_send = (model, value) => {
 		case 'clear':
 			model.messages = [];
 			break;
+		case 'clearinv':
+			player.inventory.fill(null);
+			game_message_print(model, 'inventory cleared', true);
+			break;
 		case 'exit':
 			model.flag_paused = false;
 			model.menu = MENU_NONE;
 			break;
+		case 'gamemode':
+		case 'gm': {
+				const value = Number_(args[0]);
+				if (
+					!isNaN(value) &&
+					value >= 0 &&
+					value < GAMEMODE_SPECTATOR + 1 &&
+					value % 1 === 0
+				) {
+					player.gamemode = value;
+					game_message_print(model, `gamemode set to ${value}`, true);
+				}
+				else {
+					game_message_print(model, 'gamemode must be in 0..2');
+				}
+			}
+			break;
 		case 'give': {
 				const value = Number_(args[0]);
+				let amount = Number_(args[1] || 1);
 				if (
 					!isNaN(value) &&
 					value > 0 &&
 					value < BLOCK_TYPE_MAX + 1 &&
 					value % 1 === 0
 				) {
-					player.holds = value;
-					game_message_print(model, 'selected block ' + value, true);
+					if (
+						!isNaN(amount) &&
+						amount > 0 &&
+						amount < STACK_SIZE + 1 &&
+						amount % 1 === 0
+					) {
+						game_message_print(
+							model,
+							player_collect(player, stack_create(value, amount))
+							?	'inventory full'
+							:	'items given',
+							true
+						);
+					}
+					else {
+						game_message_print(model, 'amount must be in 1..64');
+					}
 				}
 				else {
 					game_message_print(model, 'invalid block type');
@@ -486,7 +623,7 @@ export const game_message_send = (model, value) => {
 			}
 			break;
 		case 'help':
-			game_message_print(model, 'commands: clear, exit, give, help, save, spawn, tp, version, /regen');
+			game_message_print(model, 'commands: clear, clearinv, exit, gamemode, give, help, me, save, spawn, teleport, version');
 			break;
 		case 'me':
 			game_message_print(model, player.name + ' ' + args.join(' '), true);

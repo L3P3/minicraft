@@ -29,6 +29,7 @@ button {
 	position: relative;
 	width: 100%;
 	height: 100%;
+	overflow: hidden;
 }
 .game > canvas {
 	position: absolute;
@@ -42,10 +43,56 @@ button {
 	image-rendering: crisp-edges;
 	image-rendering: pixelated;
 }
+.game > .bar {
+	position: absolute;
+	width: 27rem;
+	height: 3rem;
+	max-width: 100%;
+	max-height: calc(100vw/9);
+	left: 50%;
+	margin-left: max(-13.5rem, -50%);
+	bottom: 0;
+	display: flex;
+}
+.game > .bar > * {
+	background: #000;
+	border: 4px solid #333;
+	flex: 1;
+}
+.game > .bar > *.active {
+	border-color: #fff;
+}
+.game .bitmap {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+.game .bitmap > * {
+	flex: 1;
+	display: flex;
+}
+.game .bitmap > * > * {
+	flex: 1;
+}
 .game > .diagnostics {
 	position: absolute;
 	font-family: monospace;
 	color: #fff;
+}
+.game .stack {
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+.game .stack > .amount {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	font-size: 1.5rem;
+	color: #fff;
+	text-shadow: 2px 2px #000;
 }
 .game > .touch {
 	position: absolute;
@@ -81,12 +128,19 @@ button {
 	position: absolute;
 	width: 10rem;
 	height: 10rem;
+	max-width: 40vw;
+	max-height: 40vw;
 	left: 1rem;
 	bottom: 1rem;
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	grid-template-rows: repeat(3, 1fr);
 	gap: .2rem;
+}
+@media (max-width: 44rem) {
+	.game > .touch > .move {
+		bottom: 4rem;
+	}
 }
 .game > .touch > .move.sec {
 	left: auto;

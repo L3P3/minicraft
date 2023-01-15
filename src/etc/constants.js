@@ -73,13 +73,24 @@ export const BLOCK_TYPE_FACE_N = 5;
 
 export const SKY_COLOR = 0xffb184;
 
-export const PLAYER_FOCUS_DISTANCE = 5;
+export const GAMEMODE_SURVIVAL = 0;
+export const GAMEMODE_CREATIVE = 1;
+export const GAMEMODE_SPECTATOR = 2;
+
+export const PLAYER_FOCUS_DISTANCE_CREATIVE = 6;
+export const PLAYER_FOCUS_DISTANCE_NORMAL = 4;
+export const PLAYER_SLOTS = 9;
+export const PLAYER_INVENTORY = PLAYER_SLOTS;
+
+export const STACK_SIZE = 64;
 
 export const FLATMAP_LAYERS_LENGTH = 7;
 
 export const KEY_MOUSE_LEFT = -1;
 export const KEY_MOUSE_MIDDLE = -2;
 export const KEY_MOUSE_RIGHT = -3;
+export const KEY_MOUSE_UP = -4;
+export const KEY_MOUSE_DOWN = -5;
 export const KEY_MOVE_FRONT = -10;
 export const KEY_MOVE_BACK = -11;
 export const KEY_MOVE_LEFT = -12;

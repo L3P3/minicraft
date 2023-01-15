@@ -9,12 +9,16 @@ import {
 	now,
 } from '../etc/lui.js';
 
+import Bar from './c_bar.js';
 import Messages from './c_messages.js';
 import Settings from './c_settings.js';
 import Terminal from './c_terminal.js';
 import Touch from './c_touch.js';
 
 import {
+	GAMEMODE_SPECTATOR,
+	KEY_MOUSE_DOWN,
+	KEY_MOUSE_UP,
 	MENU_NONE,
 	MENU_SETTINGS,
 	MENU_TERMINAL,
@@ -69,6 +73,22 @@ export default function Game({
 					model.flag_touch = true;
 					if (!model.menu) {
 						model.flag_paused = false;
+						event.preventDefault();
+					}
+				},
+				onwheel: event => {
+					model.flag_touch = false;
+					if (
+						!model.menu &&
+						!model.flag_paused &&
+						Math.abs(event.deltaY) > 5
+					) {
+						const key =
+							event.deltaY > 0
+							?	KEY_MOUSE_DOWN
+							:	KEY_MOUSE_UP;
+						game_key(model, key, true);
+						game_key(model, key, false);
 						event.preventDefault();
 					}
 				},
@@ -150,6 +170,11 @@ export default function Game({
 		node(Touch, {
 			game: model,
 			keys_active_check: model.keys_active_check,
+		}),
+		model.player.gamemode !== GAMEMODE_SPECTATOR &&
+		node(Bar, {
+			player: model.player,
+			time_now,
 		}),
 		model.menu === MENU_SETTINGS &&
 		node(Settings, {

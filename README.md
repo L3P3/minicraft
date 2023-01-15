@@ -39,8 +39,9 @@ Heavily inspired by and somewhat based on the work of [@xNotch](https://github.c
 - [x] chat/terminal
 - [x] more blocks
 - [x] higher world
+- [x] inventory
+- [x] gamemode
 - [ ] world edit
-- [ ] inventory
 - [ ] styled ui
 - [ ] multiple worlds
 - [ ] entity models

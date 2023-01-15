@@ -1,6 +1,8 @@
 import {
-	BLOCK_TYPE_BRICKS,
+	GAMEMODE_CREATIVE,
 	MOUSE_MODE_NORMAL,
+	PLAYER_INVENTORY,
+	STACK_SIZE,
 } from '../etc/constants.js';
 import {
 	Math_cos,
@@ -23,7 +25,8 @@ export const player_create = world => ({
 	block_focus_z: 0,
 	block_select_a: null,
 	block_select_b: null,
-	holds: BLOCK_TYPE_BRICKS,
+	gamemode: GAMEMODE_CREATIVE,
+	inventory: new Array(PLAYER_INVENTORY).fill(null),
 	mouse_mode: MOUSE_MODE_NORMAL,
 	name: 'Gast',
 	position_x: world.spawn_x,
@@ -31,6 +34,8 @@ export const player_create = world => ({
 	position_z: world.spawn_z,
 	rotation_h: 0.0,
 	rotation_v: 0.0,
+	slot_index: 0,
+	slot_time: 0,
 	speed_x: 0.0,
 	speed_y: 0.0,
 	speed_z: 0.0,
@@ -79,4 +84,35 @@ export const player_rotate = (model, h, v) => {
 			+ v
 		)
 	);
+}
+
+/**
+	@returns {Object?} rest stack
+*/
+export const player_collect = ({inventory}, stack) => {
+	// try to merge with existing stacks
+	for (const slot of inventory) {
+		if (
+			slot !== null &&
+			slot.id === stack.id
+		) {
+			const amount = Math_min(
+				slot.amount + stack.amount,
+				STACK_SIZE
+			);
+			stack.amount -= amount - slot.amount;
+			slot.amount = amount;
+			if (stack.amount === 0) {
+				return null;
+			}
+		}
+	}
+	// try to find empty slot
+	for (let i = 0; i < PLAYER_INVENTORY; ++i) {
+		if (inventory[i] === null) {
+			inventory[i] = stack;
+			return null;
+		}
+	}
+	return stack;
 }

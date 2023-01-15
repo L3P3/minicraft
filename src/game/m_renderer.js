@@ -1,13 +1,15 @@
 import {
-	BLOCK_TYPE_AIR,
 	BLOCK_COLORS,
-	CHUNK_WIDTH_L2,
-	COORDINATE_OFFSET,
-	SKY_COLOR,
-	PLAYER_FOCUS_DISTANCE,
+	BLOCK_TYPE_AIR,
 	BLOCK_TYPE_FACE_LABELS,
 	CHUNK_HEIGHT,
 	CHUNK_HEIGHT_L2,
+	CHUNK_WIDTH_L2,
+	COORDINATE_OFFSET,
+	GAMEMODE_CREATIVE,
+	PLAYER_FOCUS_DISTANCE_CREATIVE,
+	PLAYER_FOCUS_DISTANCE_NORMAL,
+	SKY_COLOR,
 } from '../etc/constants.js';
 import {
 	VERSION,
@@ -45,7 +47,7 @@ import {
 } from '../etc/textures.js';
 
 // parse png
-let tiles_data = null;
+export let tiles_data = null;
 let tiles_image = new Image();
 tiles_image.crossOrigin = 'anonymous';
 tiles_image.onload = () => {
@@ -162,7 +164,10 @@ export const renderer_render = (model, now) => {
 		const world_width_l2 = CHUNK_WIDTH_L2 + size_l2;
 		const world_width_m1 = (1 << world_width_l2) - 1;
 
-		let focus_distance_min = PLAYER_FOCUS_DISTANCE;
+		let focus_distance_min =
+			player.gamemode === GAMEMODE_CREATIVE
+			?	PLAYER_FOCUS_DISTANCE_CREATIVE
+			:	PLAYER_FOCUS_DISTANCE_NORMAL;
 		let canvas_surface_data_index =
 			player.block_focus_x =
 			player.block_focus_z =
@@ -417,7 +422,7 @@ export const renderer_render = (model, now) => {
 				)
 				* CHUNK_HEIGHT >> 10
 			) + 'k\n' +
-			'E: 0/0\n\n' +
+			'E: 0/0 M: ' + player.gamemode + '\n\n' +
 
 			'Position: ' + (
 				number_toFixed2(player.position_x)
