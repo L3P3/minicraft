@@ -1,5 +1,6 @@
 import {
 	hook_dom,
+	hook_static,
 	node,
 	node_dom,
 } from '../etc/lui.js';
@@ -19,12 +20,12 @@ export default function Bar({
 	time_now,
 }) {
 	hook_dom('div[className=bar]', {
-		ontouchstart: event => {
+		ontouchstart: hook_static(event => {
 			player.slot_index = Number(
 				event.target.closest('[data-slot]').dataset.slot
 			);
 			player.slot_time = time_now;
-		},
+		}),
 		S: {
 			opacity: Math_max(
 				.5,

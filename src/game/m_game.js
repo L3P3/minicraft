@@ -463,6 +463,7 @@ export const game_key = (model, code, state) => {
 			break;
 		case 81: // Q
 			if (
+				keys_active.has(17) ||
 				player.inventory[player.slot_index] !== null &&
 				--player.inventory[player.slot_index].amount <= 0
 			) {
