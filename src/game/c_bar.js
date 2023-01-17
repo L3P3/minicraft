@@ -24,7 +24,7 @@ export default function Bar({
 			player.slot_index = Number(
 				event.target.closest('[data-slot]').dataset.slot
 			);
-			player.slot_time = time_now;
+			player.slot_time = event.timeStamp;
 		}),
 		S: {
 			opacity: Math_max(
@@ -39,7 +39,7 @@ export default function Bar({
 
 	return (
 		player.inventory
-		.slice(0, PLAYER_SLOTS)
+		//.slice(0, PLAYER_SLOTS)
 		.map((stack, index) => (
 			node_dom('div', {
 				D: {
