@@ -79,6 +79,7 @@ import {
 	world_chunk_reset,
 	world_create,
 	world_data_init,
+	world_load,
 	world_offset_update,
 	world_save,
 } from './m_world.js';
@@ -87,6 +88,10 @@ let message_id_counter = 0;
 
 export const game_create = () => {
 	const world = world_create();
+	const player = player_create(world);
+
+	world_load(world, player);
+
 	return {
 		actions: null,
 		config: null,
@@ -99,7 +104,7 @@ export const game_create = () => {
 		keys_active_check: '',
 		menu: MENU_NONE,
 		messages: [],
-		player: player_create(world),
+		player,
 		renderer: null,
 		resolution_raw_x: 1,
 		resolution_raw_y: 1,
@@ -120,7 +125,7 @@ export const game_start = (model, canvas_element) => {
 }
 
 export const game_save = model => (
-	world_save(model.world)
+	world_save(model.world, model.player)
 );
 
 export const game_umount = model => (
@@ -639,14 +644,21 @@ export const game_message_send = (model, value) => {
 			game_message_print(model, 'lff.smart: true', true);
 			break;
 		case 'spawn':
-			player.position_x = model.world.spawn_x;
-			player.position_y = model.world.spawn_y;
-			player.position_z = model.world.spawn_z;
-			model.renderer.flag_dirty = true;
+			model.world.spawn_x = player.position_x;
+			model.world.spawn_y = player.position_y;
+			model.world.spawn_z = player.position_z;
+			game_message_print(model, 'spawn updated', true);
 			break;
 		case 'teleport':
 		case 'tp':
-			if (args.length === 3) {
+			if (args.length === 0) {
+				player.position_x = model.world.spawn_x;
+				player.position_y = model.world.spawn_y;
+				player.position_z = model.world.spawn_z;
+				model.renderer.flag_dirty = true;
+				game_message_print(model, 'teleported to spawn', true);
+			}
+			else if (args.length === 3) {
 				game_message_print(model, `teleported to ${
 					player.position_x = coord_part_parse(player.position_x, args[0])
 				} ${
@@ -659,6 +671,9 @@ export const game_message_send = (model, value) => {
 			else {
 				game_message_print(model, 'PITCH');
 			}
+			player.speed_x = 0;
+			player.speed_y = 0;
+			player.speed_z = 0;
 			break;
 		case 'version':
 			game_message_print(model, 'Minicraft ' + VERSION);

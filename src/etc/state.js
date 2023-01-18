@@ -2,8 +2,10 @@ import {
 	VERSION,
 } from './env.js';
 import {
-	JSON_,
-	localStorage_,
+	JSON_parse,
+	JSON_stringify,
+	localStorage_getItem,
+	localStorage_setItem,
 } from './helpers.js';
 
 export const reducers = {
@@ -15,9 +17,9 @@ export const reducers = {
 			view_angle: 80,
 			view_distance: 64,
 		};
-		const config_raw = localStorage_.getItem('minicraft.config');
+		const config_raw = localStorage_getItem('minicraft.config');
 		if (config_raw) {
-			let config_loaded = JSON_.parse(config_raw);
+			let config_loaded = JSON_parse(config_raw);
 			let tmp = config_loaded['flag_textures'];
 			if (tmp != null)
 				config.flag_textures = tmp;
@@ -39,7 +41,7 @@ export const reducers = {
 			config,
 		} = state;
 		if (config === state.config_saved) return state;
-		localStorage_.setItem('minicraft.config', JSON_.stringify({
+		localStorage_setItem('minicraft.config', JSON_stringify({
 			'version': VERSION,
 			'flag_textures': config.flag_textures,
 			'mouse_sensitivity': config.mouse_sensitivity,

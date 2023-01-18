@@ -13,9 +13,14 @@ import {
 	CHUNK_WIDTH_L2,
 	COORDINATE_OFFSET,
 	FLATMAP_LAYERS_LENGTH,
+	WORLD_FORMAT,
 } from '../etc/constants.js';
 import {
+	JSON_parse,
+	JSON_stringify,
 	localStorage_,
+	localStorage_getItem,
+	localStorage_setItem,
 	Map_,
 	Math_floor,
 	Math_max,
@@ -122,7 +127,7 @@ export const world_block_set = (model, x, y, z, value) => {
 }
 
 export const world_data_init = (model, player, size_l2) => {
-	if (model.chunks) world_save(model);
+	if (model.chunks) world_save(model, player);
 
 	const size = 1 << (
 		model.size_l2 = size_l2
@@ -258,10 +263,70 @@ const world_chunk_load_setup = model => {
 	model.chunks_checklist_index = 0;
 }
 
-export const world_save = model => {
+export const world_save = (model, player) => {
 	for (const chunk of model.chunks)
 	if (chunk.dirty) {
 		world_chunk_save(model, chunk);
+	}
+
+	localStorage_setItem(
+		`minicraft.world.${model.id}:meta`,
+		JSON_stringify({
+			p: {
+				h: player.health,
+				i: player.inventory.map(slot => (
+					slot && [
+						slot.id,
+						slot.amount,
+						slot.data,
+					]
+				)),
+				m: player.gamemode,
+				p: [
+					player.position_x,
+					player.position_y,
+					player.position_z,
+					player.angle_h,
+					player.angle_v,
+				],
+			},
+			s: [
+				model.spawn_x,
+				model.spawn_y,
+				model.spawn_z,
+			],
+			v: WORLD_FORMAT,
+		})
+	);
+}
+
+export const world_load = (model, player) => {
+	const meta = localStorage_getItem(`minicraft.world.${model.id}:meta`);
+	if (meta) {
+		const {
+			p,
+			s,
+		} = JSON_parse(meta);
+
+		player.health = p.h;
+		player.inventory = p.i.map(slot => (
+			slot && {
+				id: slot[0],
+				amount: slot[1],
+				data: slot[2],
+			}
+		));
+		player.gamemode = p.m;
+
+		player.position_x = p.p[0];
+		player.position_y = p.p[1];
+		player.position_z = p.p[2];
+		player.angle_h = p.p[3];
+		player.angle_v = p.p[4];
+
+		model.spawn_x = s[0];
+		model.spawn_y = s[1];
+		model.spawn_z = s[2];
 	}
 }
 
@@ -325,7 +390,7 @@ const world_chunk_save = (model, chunk) => {
 	}
 
 	// console.log('chunk_save', chunk.x_abs, chunk.z_abs);
-	localStorage_.setItem(
+	localStorage_setItem(
 		world_chunk_key(
 			model,
 			chunk.x_abs, chunk.z_abs, y
@@ -361,7 +426,7 @@ const world_chunk_load = model => {
 			// console.log('chunk_load', x_abs, z_abs);
 			chunk.loaded = true;
 			const chunk_stored = decompress(
-				localStorage_.getItem(
+				localStorage_getItem(
 					world_chunk_key(
 						model,
 						chunk.x_abs = x_abs,

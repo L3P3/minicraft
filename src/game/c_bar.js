@@ -6,14 +6,15 @@ import {
 } from '../etc/lui.js';
 
 import {
-	PLAYER_SLOTS,
-} from '../etc/constants.js';
-import {
 	Math_max,
 	Math_min,
 } from '../etc/helpers.js';
 
 import Stack from './c_stack.js';
+
+import {
+	tiles_data,
+} from './m_renderer.js';
 
 export default function Bar({
 	player,
@@ -38,6 +39,7 @@ export default function Bar({
 	});
 
 	return (
+		tiles_data &&
 		player.inventory
 		//.slice(0, PLAYER_SLOTS)
 		.map((stack, index) => (
@@ -51,7 +53,9 @@ export default function Bar({
 			}, [
 				stack !== null &&
 				node(Stack, {
-					...stack,
+					id: stack.id,
+					amount: stack.amount,
+					data: stack.data,
 				}),
 			])
 		))

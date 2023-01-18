@@ -48,6 +48,7 @@ import {
 
 // parse png
 export let tiles_data = null;
+let tiles_data_onload = null;
 let tiles_image = new Image();
 tiles_image.crossOrigin = 'anonymous';
 tiles_image.onload = () => {
@@ -56,7 +57,6 @@ tiles_image.onload = () => {
 	canvas_temp.height = TILES_COUNT;
 	const context = canvas_temp.getContext('2d');
 	context.drawImage(tiles_image, 0, 0);
-	tiles_image = null;
 	tiles_data = new Uint32Array_(
 		context.getImageData(
 			0, 0,
@@ -64,6 +64,8 @@ tiles_image.onload = () => {
 			TILES_COUNT
 		).data.buffer
 	);
+	tiles_data_onload && tiles_data_onload();
+	tiles_image = tiles_data_onload = null;
 }
 tiles_image.src = ASSETS + 'blocks.png';
 
@@ -85,6 +87,9 @@ export const renderer_create = (game, canvas_element) => {
 		), 1e3),
 		game,
 	};
+	if (tiles_data === null) {
+		tiles_data_onload = () => model.flag_dirty = true;
+	}
 	renderer_canvas_init(model);
 	return model;
 }

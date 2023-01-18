@@ -1,5 +1,4 @@
 import {
-	hook_assert,
 	hook_dom,
 	node,
 	node_dom,
@@ -53,8 +52,6 @@ export default function Stack({
 	id,
 }) {
 	hook_dom('div[className=stack]');
-
-	hook_assert(tiles_data !== null);
 
 	return [
 		node(Bitmap, {

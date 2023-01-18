@@ -6,6 +6,8 @@ export const CHUNK_HEIGHT_L2 = CHUNK_WIDTH_L2 + CHUNK_HEIGHT_FACTOR_L2;
 export const CHUNK_HEIGHT = 1 << CHUNK_HEIGHT_L2;
 export const COORDINATE_OFFSET = 1 << 16;
 
+export const WORLD_FORMAT = 1;
+
 export const BLOCK_TYPE_AIR = 0;
 export const BLOCK_TYPE_STONE = 1;
 export const BLOCK_TYPE_GRASS = 2;

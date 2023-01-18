@@ -26,6 +26,7 @@ export const player_create = world => ({
 	block_select_a: null,
 	block_select_b: null,
 	gamemode: GAMEMODE_CREATIVE,
+	health: 20,
 	inventory: new Array(PLAYER_INVENTORY).fill(null),
 	mouse_mode: MOUSE_MODE_NORMAL,
 	name: 'Gast',
