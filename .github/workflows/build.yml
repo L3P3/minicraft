@@ -49,4 +49,4 @@ jobs:
         if: github.ref == 'refs/heads/master'
         run: |
           echo "::add-mask::${{ secrets.UPDATE_KEY }}"
-          curl https://l3p3.de/svr/minicraft/update.txt?key=${{ secrets.UPDATE_KEY }}
+          curl -X POST -d "key=${{ secrets.UPDATE_KEY }}" https://l3p3.de/svr/minicraft/update.txt
