@@ -48,4 +48,5 @@ jobs:
       - name: Update commit reference
         if: github.ref == 'refs/heads/master'
         run: |
-          curl https://l3p3.de/svr/minicraft/update.txt
+          echo "::add-mask::${{ secrets.UPDATE_KEY }}"
+          curl https://l3p3.de/svr/minicraft/update.txt?key=${{ secrets.UPDATE_KEY }}
