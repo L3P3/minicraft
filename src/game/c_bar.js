@@ -6,6 +6,9 @@ import {
 } from '../etc/lui.js';
 
 import {
+	PLAYER_SLOTS,
+} from '../etc/constants.js';
+import {
 	Math_max,
 	Math_min,
 } from '../etc/helpers.js';
@@ -41,7 +44,7 @@ export default function Bar({
 	return (
 		tiles_data &&
 		player.inventory
-		//.slice(0, PLAYER_SLOTS)
+		.slice(0, PLAYER_SLOTS)
 		.map((stack, index) => (
 			node_dom('div', {
 				D: {

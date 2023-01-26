@@ -35,6 +35,8 @@ export const BLOCK_TYPE_REDSTONE_BLOCK = 23;
 export const BLOCK_TYPE_QUARTZ_BLOCK = 24;
 export const BLOCK_TYPE_MAX = 24;
 
+export const ITEM_HANDLES = 'air,stone,grass,dirt,cobble,planks,bedrock,log,leaves,bricks,wool,sand,gravel,glass,bookshelf,obsidian,stone_bricks,sandstone,lapis_block,iron_block,gold_block,diamond_block,emerald_block,redstone_block,quartz_block'.split(',');
+
 // B G R
 export const BLOCK_COLORS = [
 	0x000000, // VOID
@@ -82,7 +84,7 @@ export const GAMEMODE_SPECTATOR = 2;
 export const PLAYER_FOCUS_DISTANCE_CREATIVE = 6;
 export const PLAYER_FOCUS_DISTANCE_NORMAL = 4;
 export const PLAYER_SLOTS = 9;
-export const PLAYER_INVENTORY = PLAYER_SLOTS;
+export const PLAYER_INVENTORY = PLAYER_SLOTS * 4;
 
 export const STACK_SIZE = 64;
 
@@ -107,6 +109,7 @@ export const KEY_ROTATE_RIGHT = -19;
 export const MENU_NONE = 0;
 export const MENU_SETTINGS = 1;
 export const MENU_TERMINAL = 2;
+export const MENU_INVENTORY = 3;
 
 export const MOUSE_MODE_NORMAL = 0;
 export const MOUSE_MODE_SELECT = 1;

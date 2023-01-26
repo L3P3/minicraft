@@ -231,6 +231,25 @@ button {
 	grid-template-rows: 3rem;
 	gap: 1rem;
 }
+.game > .menu.inventory > * {
+	position: absolute;
+	width: 28rem;
+	height: 13rem;
+	left: 50%;
+	top: 50%;
+	margin-left: -14rem;
+	margin-top: -6.5rem;
+	padding: .5rem;
+	border-radius: .5rem;
+	background: #ccc;
+	display: grid;
+	grid-template-columns: repeat(9, 1fr);
+	grid-template-rows: repeat(4, 1fr);
+	gap: .5rem;
+}
+.game > .menu.inventory > * > * {
+	background: #aaa;
+}
 .game > .terminal {
 	display: flex;
 	flex-direction: column;

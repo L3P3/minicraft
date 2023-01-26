@@ -7,43 +7,45 @@ import {
 	BLOCK_TYPE_BEDROCK,
 	BLOCK_TYPE_COBBLE,
 	BLOCK_TYPE_DIRT,
-	BLOCK_TYPE_GLASS,
-	BLOCK_TYPE_GRASS,
-	BLOCK_TYPE_LEAVES,
-	BLOCK_TYPE_MAX,
-	BLOCK_TYPE_STONE,
 	BLOCK_TYPE_FACE_B,
 	BLOCK_TYPE_FACE_E,
 	BLOCK_TYPE_FACE_S,
 	BLOCK_TYPE_FACE_T,
 	BLOCK_TYPE_FACE_W,
+	BLOCK_TYPE_GLASS,
+	BLOCK_TYPE_GRASS,
+	BLOCK_TYPE_LEAVES,
+	BLOCK_TYPE_MAX,
+	BLOCK_TYPE_STONE,
 	CHUNK_HEIGHT,
 	CHUNK_WIDTH_L2,
 	GAMEMODE_CREATIVE,
 	GAMEMODE_SPECTATOR,
 	GAMEMODE_SURVIVAL,
+	ITEM_HANDLES,
+	KEY_MOUSE_DOWN,
 	KEY_MOUSE_LEFT,
 	KEY_MOUSE_MIDDLE,
 	KEY_MOUSE_RIGHT,
+	KEY_MOUSE_UP,
 	KEY_MOVE_BACK,
 	KEY_MOVE_DOWN,
-	KEY_MOVE_LEFT,
 	KEY_MOVE_FRONT,
+	KEY_MOVE_LEFT,
 	KEY_MOVE_RIGHT,
 	KEY_MOVE_UP,
 	KEY_ROTATE_DOWN,
 	KEY_ROTATE_LEFT,
 	KEY_ROTATE_RIGHT,
 	KEY_ROTATE_UP,
+	MENU_INVENTORY,
 	MENU_NONE,
 	MENU_SETTINGS,
 	MENU_TERMINAL,
-	MOUSE_MODE_SELECT,
 	MOUSE_MODE_NORMAL,
+	MOUSE_MODE_SELECT,
 	PLAYER_SLOTS,
 	STACK_SIZE,
-	KEY_MOUSE_UP,
-	KEY_MOUSE_DOWN,
 } from '../etc/constants.js';
 import {
 	DEBUG,
@@ -463,6 +465,16 @@ export const game_key = (model, code, state) => {
 		case 68: // D
 			game_movement_x_update(model);
 			break;
+		case 69: // E
+			if (
+				player.gamemode !== GAMEMODE_SPECTATOR &&
+				!model.menu
+			) {
+				model.menu = MENU_INVENTORY;
+				for (const code of keys_active)
+					game_key(model, code, false);
+			}
+			break;
 		case 80: // P
 			model.flag_paused = !model.flag_paused;
 			break;
@@ -597,8 +609,11 @@ export const game_message_send = (model, value) => {
 			}
 			break;
 		case 'give': {
-				const value = Number_(args[0]);
-				let amount = Number_(args[1] || 1);
+				const handles_index = ITEM_HANDLES.indexOf(
+					(args[0] || '').toLowerCase()
+				);
+				const value = handles_index >= 0 ? handles_index : Number_(args[0]);
+				const amount = Number_(args[1] || 1);
 				if (
 					!isNaN(value) &&
 					value > 0 &&
@@ -615,7 +630,7 @@ export const game_message_send = (model, value) => {
 							model,
 							player_collect(player, stack_create(value, amount))
 							?	'inventory full'
-							:	'items given',
+							:	`gave ${amount} ${ITEM_HANDLES[value]}`,
 							true
 						);
 					}

@@ -10,6 +10,7 @@ import {
 } from '../etc/lui.js';
 
 import Bar from './c_bar.js';
+import Inventory from './c_inventory.js';
 import Messages from './c_messages.js';
 import Settings from './c_settings.js';
 import Terminal from './c_terminal.js';
@@ -19,6 +20,7 @@ import {
 	GAMEMODE_SPECTATOR,
 	KEY_MOUSE_DOWN,
 	KEY_MOUSE_UP,
+	MENU_INVENTORY,
 	MENU_NONE,
 	MENU_SETTINGS,
 	MENU_TERMINAL,
@@ -171,9 +173,15 @@ export default function Game({
 			game: model,
 			keys_active_check: model.keys_active_check,
 		}),
+		model.menu !== MENU_INVENTORY &&
 		model.player.gamemode !== GAMEMODE_SPECTATOR &&
 		node(Bar, {
 			player: model.player,
+			time_now,
+		}),
+		model.menu === MENU_INVENTORY &&
+		node(Inventory, {
+			game: model,
 			time_now,
 		}),
 		model.menu === MENU_SETTINGS &&

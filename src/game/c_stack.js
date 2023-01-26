@@ -19,31 +19,26 @@ const Bitmap = ({
 	id,
 }) => (
 	hook_dom('div[className=bitmap]'),
-	--id,
-	rows_template.map((_, row) =>
+	id = (id - 1) << (TILES_RESOLUTION_LOG2 * 2),
+	rows_template.map((_, row) => (
+		row = id | (15 - row) << TILES_RESOLUTION_LOG2,
 		node_dom('div', null,
-			rows_template.map((_, column) => {
-				const pixel = tiles_data[
-					id << (TILES_RESOLUTION_LOG2 * 2) |
-					(15 - row) << TILES_RESOLUTION_LOG2 |
-					column
-				];
-				return (
-					node_dom('div', {
-						style: (pixel >>> 24) > 0
-						?	`background-color:rgb(${
-								pixel & 0xff
-							},${
-								pixel >>> 8 & 0xff
-							},${
-								pixel >>> 16 & 0xff
-							})`
-						:	'',
-					})
-				);
-			})
+			rows_template.map((_, column) => (
+				column = tiles_data[row | column],
+				node_dom('div', {
+					style: (column >>> 24) > 0
+					?	`background-color:rgb(${
+							column & 0xff
+						},${
+							column >>> 8 & 0xff
+						},${
+							column >>> 16 & 0xff
+						})`
+					:	'',
+				})
+			))
 		)
-	)
+	))
 );
 
 export default function Stack({

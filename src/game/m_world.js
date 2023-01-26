@@ -269,18 +269,24 @@ export const world_save = (model, player) => {
 		world_chunk_save(model, chunk);
 	}
 
+	const i = player.inventory.map(slot =>
+		slot && [
+			slot.id,
+			slot.amount,
+			slot.data,
+		]
+	);
+	while (
+		i.length > 0 &&
+		i[i.length - 1] === null
+	) i.pop();
+
 	localStorage_setItem(
 		`minicraft.world.${model.id}:meta`,
 		JSON_stringify({
 			p: {
 				h: player.health,
-				i: player.inventory.map(slot => (
-					slot && [
-						slot.id,
-						slot.amount,
-						slot.data,
-					]
-				)),
+				i,
 				m: player.gamemode,
 				p: [
 					player.position_x,
@@ -308,14 +314,17 @@ export const world_load = (model, player) => {
 			s,
 		} = JSON_parse(meta);
 
-		player.health = p.h;
-		player.inventory = p.i.map(slot => (
-			slot && {
-				id: slot[0],
-				amount: slot[1],
-				data: slot[2],
+		p.i.forEach((slot, i) => {
+			if (slot) {
+				player.inventory[i] = {
+					id: slot[0],
+					amount: slot[1],
+					data: slot[2],
+				};
 			}
-		));
+		});
+
+		player.health = p.h;
 		player.gamemode = p.m;
 
 		player.position_x = p.p[0];
