@@ -67,7 +67,9 @@ button {
 	flex: 1;
 }
 .game > .bar > *.active {
-	border-color: #fff;
+	border-color: #d6ded3;
+	border-width: 5px;
+	border-radius: 2px;
 }
 .game .bitmap {
 	position: absolute;
