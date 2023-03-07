@@ -13,7 +13,7 @@
 	"main": "./src/app.js",
 	"type": "module",
 	"scripts": {
-		"build": "node ./build.js"
+		"build": "node build.js"
 	},
 	"keywords": [
 		"minecraft",
