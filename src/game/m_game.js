@@ -78,6 +78,7 @@ import {
 import {
 	world_block_get,
 	world_block_set,
+	world_block_set_try,
 	world_chunk_reset,
 	world_create,
 	world_data_init,
@@ -396,14 +397,14 @@ export const game_key = (model, code, state) => {
 						y >= 0 &&
 						y < CHUNK_HEIGHT
 					) {
-						world_block_set(
-							model.world,
-							x & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
-							y,
-							z & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
-							stack.id
-						);
 						if (
+							world_block_set_try(
+								model.world,
+								x & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
+								y,
+								z & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
+								stack.id
+							) &&
 							player.gamemode !== GAMEMODE_CREATIVE &&
 							--stack.amount <= 0
 						) {

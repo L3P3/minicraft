@@ -126,6 +126,22 @@ export const world_block_set = (model, x, y, z, value) => {
 	).dirty = true;
 }
 
+/**
+	tries to set a block
+	@return {boolean} success
+*/
+export const world_block_set_try = (model, x, y, z, value) => {
+	const {size_l2} = model;
+	const index = world_block_index(size_l2, x, z, y);
+	if (model.blocks[index] > BLOCK_TYPE_AIR) return false;
+	model.blocks[index] = value;
+	world_chunk_get(
+		model.chunks, size_l2,
+		x, y, z
+	).dirty = true;
+	return true;
+}
+
 export const world_data_init = (model, player, size_l2) => {
 	if (model.chunks) world_save(model, player);
 
