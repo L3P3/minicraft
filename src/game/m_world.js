@@ -332,7 +332,10 @@ export const world_load = (model, player) => {
 		const {
 			p,
 			s,
+			v,
 		} = /** @type {TYPE_WORLD_META} */ (JSON_parse(meta));
+
+		if (v == null) return;
 
 		p.i.forEach((stack, i) => {
 			if (stack) {
