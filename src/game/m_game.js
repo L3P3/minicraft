@@ -329,6 +329,7 @@ export const game_key = (model, code, state) => {
 						block_focus_z,
 						BLOCK_TYPE_AIR
 					);
+					player.block_focus_y = -1;
 				}
 				else {
 					game_block_select(
