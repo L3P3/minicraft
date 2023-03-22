@@ -252,3 +252,17 @@ var onmouseup;
 	@type {string}
 */
 var ASSETS;
+
+/**
+	@typedef {{
+		p: {
+			h: number,
+			i: !Array<Array>,
+			m: number,
+			p: !Array<number>,
+		},
+		s: !Array<number>,
+		v: number,
+	}}
+*/
+var TYPE_WORLD_META;

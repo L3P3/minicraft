@@ -2,7 +2,6 @@ import {
 	GAMEMODE_CREATIVE,
 	MOUSE_MODE_NORMAL,
 	PLAYER_INVENTORY,
-	STACK_SIZE,
 } from '../etc/constants.js';
 import {
 	Math_cos,
@@ -12,6 +11,10 @@ import {
 	Math_PI_h,
 	Math_sin,
 } from '../etc/helpers.js';
+
+import {
+	slot_create,
+} from './m_slot.js';
 
 export const player_create = world => ({
 	accel_x: 0.0,
@@ -27,7 +30,9 @@ export const player_create = world => ({
 	block_select_b: null,
 	gamemode: GAMEMODE_CREATIVE,
 	health: 20,
-	inventory: new Array(PLAYER_INVENTORY).fill(null),
+	inventory: new Array(PLAYER_INVENTORY)
+		.fill(null)
+		.map(() => slot_create(null)),
 	mouse_mode: MOUSE_MODE_NORMAL,
 	name: 'Gast',
 	position_x: world.spawn_x,
@@ -85,35 +90,4 @@ export const player_rotate = (model, h, v) => {
 			+ v
 		)
 	);
-}
-
-/**
-	@returns {Object?} rest stack
-*/
-export const player_collect = ({inventory}, stack) => {
-	// try to merge with existing stacks
-	for (const slot of inventory) {
-		if (
-			slot !== null &&
-			slot.id === stack.id
-		) {
-			const amount = Math_min(
-				slot.amount + stack.amount,
-				STACK_SIZE
-			);
-			stack.amount -= amount - slot.amount;
-			slot.amount = amount;
-			if (stack.amount === 0) {
-				return null;
-			}
-		}
-	}
-	// try to find empty slot
-	for (let i = 0; i < PLAYER_INVENTORY; ++i) {
-		if (inventory[i] === null) {
-			inventory[i] = stack;
-			return null;
-		}
-	}
-	return stack;
 }

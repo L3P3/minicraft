@@ -45,7 +45,6 @@ import {
 	MOUSE_MODE_NORMAL,
 	MOUSE_MODE_SELECT,
 	PLAYER_SLOTS,
-	STACK_SIZE,
 } from '../etc/constants.js';
 import {
 	DEBUG,
@@ -61,7 +60,6 @@ import {
 	setInterval_,
 } from '../etc/helpers.js';
 import {
-	player_collect,
 	player_create,
 	player_rotate,
 	player_tick,
@@ -72,6 +70,9 @@ import {
 	renderer_destroy,
 	renderer_render,
 } from './m_renderer.js';
+import {
+	slots_collect,
+} from './m_slot.js';
 import {
 	stack_create,
 } from './m_stack.js';
@@ -98,6 +99,8 @@ export const game_create = () => {
 	return {
 		actions: null,
 		config: null,
+		cursor_x: 0,
+		cursor_y: 0,
 		flag_diagnostics: DEBUG,
 		flag_paused: true,
 		flag_touch: DEBUG,
@@ -206,6 +209,10 @@ export const game_mouse_move = (model, event) => {
 			event.movementX * factor,
 			-event.movementY * factor
 		);
+	}
+	else {
+		model.cursor_x = event.clientX;
+		model.cursor_y = event.clientY;
 	}
 }
 
@@ -320,7 +327,7 @@ export const game_key = (model, code, state) => {
 							id === BLOCK_TYPE_BEDROCK ||
 							id !== BLOCK_TYPE_LEAVES &&
 							id !== BLOCK_TYPE_GLASS &&
-							player_collect(player, stack_create(id, 1)) !== null
+							slots_collect(player.inventory, stack_create(id, 1)) !== null
 						) break;
 					}
 					world_block_set(
@@ -355,21 +362,23 @@ export const game_key = (model, code, state) => {
 					block_focus_z
 				);
 				const slots = player.inventory.slice(0, PLAYER_SLOTS);
-				const index_existing = slots.findIndex(stack =>
-					stack !== null &&
-					stack.id === id
+				const index_existing = slots.findIndex(slot =>
+					slot.content !== null &&
+					slot.content.id === id
 				);
 				if (index_existing >= 0) {
 					player.slot_index = index_existing;
 				}
 				else if (player.gamemode === GAMEMODE_CREATIVE) {
-					if (slots[player.slot_index] !== null) {
-						const index_empty = slots.indexOf(null);
+					if (slots[player.slot_index].content) {
+						const index_empty = slots.findIndex(slot =>
+							slot.content === null
+						);
 						if (index_empty >= 0) {
 							player.slot_index = index_empty;
 						}
 					}
-					player.inventory[player.slot_index] = stack_create(id);
+					player.inventory[player.slot_index].content = stack_create(id);
 				}
 				player.slot_time = model.frame_last;
 			}
@@ -380,8 +389,8 @@ export const game_key = (model, code, state) => {
 				block_focus_y >= 0
 			) {
 				if (player.mouse_mode === MOUSE_MODE_NORMAL) {
-					const stack = player.inventory[player.slot_index];
-					if (stack === null) break;
+					const slot = player.inventory[player.slot_index];
+					if (!slot.content) break;
 					let x = block_focus_x;
 					let y = block_focus_y;
 					let z = block_focus_z;
@@ -403,12 +412,12 @@ export const game_key = (model, code, state) => {
 								x & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
 								y,
 								z & ((1 << (CHUNK_WIDTH_L2 + model.world.size_l2)) - 1),
-								stack.id
+								slot.content.id
 							) &&
 							player.gamemode !== GAMEMODE_CREATIVE &&
-							--stack.amount <= 0
+							--slot.content.amount <= 0
 						) {
-							player.inventory[player.slot_index] = null;
+							slot.content = null;
 						}
 					}
 				}
@@ -480,15 +489,17 @@ export const game_key = (model, code, state) => {
 		case 80: // P
 			model.flag_paused = !model.flag_paused;
 			break;
-		case 81: // Q
+		case 81: {// Q
+			const slot = player.inventory[player.slot_index];
 			if (
 				keys_active.has(17) ||
-				player.inventory[player.slot_index] !== null &&
-				--player.inventory[player.slot_index].amount <= 0
+				slot.content &&
+				--slot.content.amount <= 0
 			) {
-				player.inventory[player.slot_index] = null;
+				slot.content = null;
 			}
 			break;
+		}
 		case KEY_MOVE_BACK:
 		case KEY_MOVE_FRONT:
 		case 83: // S
@@ -586,7 +597,9 @@ export const game_message_send = (model, value) => {
 			model.messages = [];
 			break;
 		case 'clearinv':
-			player.inventory.fill(null);
+			for (const slot of player.inventory) {
+				slot.content = null;
+			}
 			game_message_print(model, 'inventory cleared', true);
 			break;
 		case 'exit':
@@ -611,6 +624,10 @@ export const game_message_send = (model, value) => {
 			}
 			break;
 		case 'give': {
+				if (args.length === 0) {
+					game_message_print(model, '/give <id> [amount]\n' + ITEM_HANDLES.join(' '));
+					break;
+				}
 				const handles_index = ITEM_HANDLES.indexOf(
 					(args[0] || '').toLowerCase()
 				);
@@ -625,19 +642,18 @@ export const game_message_send = (model, value) => {
 					if (
 						!isNaN(amount) &&
 						amount > 0 &&
-						amount < STACK_SIZE + 1 &&
 						amount % 1 === 0
 					) {
 						game_message_print(
 							model,
-							player_collect(player, stack_create(value, amount))
+							slots_collect(player.inventory, stack_create(value, amount))
 							?	'inventory full'
 							:	`gave ${amount} ${ITEM_HANDLES[value]}`,
 							true
 						);
 					}
 					else {
-						game_message_print(model, 'amount must be in 1..64');
+						game_message_print(model, 'amount must be at least 1');
 					}
 				}
 				else {

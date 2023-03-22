@@ -45,7 +45,7 @@ export default function Bar({
 		tiles_data &&
 		player.inventory
 		.slice(0, PLAYER_SLOTS)
-		.map((stack, index) => (
+		.map(({content}, index) => (
 			node_dom('div', {
 				D: {
 					slot: index,
@@ -54,11 +54,11 @@ export default function Bar({
 					active: index === player.slot_index,
 				},
 			}, [
-				stack !== null &&
+				content &&
 				node(Stack, {
-					id: stack.id,
-					amount: stack.amount,
-					data: stack.data,
+					amount: content.amount,
+					data: content.data,
+					id: content.id,
 				}),
 			])
 		))

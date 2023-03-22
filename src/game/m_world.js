@@ -34,6 +34,10 @@ import {
 	decompress,
 } from '../etc/lz.js';
 
+import {
+	stack_create,
+} from './m_stack.js';
+
 // used for loading/saving of chunks (prevent frequent reallocation)
 const chunk_data_tmp = new Uint32Array_(1 << (CHUNK_WIDTH_L2 * 3 - 2));
 const chunk_data_tmp_u8 = new Uint8Array_(chunk_data_tmp.buffer);
@@ -285,11 +289,11 @@ export const world_save = (model, player) => {
 		world_chunk_save(model, chunk);
 	}
 
-	const i = player.inventory.map(slot =>
-		slot && [
-			slot.id,
-			slot.amount,
-			slot.data,
+	const i = player.inventory.map(({content}) =>
+		content && [
+			content.id,
+			content.amount,
+			content.data,
 		]
 	);
 	while (
@@ -299,7 +303,7 @@ export const world_save = (model, player) => {
 
 	localStorage_setItem(
 		`minicraft.world.${model.id}:meta`,
-		JSON_stringify({
+		JSON_stringify(/** @type {TYPE_WORLD_META} */ ({
 			p: {
 				h: player.health,
 				i,
@@ -318,7 +322,7 @@ export const world_save = (model, player) => {
 				model.spawn_z,
 			],
 			v: WORLD_FORMAT,
-		})
+		}))
 	);
 }
 
@@ -328,15 +332,15 @@ export const world_load = (model, player) => {
 		const {
 			p,
 			s,
-		} = JSON_parse(meta);
+		} = /** @type {TYPE_WORLD_META} */ (JSON_parse(meta));
 
-		p.i.forEach((slot, i) => {
-			if (slot) {
-				player.inventory[i] = {
-					id: slot[0],
-					amount: slot[1],
-					data: slot[2],
-				};
+		p.i.forEach((stack, i) => {
+			if (stack) {
+				player.inventory[i].content = stack_create(
+					stack[0],
+					stack[1],
+					stack[2]
+				);
 			}
 		});
 

@@ -52,7 +52,7 @@ export default function Stack({
 		node(Bitmap, {
 			id,
 		}),
-		amount > 1 &&
+		amount !== 1 &&
 		node_dom('div[className=amount]', {
 			innerText: amount,
 		}),
