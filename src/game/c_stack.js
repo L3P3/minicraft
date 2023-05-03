@@ -5,6 +5,9 @@ import {
 } from '../etc/lui.js';
 
 import {
+	ITEM_HANDLES,
+} from '../etc/constants.js';
+import {
 	TILES_RESOLUTION,
 	TILES_RESOLUTION_LOG2,
 } from '../etc/textures.js';
@@ -46,7 +49,9 @@ export default function Stack({
 	data,
 	id,
 }) {
-	hook_dom('div[className=stack]');
+	hook_dom('div[className=stack]', {
+		title: ITEM_HANDLES[id],
+	});
 
 	return [
 		node(Bitmap, {

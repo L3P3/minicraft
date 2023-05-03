@@ -45,16 +45,16 @@ button {
 }
 .game > .bar {
 	position: absolute;
-	width: 27rem;
-	height: 3rem;
+	width: 22.5rem;
+	height: 2.5rem;
 	max-width: 100%;
 	max-height: calc(100vw/9);
 	left: 50%;
-	margin-left: -13.5rem;
+	margin-left: -11.25rem;
 	bottom: 0;
 	display: flex;
 }
-@media (max-width: 27rem) {
+@media (max-width: 22.5rem) {
 	.game > .bar {
 		left: 0;
 		margin-left: 0;
@@ -62,7 +62,7 @@ button {
 }
 .game > .bar > * {
 	background: #000;
-	border: 4px solid #333;
+	border: .25rem solid #333;
 	flex: 1;
 }
 .game > .bar > *.active {
@@ -96,7 +96,7 @@ button {
 	position: absolute;
 	right: 0;
 	bottom: 0;
-	font-size: 1.5rem;
+	font-size: 1.2rem;
 	color: #fff;
 	text-shadow: 2px 2px #000;
 }
@@ -231,40 +231,41 @@ button {
 	grid-template-rows: 3rem;
 	gap: 1rem;
 }
+.game > .menu.inventory {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
 .game > .menu.inventory > .window {
-	position: absolute;
-	width: 28rem;
-	height: 13rem;
-	left: 50%;
-	top: 50%;
-	margin-left: -14rem;
-	margin-top: -6.5rem;
-	padding: .5rem;
 	border-radius: .5rem;
 	background: #ccc;
-	display: grid;
-	grid-template-columns: repeat(9, 1fr);
-	grid-template-rows: repeat(4, 1fr);
+	display: flex;
+	flex-direction: column;
+	padding: .5rem;
 	gap: .5rem;
+	color: #333;
 }
-.game > .menu.inventory > .window > * {
+.game > .menu.inventory > .window > .grid {
+	display: grid;
+	grid-template-columns: repeat(9, 2rem);
+	gap: .25rem;
+}
+.game > .menu.inventory > .window > .grid > * {
+	width: 2rem;
+	height: 2rem;
 	background: #aaa;
 }
-.game > .menu.inventory > .window > .first {
+.game > .menu.inventory > .window > .grid > .first {
 	grid-row-start: 4;
+	background: #999;
 }
 .game > .menu.inventory > .hand {
 	position: absolute;
-	width: 3rem;
-	height: 3rem;
-	margin-left: -1.5rem;
-	margin-top: -1.5rem;
-	opacity: .5;
+	width: 2rem;
+	height: 2rem;
+	margin-left: -1rem;
+	margin-top: -1rem;
 	pointer-events: none;
-}
-.game > .menu.inventory > .hand > * {
-	width: 100%;
-	height: 100%;
 }
 .game > .terminal {
 	display: flex;

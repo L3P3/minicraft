@@ -7,6 +7,7 @@ import {
 } from '../etc/lui.js';
 
 import {
+	GAMEMODE_CREATIVE,
 	ITEM_HANDLES,
 	MENU_NONE,
 	PLAYER_SLOTS,
@@ -28,6 +29,48 @@ import {
 	slot_create,
 	slot_transfer,
 } from './m_slot.js';
+import {
+	stack_create,
+} from './m_stack.js';
+
+function Palette({
+	slot_hand,
+}) {
+	hook_dom('div[className=grid]', {
+		onclick: ({
+			target,
+		}) => {
+			const slot_element = target.closest('[data-id]');
+			if (slot_element) {
+				slot_transfer(
+					slot_create(
+						stack_create(
+							Number_(slot_element.dataset.id)
+						)
+					),
+					slot_hand
+				);
+			}
+		},
+	});
+
+	return (
+		ITEM_HANDLES.map((_, id) => (
+			id > 0 &&
+			node_dom('div', {
+				D: {
+					id,
+				},
+			}, [
+				node(Stack, {
+					id,
+					amount: 1,
+					data: null,
+				}),
+			])
+		))
+	);
+}
 
 export default function Inventory({
 	game,
@@ -95,28 +138,32 @@ export default function Inventory({
 	hook_assert(tiles_data);
 
 	return [
-		node_dom('div[className=window]', null,
-			game.player.inventory.map(({content}, index) =>
-				node_dom('div', {
-					D: {
-						slot: index,
-					},
-					F: {
-						first: index < PLAYER_SLOTS,
-					},
-					title: content
-					?	ITEM_HANDLES[content.id]
-					:	'',
-				}, [
-					content &&
-					node(Stack, {
-						id: content.id,
-						amount: content.amount,
-						data: content.data,
-					}),
-				])
-			)
-		),
+		node_dom('div[className=window]', null, [
+			node_dom('div[innerText=Inventory]'),
+			game.player.gamemode === GAMEMODE_CREATIVE &&
+			node(Palette, {
+				slot_hand,
+			}),
+			node_dom('div[className=grid]', null,
+				game.player.inventory.map(({content}, index) =>
+					node_dom('div', {
+						D: {
+							slot: index,
+						},
+						F: {
+							first: index < PLAYER_SLOTS,
+						},
+					}, [
+						content &&
+						node(Stack, {
+							id: content.id,
+							amount: content.amount,
+							data: content.data,
+						}),
+					])
+				)
+			),
+		]),
 		slot_hand.content &&
 		node_dom('div[className=hand]', {
 			S: {

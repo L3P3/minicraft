@@ -531,18 +531,6 @@ const world_chunk_load = model => {
 					}
 					blocks_u32_index += step_x;
 				}
-				if ((x_abs | z_abs | y) === 0) {
-					// block palette
-					for (let i = 1; i < BLOCK_COLORS_LENGTH; ++i)
-						world_block_set(
-							model,
-							i % 9,
-							FLATMAP_LAYERS_LENGTH,
-							Math_floor(i / 9),
-							i
-						);
-					chunk.dirty = false;
-				}
 				return;
 			}
 			// if no work neccessary, continue with next chunk
