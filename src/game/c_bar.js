@@ -15,10 +15,6 @@ import {
 
 import Stack from './c_stack.js';
 
-import {
-	tiles_data,
-} from './m_renderer.js';
-
 export default function Bar({
 	player,
 	time_now,
@@ -42,7 +38,6 @@ export default function Bar({
 	});
 
 	return (
-		tiles_data &&
 		player.inventory
 		.slice(0, PLAYER_SLOTS)
 		.map(({content}, index) => (

@@ -5,43 +5,19 @@ import {
 } from '../etc/lui.js';
 
 import {
+	BLOCK_TEXTURES_SRC,
 	ITEM_HANDLES,
 } from '../etc/constants.js';
-import {
-	TILES_RESOLUTION,
-	TILES_RESOLUTION_LOG2,
-} from '../etc/textures.js';
-
-import {
-	tiles_data,
-} from './m_renderer.js';
-
-const rows_template = new Array(TILES_RESOLUTION).fill(0);
 
 const Bitmap = ({
 	id,
 }) => (
-	hook_dom('div[className=bitmap]'),
-	id = (id - 1) << (TILES_RESOLUTION_LOG2 * 2),
-	rows_template.map((_, row) => (
-		row = id | (15 - row) << TILES_RESOLUTION_LOG2,
-		node_dom('div', null,
-			rows_template.map((_, column) => (
-				column = tiles_data[row | column],
-				node_dom('div', {
-					style: (column >>> 24) > 0
-					?	`background-color:rgb(${
-							column & 0xff
-						},${
-							column >>> 8 & 0xff
-						},${
-							column >>> 16 & 0xff
-						})`
-					:	'',
-				})
-			))
-		)
-	))
+	hook_dom(`div[className=bitmap][style=background-image:url(${BLOCK_TEXTURES_SRC})]`, {
+		S: {
+			backgroundPositionY: `-${(id - 1) * 2}rem`,
+		},
+	}),
+	null
 );
 
 export default function Stack({

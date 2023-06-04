@@ -1,6 +1,6 @@
 {
 	"name": "minicraft-texture-packer",
-	"version": "1.1.0",
+	"version": "2.0.0",
 	"description": "generates optimized texture data for minicraft",
 	"main": "./packer.js",
 	"scripts": {
@@ -14,7 +14,6 @@
 	"author": "L3P3 <dev@l3p3.de> (https://l3p3.de)",
 	"license": "Zlib",
 	"devDependencies": {
-		"node-zopflipng": "latest",
 		"pngjs": "latest"
 	}
 }

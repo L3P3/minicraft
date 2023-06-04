@@ -1,5 +1,4 @@
 import {
-	hook_assert,
 	hook_dom,
 	hook_memo,
 	node,
@@ -22,9 +21,6 @@ import Stack from './c_stack.js';
 import {
 	game_mouse_catch,
 } from './m_game.js';
-import {
-	tiles_data,
-} from './m_renderer.js';
 import {
 	slot_create,
 	slot_transfer,
@@ -134,8 +130,6 @@ export default function Inventory({
 			}
 		},
 	})));
-
-	hook_assert(tiles_data);
 
 	return [
 		node_dom('div[className=window]', null, [

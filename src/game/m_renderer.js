@@ -1,5 +1,6 @@
 import {
 	BLOCK_COLORS,
+	BLOCK_TEXTURES_SRC,
 	BLOCK_TYPE_AIR,
 	BLOCK_TYPE_FACE_LABELS,
 	CHUNK_HEIGHT,
@@ -47,27 +48,27 @@ import {
 } from '../etc/textures.js';
 
 // parse png
-export let tiles_data = null;
+let tiles_data = null;
 let tiles_data_onload = null;
 let tiles_image = new Image();
 tiles_image.crossOrigin = 'anonymous';
 tiles_image.onload = () => {
 	const canvas_temp = document_.createElement('canvas');
-	canvas_temp.width = 1 << (TILES_RESOLUTION_LOG2 * 2);
-	canvas_temp.height = TILES_COUNT;
+	canvas_temp.width = 1 << TILES_RESOLUTION_LOG2;
+	canvas_temp.height = TILES_COUNT << TILES_RESOLUTION_LOG2;
 	const context = canvas_temp.getContext('2d');
 	context.drawImage(tiles_image, 0, 0);
 	tiles_data = new Uint32Array_(
 		context.getImageData(
 			0, 0,
-			1 << (TILES_RESOLUTION_LOG2 * 2),
-			TILES_COUNT
+			1 << TILES_RESOLUTION_LOG2,
+			TILES_COUNT << TILES_RESOLUTION_LOG2
 		).data.buffer
 	);
 	tiles_data_onload && tiles_data_onload();
 	tiles_image = tiles_data_onload = null;
 }
-tiles_image.src = ASSETS + 'blocks.png';
+tiles_image.src = BLOCK_TEXTURES_SRC;
 
 export const renderer_create = (game, canvas_element) => {
 	const model = {

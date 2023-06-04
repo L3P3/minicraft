@@ -31,7 +31,7 @@ button {
 	height: 100%;
 	overflow: hidden;
 }
-.game > canvas {
+.game > canvas, .game .bitmap {
 	position: absolute;
 	width: 100%;
 	height: 100%;
@@ -69,18 +69,8 @@ button {
 	border-color: #fff;
 }
 .game .bitmap {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-}
-.game .bitmap > * {
-	flex: 1;
-	display: flex;
-}
-.game .bitmap > * > * {
-	flex: 1;
+	background-size: 100% auto;
+	transform: scaleY(-1);
 }
 .game > .diagnostics {
 	position: absolute;
