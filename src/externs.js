@@ -60,6 +60,13 @@ lui.defer = function(){}
 lui.defer_end = function(){}
 
 /**
+	@param {string} handle
+	@param {string} descriptor
+	@param {?TYPE_PROPS=} attributes
+*/
+lui.dom_define = function(handle, descriptor, attributes){}
+
+/**
 	@param {boolean=} condition
 	@return {void}
 */

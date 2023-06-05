@@ -1,6 +1,9 @@
 import {
+	dom_define,
+} from '../etc/lui.js';
+
+import {
 	BLOCK_COLORS,
-	BLOCK_TEXTURES_SRC,
 	BLOCK_TYPE_AIR,
 	BLOCK_TYPE_FACE_LABELS,
 	CHUNK_HEIGHT,
@@ -58,6 +61,11 @@ tiles_image.onload = () => {
 	canvas_temp.height = TILES_COUNT << TILES_RESOLUTION_LOG2;
 	const context = canvas_temp.getContext('2d');
 	context.drawImage(tiles_image, 0, 0);
+	dom_define('tile', 'div[className=bitmap]', {
+		S: {
+			backgroundImage: `url(${canvas_temp.toDataURL()})`,
+		},
+	});
 	tiles_data = new Uint32Array_(
 		context.getImageData(
 			0, 0,
@@ -68,7 +76,7 @@ tiles_image.onload = () => {
 	tiles_data_onload && tiles_data_onload();
 	tiles_image = tiles_data_onload = null;
 }
-tiles_image.src = BLOCK_TEXTURES_SRC;
+tiles_image.src = ASSETS + 'blocks.webp';
 
 export const renderer_create = (game, canvas_element) => {
 	const model = {

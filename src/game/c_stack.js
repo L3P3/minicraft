@@ -5,14 +5,13 @@ import {
 } from '../etc/lui.js';
 
 import {
-	BLOCK_TEXTURES_SRC,
 	ITEM_HANDLES,
 } from '../etc/constants.js';
 
 const Bitmap = ({
 	id,
 }) => (
-	hook_dom(`div[className=bitmap][style=background-image:url(${BLOCK_TEXTURES_SRC})]`, {
+	hook_dom('#tile', {
 		S: {
 			backgroundPositionY: `-${(id - 1) * 2}rem`,
 		},

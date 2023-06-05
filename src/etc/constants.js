@@ -8,8 +8,6 @@ export const COORDINATE_OFFSET = 1 << 16;
 
 export const WORLD_FORMAT = 1;
 
-export const BLOCK_TEXTURES_SRC = ASSETS + 'blocks.webp';
-
 export const BLOCK_TYPE_AIR = 0;
 export const BLOCK_TYPE_STONE = 1;
 export const BLOCK_TYPE_GRASS = 2;
