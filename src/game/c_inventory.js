@@ -22,6 +22,9 @@ import {
 	game_mouse_catch,
 } from './m_game.js';
 import {
+	tiles_data,
+} from './m_renderer.js';
+import {
 	slot_create,
 	slot_transfer,
 } from './m_slot.js';
@@ -131,7 +134,7 @@ export default function Inventory({
 		},
 	})));
 
-	return [
+	return tiles_data && [
 		node_dom('div[className=window]', null, [
 			node_dom('div[innerText=Inventory]'),
 			game.player.gamemode === GAMEMODE_CREATIVE &&

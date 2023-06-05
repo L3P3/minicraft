@@ -48,7 +48,7 @@ import {
 } from '../etc/textures.js';
 
 // parse png
-let tiles_data = null;
+export let tiles_data = null;
 let tiles_data_onload = null;
 let tiles_image = new Image();
 tiles_image.crossOrigin = 'anonymous';
