@@ -46,13 +46,13 @@ button {
 .game > .bar {
 	position: absolute;
 	width: 22.5rem;
-	height: 2.5rem;
 	max-width: 100%;
-	max-height: calc(100vw/9);
 	left: 50%;
 	margin-left: -11.25rem;
 	bottom: 0;
-	display: flex;
+	white-space: nowrap;
+	overflow: auto hidden;
+	font-size: 0;
 }
 @media (max-width: 22.5rem) {
 	.game > .bar {
@@ -61,9 +61,11 @@ button {
 	}
 }
 .game > .bar > * {
+	display: inline-block;
+	width: 2.5rem;
+	height: 2.5rem;
 	background: #000;
 	border: .25rem solid #333;
-	flex: 1;
 }
 .game > .bar > *.active {
 	border-color: #fff;
