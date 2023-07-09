@@ -1,5 +1,4 @@
 import {
-	BLOCK_COLORS_LENGTH,
 	BLOCK_TYPE_AIR,
 	BLOCK_TYPE_BEDROCK,
 	BLOCK_TYPE_DIRT,
@@ -213,7 +212,7 @@ export const world_offset_update = (model, player, force) => {
 		);
 		world_chunk_load_setup(model);
 	}
-	world_chunk_load(model);
+	world_chunk_load(model, false);
 }
 
 const world_chunk_load_setup = model => {
@@ -385,7 +384,7 @@ export const world_chunk_reset = model => {
 	);
 	chunk.dirty = false;
 	++chunk.x_abs;
-	world_chunk_load(model);
+	world_chunk_load(model, false);
 }
 
 const world_chunk_save = (model, chunk) => {
@@ -432,7 +431,7 @@ const world_chunk_save = (model, chunk) => {
 	chunk.dirty = false;
 }
 
-const world_chunk_load = model => {
+export const world_chunk_load = (model, all) => {
 	const {
 		chunks,
 		chunks_checklist,
@@ -531,7 +530,7 @@ const world_chunk_load = model => {
 					}
 					blocks_u32_index += step_x;
 				}
-				return;
+				if (!all) return;
 			}
 			// if no work neccessary, continue with next chunk
 		}

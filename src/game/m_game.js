@@ -80,6 +80,7 @@ import {
 	world_block_get,
 	world_block_set,
 	world_block_set_try,
+	world_chunk_load,
 	world_chunk_reset,
 	world_create,
 	world_data_init,
@@ -662,7 +663,12 @@ export const game_message_send = (model, value) => {
 			}
 			break;
 		case 'help':
-			game_message_print(model, 'commands: clear, clearinv, exit, gamemode, give, help, me, save, spawn, teleport, version');
+			game_message_print(model, 'commands: clear, clearinv, exit, gamemode, give, help, load, me, save, spawn, teleport, version');
+			break;
+		case 'load':
+			world_chunk_load(model.world, true);
+			model.renderer.flag_dirty = true;
+			game_message_print(model, 'chunks loaded', true);
 			break;
 		case 'me':
 			game_message_print(model, player.name + ' ' + args.join(' '), true);

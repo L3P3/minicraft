@@ -65,7 +65,6 @@ export const BLOCK_COLORS = [
 	0x0a1dac, // REDSTONE_BLOCK
 	0xe3eaed, // QUARTZ_BLOCK
 ];
-export const BLOCK_COLORS_LENGTH = BLOCK_COLORS.length;
 
 export const BLOCK_TYPE_FACE_LABELS = 'WEBTSN'.split('');
 export const BLOCK_TYPE_FACE_W = 0;
