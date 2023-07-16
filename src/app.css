@@ -64,11 +64,21 @@ button {
 	display: inline-block;
 	width: 2.5rem;
 	height: 2.5rem;
-	background: #000;
-	border: .25rem solid #333;
+	background: #333;
+	padding: .25rem;
 }
 .game > .bar > *.active {
-	border-color: #fff;
+	background: #fff;
+}
+.game > .bar > * > * {
+	background: #000;
+}
+.game > .bar > :empty::after {
+	content: ' ';
+	display: block;
+	width: 100%;
+	height: 100%;
+	background: #000;
 }
 .game .bitmap {
 	background-size: 100% auto;
