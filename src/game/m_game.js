@@ -18,6 +18,7 @@ import {
 	BLOCK_TYPE_MAX,
 	BLOCK_TYPE_STONE,
 	CHUNK_HEIGHT,
+	CHUNK_WIDTH,
 	CHUNK_WIDTH_L2,
 	GAMEMODE_CREATIVE,
 	GAMEMODE_SPECTATOR,
@@ -169,10 +170,14 @@ export const game_view_distance_update = model => {
 		world,
 	} = model;
 
-	// this formula took me 4 hours to figure out
-	// leaves 2 chunks of padding around the player
+	// this formula took me 3 hours to figure out
 	const size_l2 = Math_ceil(
-		Math_log2(view_distance / 8 + 2)
+		Math_log2(
+			view_distance
+			/ CHUNK_WIDTH // blocks -> chunks
+			* 2 // in both directions
+			+ 2 // 2 chunks of padding
+		)
 	);
 
 	if (world.size_l2 !== size_l2)
