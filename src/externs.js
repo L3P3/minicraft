@@ -237,6 +237,10 @@ function open(url){}
 
 function onbeforeinstallprompt(){}
 function onbeforeunload(){}
+function onblur(){}
+function onfocus(){}
+function onpagehide(){}
+function onpageshow(){}
 function onunload(){}
 function onerror(error){}
 function onkeydown(event){}

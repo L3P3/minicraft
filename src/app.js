@@ -29,11 +29,15 @@ lui_.init(() => {
 	hook_effect(() => {
 		let unloaded = false;
 
-		onbeforeunload = onunload = () => {
+		// shotgun method
+		onbeforeunload = onunload = onpagehide = onblur = () => {
 			if (unloaded) return;
 			unloaded = true;
 			actions.config_save();
 			if (ref.game) game_save(ref.game);
+		};
+		onpageshow = onfocus = () => {
+			unloaded = false;
 		};
 	});
 

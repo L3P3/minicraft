@@ -27,7 +27,6 @@ button {
 
 .game {
 	position: relative;
-	width: 100%;
 	height: 100%;
 	overflow: hidden;
 }
@@ -67,17 +66,16 @@ button {
 	background: #333;
 	padding: .25rem;
 }
-.game > .bar > *.active {
+.game > .bar > .active {
 	background: #fff;
-}
-.game > .bar > * > * {
-	background: #000;
 }
 .game > .bar > :empty::after {
 	content: ' ';
 	display: block;
-	width: 100%;
 	height: 100%;
+	background: #000;
+}
+.game > .bar > * > * {
 	background: #000;
 }
 .game .bitmap {
@@ -90,7 +88,6 @@ button {
 	color: #fff;
 }
 .game .stack {
-	width: 100%;
 	height: 100%;
 	position: relative;
 }

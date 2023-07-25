@@ -52,7 +52,9 @@ import {
 } from '../etc/env.js';
 import {
 	clearInterval_,
+	Math_ceil,
 	Math_floor,
+	Math_log2,
 	Math_max,
 	Math_PI,
 	Math_round,
@@ -159,32 +161,20 @@ export const game_resolution_update = model => {
 }
 
 export const game_view_distance_update = model => {
-	const {player, world} = model;
-	const {view_distance} = model.config;
-	// TODO proper formula would be less embarrassing
-	const size_l2 = (
-		view_distance < 17 ? 2
-		: view_distance < 49 ? 3
-		: view_distance < 113 ? 4
-		: view_distance < 241 ? 5
-		: view_distance < 497 ? 6
-		: view_distance < 1009 ? 7
-		: view_distance < 2033 ? 8
-		: view_distance < 4081 ? 9
-		: view_distance < 8177 ? 10
-		: view_distance < 16369 ? 11
-		: view_distance < 32753 ? 12
-		: 13
+	const {
+		config: {
+			view_distance,
+		},
+		player,
+		world,
+	} = model;
+
+	// this formula took me 4 hours to figure out
+	// leaves 2 chunks of padding around the player
+	const size_l2 = Math_ceil(
+		Math_log2(view_distance / 8 + 2)
 	);
-	/*Math_max(
-		Math_ceil(
-			Math_log2(
-				model.config.view_distance
-			) - CHUNK_WIDTH_L2 + 2
-		),
-		2
-	);*/
-	//console.log('size_l2', world.size_l2, size_l2, 1 << (CHUNK_WIDTH_L2 + size_l2));
+
 	if (world.size_l2 !== size_l2)
 		world_data_init(world, player, size_l2);
 }
