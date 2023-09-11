@@ -158,6 +158,7 @@ export default function Game({
 				game_start(model, canvas_element)
 			)),
 		}),
+		model.flag_hud &&
 		model.menu !== MENU_TERMINAL &&
 		node(Messages, {
 			messages: model.messages,
@@ -168,11 +169,13 @@ export default function Game({
 		node_dom('div[className=diagnostics]', {
 			innerText: model.renderer.diagnostics,
 		}),
+		model.flag_hud &&
 		model.flag_touch &&
 		node(Touch, {
 			game: model,
 			keys_active_check: model.keys_active_check,
 		}),
+		model.flag_hud &&
 		model.menu !== MENU_INVENTORY &&
 		model.player.gamemode !== GAMEMODE_SPECTATOR &&
 		node(Bar, {

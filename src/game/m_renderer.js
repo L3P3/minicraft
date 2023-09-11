@@ -117,6 +117,7 @@ export const renderer_render = (model, now) => {
 	} = model;
 	const {
 		config,
+		flag_hud,
 		player,
 		resolution_x,
 		resolution_y,
@@ -140,12 +141,12 @@ export const renderer_render = (model, now) => {
 			angle_h,
 			angle_v,
 			block_focus_x,
-			block_focus_y,
 			block_focus_z,
 			position_x,
 			position_y,
 			position_z,
 		} = player;
+		const block_focus_y = flag_hud ? player.block_focus_y : -1;
 		const {
 			blocks,
 			size_l2,
@@ -374,7 +375,10 @@ export const renderer_render = (model, now) => {
 		}
 
 		// cursor
-		if (!cursor_cross) {
+		if (
+			flag_hud &&
+			!cursor_cross
+		) {
 			canvas_surface_data[
 				canvas_surface_data_index =
 					(resolution_x * pixel_focus_y + pixel_focus_x) << 2
@@ -385,7 +389,10 @@ export const renderer_render = (model, now) => {
 
 		canvas_context.putImageData(canvas_surface, 0, 0);
 
-		if (cursor_cross) {
+		if (
+			flag_hud &&
+			cursor_cross
+		) {
 			const cross_width_h = Math_ceil(
 				resolution_min * .05
 			);

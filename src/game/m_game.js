@@ -106,6 +106,7 @@ export const game_create = () => {
 		cursor_x: 0,
 		cursor_y: 0,
 		flag_diagnostics: DEBUG,
+		flag_hud: true,
 		flag_paused: true,
 		flag_touch: DEBUG,
 		frame_element: null,
@@ -508,6 +509,9 @@ export const game_key = (model, code, state) => {
 				for (const code of keys_active)
 					game_key(model, code, false);
 			}
+			break;
+		case 112: // F1
+			model.flag_hud = !model.flag_hud;
 			break;
 		case 114: // F3
 			model.flag_diagnostics = !model.flag_diagnostics;
