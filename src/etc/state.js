@@ -13,8 +13,8 @@ export const reducers = {
 		const config = {
 			flag_textures: true,
 			mouse_sensitivity: 3,
-			resolution_scaling: 10,
-			view_angle: 80,
+			resolution_scaling: 4,
+			view_angle: 120,
 			view_distance: 64,
 		};
 		const config_raw = localStorage_getItem('minicraft.config');
