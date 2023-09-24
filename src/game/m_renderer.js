@@ -127,7 +127,7 @@ export const renderer_render = (model, now) => {
 	//let check_count = 0;
 
 	if (
-		!game.flag_paused ||
+		!world.flag_paused ||
 		model.flag_dirty
 	) {
 		model.flag_dirty = false;
@@ -423,14 +423,14 @@ export const renderer_render = (model, now) => {
 		?	'Minicraft ' + VERSION + ' ' + (
 				number_padStart2(model.fps, '\xa0')
 			) + ' fps, T: ' + (
-				number_padStart2(game.time_f * 24, '0')
+				number_padStart2(world.time_f * 24, '0')
 			) + ':' + (
-				number_padStart2((((game.time_f * 24) % 1) * 60), '0')
+				number_padStart2((((world.time_f * 24) % 1) * 60), '0')
 			) + '; ' + (
-				game.flag_paused &&
+				world.flag_paused &&
 				now % 1e3 < 500
 				?	''
-				:	game.time
+				:	world.time
 			) + '\n' +
 
 			'R: ' + resolution_x + 'x' + resolution_y +

@@ -12,6 +12,7 @@ import {
 import Bar from './c_bar.js';
 import Inventory from './c_inventory.js';
 import Messages from './c_messages.js';
+import MenuStart from './c_menu_start.js';
 import Settings from './c_settings.js';
 import Terminal from './c_terminal.js';
 import Touch from './c_touch.js';
@@ -36,10 +37,11 @@ import {
 	game_mouse_catch,
 	game_mouse_move,
 	game_render,
+	game_renderer_init,
 	game_resolution_update,
-	game_start,
-	game_umount,
 	game_view_distance_update,
+	game_world_close,
+	game_world_open,
 } from './m_game.js';
 
 export default function Game({
@@ -54,10 +56,11 @@ export default function Game({
 		'div[className=game]',
 		hook_memo(() => {
 			const handler_mousebutton = event => (
+				!model.world ||
 				model.menu !== MENU_NONE || (
 					model.flag_touch = false,
 					document_.pointerLockElement === frame
-					?	model.flag_paused || game_key(
+					?	model.world.flag_paused || game_key(
 							model,
 							-1 - event.button,
 							event.type === 'mousedown'
@@ -73,16 +76,20 @@ export default function Game({
 				onmouseup: handler_mousebutton,
 				ontouchstart: event => {
 					model.flag_touch = true;
-					if (!model.menu) {
-						model.flag_paused = false;
+					if (
+						model.world &&
+						!model.menu
+					) {
+						model.world.flag_paused = false;
 						event.preventDefault();
 					}
 				},
 				onwheel: event => {
 					model.flag_touch = false;
 					if (
+						model.world &&
 						!model.menu &&
-						!model.flag_paused &&
+						!model.world.flag_paused &&
 						Math.abs(event.deltaY) > 5
 					) {
 						const key =
@@ -101,10 +108,14 @@ export default function Game({
 
 	hook_effect(() => (
 		model.actions = actions,
+		model.config = config,
 		model.frame_element = frame,
 		ref.game = model,
+		config.world_last !== -1 &&
+			game_world_open(model),
 		() => (
-			game_umount(model),
+			model.world &&
+				game_world_close(model),
 			ref.game = null
 		)
 	));
@@ -114,7 +125,8 @@ export default function Game({
 		model.renderer && (
 			model.renderer.flag_dirty = true
 		),
-		game_view_distance_update(model)
+		model.world &&
+			game_view_distance_update(model)
 	), [config]);
 
 	hook_effect((width, height, ratio) => (
@@ -130,21 +142,27 @@ export default function Game({
 
 	// two-way binding for lock and pause
 	hook_effect(() => {
+		if (!model.world) return;
 		// esc pressed ingame?
 		if (
 			!pointer_locked &&
-			!model.flag_paused &&
+			!model.world.flag_paused &&
 			!model.menu
 		)
 			model.menu = MENU_SETTINGS;
-		model.flag_paused = !pointer_locked;
+		model.world.flag_paused = !pointer_locked;
 	}, [pointer_locked]);
 
 	hook_effect(shouldRelease => (
 		pointer_locked &&
 		shouldRelease &&
 			document_.exitPointerLock()
-	), [model.flag_paused || model.menu]);
+	), [
+		model.world && (
+			model.world.flag_paused ||
+			model.menu !== MENU_NONE
+		)
+	]);
 
 	hook_effect(() => (
 		game_render(model, time_now)
@@ -153,28 +171,38 @@ export default function Game({
 	hook_rerender();
 
 	return [
+		model.world &&
 		node_dom('canvas', {
 			R: hook_static(canvas_element => (
-				game_start(model, canvas_element)
+				game_renderer_init(model, canvas_element)
 			)),
 		}),
+		!model.world &&
+		model.menu === MENU_NONE &&
+		node(MenuStart, {
+			actions,
+			game: model,
+		}),
+		model.world &&
 		model.flag_hud &&
 		model.menu !== MENU_TERMINAL &&
 		node(Messages, {
 			messages: model.messages,
 			time_now,
 		}),
+		model.world &&
 		model.renderer &&
 		model.flag_diagnostics &&
 		node_dom('div[className=diagnostics]', {
 			innerText: model.renderer.diagnostics,
 		}),
-		model.flag_hud &&
+		model.world &&
 		model.flag_touch &&
 		node(Touch, {
 			game: model,
 			keys_active_check: model.keys_active_check,
 		}),
+		model.world &&
 		model.flag_hud &&
 		model.menu !== MENU_INVENTORY &&
 		model.player.gamemode !== GAMEMODE_SPECTATOR &&

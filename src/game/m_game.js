@@ -88,61 +88,72 @@ import {
 	world_create,
 	world_data_init,
 	world_load,
-	world_offset_update,
 	world_save,
+	world_tick,
 } from './m_world.js';
 
 let message_id_counter = 0;
 
-export const game_create = () => {
+export const game_create = () => ({
+	actions: null,
+	config: null,
+	cursor_x: 0,
+	cursor_y: 0,
+	flag_diagnostics: DEBUG,
+	flag_hud: true,
+	flag_touch: DEBUG,
+	frame_element: null,
+	frame_last: 0,
+	keys_active: new Set,
+	keys_active_check: '',
+	menu: MENU_NONE,
+	messages: [],
+	player: null,
+	renderer: null,
+	resolution_raw_x: 1,
+	resolution_raw_y: 1,
+	resolution_x: 0,
+	resolution_y: 0,
+	tick_interval: null,
+	world: null,
+});
+
+export const game_world_open = model => {
 	const world = world_create();
 	const player = player_create(world);
 
 	world_load(world, player);
 
-	return {
-		actions: null,
-		config: null,
-		cursor_x: 0,
-		cursor_y: 0,
-		flag_diagnostics: DEBUG,
-		flag_hud: true,
-		flag_paused: true,
-		flag_touch: DEBUG,
-		frame_element: null,
-		frame_last: 0,
-		keys_active: new Set,
-		keys_active_check: '',
-		menu: MENU_NONE,
-		messages: [],
-		player,
-		renderer: null,
-		resolution_raw_x: 1,
-		resolution_raw_y: 1,
-		resolution_x: 0,
-		resolution_y: 0,
-		tick_interval: null,
-		time: 0,
-		time_f: 0.0,
-		world,
-	};
-}
+	model.world = world;
+	model.player = player;
 
-export const game_start = (model, canvas_element) => {
-	model.renderer = renderer_create(model, canvas_element);
+	game_view_distance_update(model);
+
 	model.tick_interval = setInterval_(() => (
-		game_tick(model)
+		world_tick(world, player)
 	), 50);
 }
 
-export const game_save = model => (
-	world_save(model.world, model.player)
-);
+export const game_world_close = model => {
+	clearInterval_(model.tick_interval);
 
-export const game_umount = model => (
-	clearInterval_(model.tick_interval),
-	renderer_destroy(model.renderer)
-);
+	world_save(model.world, model.player);
+
+	renderer_destroy(model.renderer);
+
+	model.world = null;
+	model.player = null;
+	model.renderer = null;
+}
+
+export const game_renderer_init = (model, canvas_element) => {
+	model.renderer = renderer_create(model, canvas_element);
+}
+
+export const game_save = model => {
+	if (model.world)
+		world_save(model.world, model.player)
+}
 
 export const game_resolution_update = model => {
 	const {resolution_scaling} = model.config;
@@ -164,17 +175,13 @@ export const game_resolution_update = model => {
 
 export const game_view_distance_update = model => {
 	const {
-		config: {
-			view_distance,
-		},
-		player,
 		world,
 	} = model;
 
 	// this formula took me 3 hours to figure out
 	const size_l2 = Math_ceil(
 		Math_log2(
-			view_distance
+			model.config.view_distance
 			/ CHUNK_WIDTH // blocks -> chunks
 			* 2 // in both directions
 			+ 2 // 2 chunks of padding
@@ -182,7 +189,7 @@ export const game_view_distance_update = model => {
 	);
 
 	if (world.size_l2 !== size_l2)
-		world_data_init(world, player, size_l2);
+		world_data_init(world, model.player, size_l2);
 }
 
 /**
@@ -194,7 +201,8 @@ export const game_mouse_catch = model => (
 
 export const game_mouse_move = (model, event) => {
 	if (
-		!model.flag_paused &&
+		model.world &&
+		!model.world.flag_paused &&
 		!model.menu
 	) {
 		const factor = model.config.mouse_sensitivity * Math_PI / Math_max(
@@ -283,6 +291,7 @@ const game_rotation_v_update = model => (
 	@return {boolean} true if state changed
 */
 export const game_key = (model, code, state) => {
+	if (!model.world) return false;
 	//console.log('KEY', code, state);
 	const {
 		keys_active,
@@ -441,11 +450,11 @@ export const game_key = (model, code, state) => {
 			break;
 		case 27: // ESC
 			if (model.menu) {
-				model.flag_paused = false;
+				model.world.flag_paused = false;
 				model.menu = MENU_NONE;
 			}
 			else {
-				model.flag_paused = true;
+				model.world.flag_paused = true;
 				model.menu = MENU_SETTINGS;
 			}
 			break;
@@ -484,7 +493,8 @@ export const game_key = (model, code, state) => {
 			}
 			break;
 		case 80: // P
-			model.flag_paused = !model.flag_paused;
+			if (model.world)
+				model.world.flag_paused = !model.world.flag_paused;
 			break;
 		case 81: {// Q
 			const slot = player.inventory[player.slot_index];
@@ -558,21 +568,16 @@ export const game_key = (model, code, state) => {
 }
 
 export const game_render = (model, now) => {
-	model.frame_last &&
-	!model.flag_paused &&
-		player_tick(model.player, now - model.frame_last);
-	model.renderer &&
-		renderer_render(model.renderer, now);
+	if (model.world) {
+		model.frame_last &&
+		!model.world.flag_paused &&
+			player_tick(model.player, now - model.frame_last);
+		model.renderer &&
+			renderer_render(model.renderer, now);
+	}
 	model.frame_last = now;
 }
 
-const game_tick = model => {
-	if (model.flag_paused) return;
-	model.time = (model.time + 1) % 24e3;
-	model.time_f = ((model.time + 6e3) * (1 / 24e3)) % 1;
-
-	world_offset_update(model.world, model.player, false);
-}
 const coord_part_parse = (base, value) => (
 	value = (
 		value.startsWith('~')
@@ -587,6 +592,7 @@ const coord_part_parse = (base, value) => (
 export const game_message_send = (model, value) => {
 	const {
 		player,
+		world,
 	} = model;
 	if (!value) {}
 	else if (value.charAt(0) === '/') {
@@ -603,7 +609,7 @@ export const game_message_send = (model, value) => {
 			game_message_print(model, 'inventory cleared', true);
 			break;
 		case 'exit':
-			model.flag_paused = false;
+			world.flag_paused = false;
 			model.menu = MENU_NONE;
 			break;
 		case 'gamemode':
@@ -665,7 +671,7 @@ export const game_message_send = (model, value) => {
 			game_message_print(model, 'commands: clear, clearinv, exit, gamemode, give, help, load, me, save, spawn, teleport, version');
 			break;
 		case 'load':
-			world_chunk_load(model.world, true);
+			world_chunk_load(world, true);
 			model.renderer.flag_dirty = true;
 			game_message_print(model, 'chunks loaded', true);
 			break;
@@ -682,17 +688,17 @@ export const game_message_send = (model, value) => {
 			game_message_print(model, 'lff.smart: true', true);
 			break;
 		case 'spawn':
-			model.world.spawn_x = player.position_x;
-			model.world.spawn_y = player.position_y;
-			model.world.spawn_z = player.position_z;
+			world.spawn_x = player.position_x;
+			world.spawn_y = player.position_y;
+			world.spawn_z = player.position_z;
 			game_message_print(model, 'spawn updated', true);
 			break;
 		case 'teleport':
 		case 'tp':
 			if (args.length === 0) {
-				player.position_x = model.world.spawn_x;
-				player.position_y = model.world.spawn_y;
-				player.position_z = model.world.spawn_z;
+				player.position_x = world.spawn_x;
+				player.position_y = world.spawn_y;
+				player.position_z = world.spawn_z;
 				model.renderer.flag_dirty = true;
 				game_message_print(model, 'teleported to spawn', true);
 			}
@@ -745,7 +751,7 @@ export const game_message_send = (model, value) => {
 			);
 			break;
 		case '/regen':
-			world_chunk_reset(model.world);
+			world_chunk_reset(world);
 			game_message_print(model, 'regenerate chunk', true);
 			model.renderer.flag_dirty = true;
 			break;

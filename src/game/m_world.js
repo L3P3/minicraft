@@ -54,6 +54,8 @@ export const world_create = () => {
 		chunks_checklist: null,
 		// next checklist item to check
 		chunks_checklist_index: 0,
+		// if world is paused
+		flag_paused: true,
 		// currently centered chunk (relative chunk position inside world tile)
 		focus_x: 0,
 		focus_y: 0,
@@ -69,6 +71,9 @@ export const world_create = () => {
 		spawn_x: 0.5,
 		spawn_y: FLATMAP_LAYERS_LENGTH + 1.5,
 		spawn_z: 0.5,
+		// ingame time
+		time: 0,
+		time_f: 0.0,
 	};
 
 	return model;
@@ -185,7 +190,7 @@ export const world_data_init = (model, player, size_l2) => {
 	world_offset_update(model, player, true);
 }
 
-export const world_offset_update = (model, player, force) => {
+const world_offset_update = (model, player, force) => {
 	const focus_y = Math_max(
 		Math_min(player.position_y, CHUNK_HEIGHT - 1),
 		0
@@ -535,4 +540,13 @@ export const world_chunk_load = (model, all) => {
 			// if no work neccessary, continue with next chunk
 		}
 	}
+}
+
+export const world_tick = (model, player) => {
+	if (model.flag_paused) return;
+
+	model.time = (model.time + 1) % 24e3;
+	model.time_f = ((model.time_f + 6e3) * (1 / 24e3)) % 1;
+
+	world_offset_update(model, player, false);
 }

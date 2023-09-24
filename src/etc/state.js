@@ -16,6 +16,7 @@ export const reducers = {
 			resolution_scaling: 4,
 			view_angle: 120,
 			view_distance: 64,
+			world_last: 0,
 		};
 		const config_raw = localStorage_getItem('minicraft.config');
 		if (config_raw) {
@@ -30,6 +31,10 @@ export const reducers = {
 			config.resolution_scaling = config_loaded['resolution_scaling'];
 			config.view_angle = config_loaded['view_angle'];
 			config.view_distance = config_loaded['view_distance'];
+			if ((
+				tmp = config_loaded['world_last']
+			) != null)
+				config.world_last = tmp;
 		}
 		return {
 			config,
@@ -48,6 +53,7 @@ export const reducers = {
 			'resolution_scaling': config.resolution_scaling,
 			'view_angle': config.view_angle,
 			'view_distance': config.view_distance,
+			'world_last': config.world_last,
 		}));
 		return {
 			...state,

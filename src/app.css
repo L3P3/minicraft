@@ -218,10 +218,19 @@ button {
 	position: absolute;
 	width: 100%;
 	height: 100%;
+}
+.game > .menu.overlay {
 	background: rgba(0, 0, 0, .7);
 }
 .game > .menu > h1 {
 	text-align: center;
+}
+.game > .menu > center {
+	margin: 1rem 0;
+}
+.game > .menu > center button {
+	width: 12rem;
+	height: 3rem;
 }
 .game > .menu > .settings {
 	margin: 1rem;
@@ -260,6 +269,8 @@ button {
 }
 .game > .menu.inventory > .hand {
 	position: absolute;
+	left: 0;
+	top: 0;
 	width: 2rem;
 	height: 2rem;
 	margin-left: -1rem;

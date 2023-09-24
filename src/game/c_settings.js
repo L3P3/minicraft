@@ -15,6 +15,7 @@ import {
 import {
 	game_mouse_catch,
 	game_save,
+	game_world_close,
 } from './m_game.js';
 
 export default function Settings({
@@ -36,10 +37,19 @@ export default function Settings({
 		return () => clearTimeout_(timeout);
 	}, [config]);
 
-	hook_dom('div[className=menu]');
+	hook_dom('div[className=menu overlay]');
 
 	return [
-		node_dom('h1[innerText=Menü]'),
+		node_dom('h1[innerText=Einstellungen]'),
+		node_dom('center', null, [
+			node_dom('button[innerText=Zurück zum Spiel]', {
+				onclick: hook_static(() => (
+					game.menu = MENU_NONE,
+					game.world.flag_paused = false,
+					game_mouse_catch(game)
+				)),
+			}),
+		]),
 		node_dom('div[className=settings]', null, [
 			node_dom('button', {
 				innerText: (
@@ -94,11 +104,13 @@ export default function Settings({
 			]),
 		]),
 		node_dom('center', null, [
-			node_dom('button[innerText=Zurück]', {
+			node_dom('button[innerText=Welt verlassen]', {
 				onclick: hook_static(() => (
 					game.menu = MENU_NONE,
-					game.flag_paused = false,
-					game_mouse_catch(game)
+					game_world_close(game),
+					config_set({
+						world_last: -1,
+					})
 				)),
 			}),
 		]),

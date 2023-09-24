@@ -76,17 +76,17 @@ export default function Inventory({
 }) {
 	const slot_hand = hook_memo(() => slot_create(null));
 
-	hook_dom('div[className=menu inventory]', hook_memo(() => ({
+	hook_dom('div[className=menu overlay inventory]', hook_memo(() => ({
 		onclick: ({
 			target,
 		}) => {
-			if (target.className === 'menu inventory') {
+			if (target.className === 'menu overlay inventory') {
 				if (slot_hand.content) {
 					slot_hand.content = null;
 				}
 				else {
 					game.menu = MENU_NONE;
-					game.flag_paused = false;
+					game.world.flag_paused = false;
 					game_mouse_catch(game);
 				}
 			}
@@ -108,7 +108,7 @@ export default function Inventory({
 		oncontextmenu: ({
 			target,
 		}) => {
-			if (target.className === 'menu inventory') {
+			if (target.className === 'menu overlay inventory') {
 				if (!slot_hand.content) {
 					game.menu = MENU_NONE;
 					game_mouse_catch(game);
@@ -164,8 +164,7 @@ export default function Inventory({
 		slot_hand.content &&
 		node_dom('div[className=hand]', {
 			S: {
-				left: `${game.cursor_x}px`,
-				top: `${game.cursor_y}px`,
+				transform: `translate(${game.cursor_x}px, ${game.cursor_y}px)`,
 			},
 		}, [
 			node(Stack, {

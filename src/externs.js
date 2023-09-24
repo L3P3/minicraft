@@ -234,6 +234,7 @@ function removeEventListener(
 	@return {void}
 */
 function open(url){}
+function close(){}
 
 function onbeforeinstallprompt(){}
 function onbeforeunload(){}

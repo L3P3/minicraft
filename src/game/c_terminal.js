@@ -34,7 +34,7 @@ export default function Terminal({
 	game,
 	messages,
 }) {
-	hook_dom('div[className=menu terminal]');
+	hook_dom('div[className=menu overlay terminal]');
 
 	const ref = hook_static({
 		history: null,

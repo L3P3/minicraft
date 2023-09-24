@@ -32,6 +32,7 @@ const buttons_top = [
 	['down', KEY_MOVE_DOWN],
 	['E', 69],
 	['T', 84],
+	['F1', 112],
 	['F3', 114],
 	['...', 27],
 ];
