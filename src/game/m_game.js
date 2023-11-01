@@ -94,56 +94,51 @@ import {
 
 let message_id_counter = 0;
 
-export const game_create = () => ({
-	actions: null,
-	config: null,
-	cursor_x: 0,
-	cursor_y: 0,
-	flag_diagnostics: DEBUG,
-	flag_hud: true,
-	flag_touch: DEBUG,
-	frame_element: null,
-	frame_last: 0,
-	keys_active: new Set,
-	keys_active_check: '',
-	menu: MENU_NONE,
-	messages: [],
-	player: null,
-	renderer: null,
-	resolution_raw_x: 1,
-	resolution_raw_y: 1,
-	resolution_x: 0,
-	resolution_y: 0,
-	tick_interval: null,
-	world: null,
-});
+export const game_create = (actions, frame_element, config) => {
+	// TODO: world id from config
+	const world = world_create(0);
 
-export const game_world_open = model => {
-	const world = world_create();
 	const player = player_create(world);
 
 	world_load(world, player);
 
-	model.world = world;
-	model.player = player;
+	const model = {
+		actions,
+		config,
+		cursor_x: 0,
+		cursor_y: 0,
+		flag_diagnostics: DEBUG,
+		flag_hud: true,
+		flag_touch: DEBUG,
+		frame_element,
+		frame_last: 0,
+		keys_active: new Set,
+		keys_active_check: '',
+		menu: MENU_NONE,
+		messages: [],
+		player,
+		renderer: null,
+		resolution_raw_x: 1,
+		resolution_raw_y: 1,
+		resolution_x: 0,
+		resolution_y: 0,
+		tick_interval: setInterval_(() => (
+			world_tick(world, player)
+		), 50),
+		world,
+	};
 
-	game_view_distance_update(model);
+	game_mouse_catch(model);
 
-	model.tick_interval = setInterval_(() => (
-		world_tick(world, player)
-	), 50);
-}
+	return model;
+};
 
-export const game_world_close = model => {
+export const game_destroy = model => {
 	clearInterval_(model.tick_interval);
 
 	world_save(model.world, model.player);
 
 	renderer_destroy(model.renderer);
-
-	model.world = null;
-	model.player = null;
-	model.renderer = null;
 }
 
 export const game_renderer_init = (model, canvas_element) => {
@@ -151,8 +146,7 @@ export const game_renderer_init = (model, canvas_element) => {
 }
 
 export const game_save = model => {
-	if (model.world)
-		world_save(model.world, model.player)
+	world_save(model.world, model.player)
 }
 
 export const game_resolution_update = model => {
@@ -195,16 +189,15 @@ export const game_view_distance_update = model => {
 /**
 	@noinline
 */
-export const game_mouse_catch = model => (
-	model.frame_element.requestPointerLock()
-);
+export const game_mouse_catch = async model => {
+	try {
+		await model.frame_element.requestPointerLock();
+	}
+	catch (error) {}
+}
 
 export const game_mouse_move = (model, event) => {
-	if (
-		model.world &&
-		!model.world.flag_paused &&
-		!model.menu
-	) {
+	if (!model.world.flag_paused) {
 		const factor = model.config.mouse_sensitivity * Math_PI / Math_max(
 			model.resolution_raw_x,
 			model.resolution_raw_y
@@ -449,11 +442,7 @@ export const game_key = (model, code, state) => {
 			player.slot_time = model.frame_last;
 			break;
 		case 27: // ESC
-			if (model.menu) {
-				model.world.flag_paused = false;
-				model.menu = MENU_NONE;
-			}
-			else {
+			if (model.menu === MENU_NONE) {
 				model.world.flag_paused = true;
 				model.menu = MENU_SETTINGS;
 			}
@@ -485,9 +474,10 @@ export const game_key = (model, code, state) => {
 		case 69: // E
 			if (
 				player.gamemode !== GAMEMODE_SPECTATOR &&
-				!model.menu
+				model.menu === MENU_NONE
 			) {
 				model.menu = MENU_INVENTORY;
+				// release all keys
 				for (const code of keys_active)
 					game_key(model, code, false);
 			}
@@ -514,8 +504,9 @@ export const game_key = (model, code, state) => {
 			game_movement_z_update(model);
 			break;
 		case 84: // T
-			if (!model.menu) {
+			if (model.menu === MENU_NONE) {
 				model.menu = MENU_TERMINAL;
+				// release all keys
 				for (const code of keys_active)
 					game_key(model, code, false);
 			}
@@ -608,10 +599,9 @@ export const game_message_send = (model, value) => {
 			}
 			game_message_print(model, 'inventory cleared', true);
 			break;
-		case 'exit':
-			world.flag_paused = false;
-			model.menu = MENU_NONE;
-			break;
+		//case 'exit':
+		//	game_message_print(model, 'use your pointer');
+		//	break;
 		case 'gamemode':
 		case 'gm': {
 				const value = Number_(args[0]);
@@ -668,7 +658,7 @@ export const game_message_send = (model, value) => {
 			}
 			break;
 		case 'help':
-			game_message_print(model, 'commands: clear, clearinv, exit, gamemode, give, help, load, me, save, spawn, teleport, version');
+			game_message_print(model, 'commands: clear, clearinv, gamemode, give, help, load, me, save, spawn, teleport, version');
 			break;
 		case 'load':
 			world_chunk_load(world, true);

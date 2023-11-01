@@ -16,8 +16,6 @@ import {
 	Number_,
 } from '../etc/helpers.js';
 
-import Stack from './c_stack.js';
-
 import {
 	game_mouse_catch,
 } from './m_game.js';
@@ -31,6 +29,8 @@ import {
 import {
 	stack_create,
 } from './m_stack.js';
+
+import Stack from './c_stack.js';
 
 function Palette({
 	slot_hand,

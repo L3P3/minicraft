@@ -43,41 +43,37 @@ const chunk_data_tmp_u8 = new Uint8Array_(chunk_data_tmp.buffer);
 
 const chunks_checklists = new Map_();
 
-export const world_create = () => {
-	const model = {
-		// uint8[]
-		blocks: null,
-		blocks_u32: null,
-		// all chunk metadata
-		chunks: null,
-		// {chunk metadata index, offset x, offset z}, sorted by loading order
-		chunks_checklist: null,
-		// next checklist item to check
-		chunks_checklist_index: 0,
-		// if world is paused
-		flag_paused: true,
-		// currently centered chunk (relative chunk position inside world tile)
-		focus_x: 0,
-		focus_y: 0,
-		focus_z: 0,
-		// world id for storage
-		id: 0,
-		// world tile offset in chunks
-		offset_x: 0,
-		offset_z: 0,
-		// log2 of world tile width
-		size_l2: 0,
-		// block position of player spawn
-		spawn_x: 0.5,
-		spawn_y: FLATMAP_LAYERS_LENGTH + 1.5,
-		spawn_z: 0.5,
-		// ingame time
-		time: 0,
-		time_f: 0.0,
-	};
-
-	return model;
-}
+export const world_create = id => ({
+	// uint8[]
+	blocks: null,
+	blocks_u32: null,
+	// all chunk metadata
+	chunks: null,
+	// {chunk metadata index, offset x, offset z}, sorted by loading order
+	chunks_checklist: null,
+	// next checklist item to check
+	chunks_checklist_index: 0,
+	// if world is paused
+	flag_paused: true,
+	// currently centered chunk (relative chunk position inside world tile)
+	focus_x: 0,
+	focus_y: 0,
+	focus_z: 0,
+	// world id for storage
+	id,
+	// world tile offset in chunks
+	offset_x: 0,
+	offset_z: 0,
+	// log2 of world tile width
+	size_l2: 0,
+	// block position of player spawn
+	spawn_x: 0.5,
+	spawn_y: FLATMAP_LAYERS_LENGTH + 1.5,
+	spawn_z: 0.5,
+	// ingame time
+	time: 0,
+	time_f: 0.0,
+});
 
 /*
 	blocks:

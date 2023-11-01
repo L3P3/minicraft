@@ -22,6 +22,7 @@ import {
 import {
 	touch_id_get,
 } from '../etc/helpers.js';
+
 import {
 	game_key,
 } from './m_game.js';

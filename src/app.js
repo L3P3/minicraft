@@ -6,18 +6,19 @@ import {
 	node,
 } from './etc/lui.js';
 
-import Game from './game/c_game.js';
-
 import {
 	reducers,
 } from './etc/state.js';
 import {
 	handler_noop,
 } from './etc/helpers.js';
+
 import {
 	game_key,
 	game_save,
 } from './game/m_game.js';
+
+import App from './game/c_app.js';
 
 lui_.init(() => {
 	const [state, actions] = hook_model(reducers);
@@ -41,18 +42,23 @@ lui_.init(() => {
 		};
 	});
 
-	const handler_key = hook_static(event => (
-		event.target.tagName === 'INPUT' ||
-		!ref.game || (
-			event.preventDefault(),
-			game_key(
-				ref.game,
-				event.keyCode,
-				event.type === 'keydown'
-			),
-			ref.game.flag_touch = false
-		)
-	));
+	const handler_key = hook_static(event => {
+		if (
+			event.target.tagName === 'INPUT' ||
+			!ref.game
+		) return true;
+
+		ref.game.flag_touch = false;
+
+		game_key(
+			ref.game,
+			event.keyCode,
+			event.type === 'keydown'
+		);
+
+		event.preventDefault();
+		return false;
+	});
 
 	return [{
 		onkeydown: handler_key,
@@ -60,7 +66,7 @@ lui_.init(() => {
 		oncontextmenu: handler_noop,
 		ondragstart: handler_noop,
 	}, [
-		node(Game, {
+		node(App, {
 			actions,
 			config: state.config,
 			ref,

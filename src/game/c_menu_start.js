@@ -1,46 +1,146 @@
 import {
 	defer,
+	defer_end,
+	hook_async,
 	hook_dom,
+	hook_memo,
+	hook_state,
+	hook_static,
 	node_dom,
+	node_map,
 } from '../etc/lui.js';
 
 import {
-	VERSION,
-} from '../etc/env.js';
-
+	APP_VIEW_GAME,
+} from '../etc/constants.js';
 import {
-	game_mouse_catch,
-	game_world_open,
-} from './m_game.js';
+	API, VERSION,
+} from '../etc/env.js';
+import {
+	datify,
+} from '../etc/helpers.js';
+
+function WorldItem({
+	I,
+	world_selected,
+	world_selected_set,
+}) {
+	hook_dom('div', {
+		F: {
+			selected: I === world_selected,
+		},
+		onclick: () => {
+			world_selected_set([I.id, I.local]);
+		},
+	});
+
+	return [
+		node_dom('span', {
+			innerText: `${I.local ? '' : '🌐 '}${I.label}`,
+			title: I.local ? '' : 'Besitzer: ' + I.account_name,
+		}),
+		node_dom('span', {
+			innerText: datify(I.modified),
+		}),
+	];
+}
 
 export default function MenuStart({
 	actions,
-	game,
+	view_set,
 }) {
 	hook_dom('div[className=menu]');
 
+	const [refreshes, refreshes_set] = hook_state(0);
+
+	const world_list_resolved = API && hook_async(
+		async () => {
+			const response = await fetch(API + 'world?what=meta_all');
+			if (!response.ok) return null;
+			return await response.json();
+		},
+		[refreshes],
+		null
+	);
+	const world_list_last_ref = API && hook_static({
+		value: null,
+	});
+	const world_list = hook_memo(() => {
+		if (
+			API &&
+			world_list_resolved
+		) {
+			world_list_last_ref.value = world_list_resolved;
+		}
+
+		const list = [];
+
+		if (
+			API &&
+			world_list_last_ref.value
+		) {
+			list.push(
+				...world_list_last_ref.value
+				.map(world => ({
+					account_name: world.account_name,
+					id: world.id,
+					label: world.label,
+					local: false,
+					modified: world.modified,
+				}))
+			);
+		}
+
+		return list.sort((a, b) => b.modified - a.modified);
+	}, [
+		world_list_resolved,
+	]);
+
+	const [world_selected_pair, world_selected_set] = hook_state([-1, false]);
+	const world_selected = hook_memo((
+		[selected_id, selected_local],
+	) => (
+		world_list.find(world => (
+			world.id === selected_id &&
+			world.local === selected_local
+		)) || null
+	), [
+		world_selected_pair,
+		world_list,
+	]);
+
 	return [
-		node_dom('h1[innerText=Minicraft]'),
+		node_dom('h1[innerText=Welten]'),
+		node_dom('div[className=worlds]', null, [
+			node_map(WorldItem, world_list, {
+				world_selected,
+				world_selected_set,
+			}),
+		]),
 		node_dom('center', null, [
-			node_dom('button[innerText=Welt betreten]', {
+			node_dom('button[innerText=Öffnen]', {
+				disabled: !world_selected,
 				onclick: () => {
+					// TODO download world if not local
+					const id = world_selected.local ? world_selected.id : 0;
 					defer();
 					actions.config_set({
-						world_last: 0,
+						world_last: id,
 					});
-					game_world_open(game);
-					game.world.flag_paused = false,
-					game_mouse_catch(game);
+					view_set(APP_VIEW_GAME);
+					defer_end();
 				},
 			}),
-		]),
-		node_dom('center', null, [
-			node_dom('button[innerText=Weltenverzeichnis]', {
+			!!API &&
+			node_dom('button', {
+				disabled: !world_list_resolved,
+				innerText: 'Aktualisieren',
 				onclick: () => {
-					location.href = '/svr/minicraft/store.html';
+					refreshes_set(refreshes + 1);
 				},
 			}),
 		]),
+		node_dom('hr'),
 		node_dom('center', null, [
 			node_dom('button[innerText=Projektseite]', {
 				onclick: () => {

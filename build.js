@@ -23,11 +23,12 @@ const exec = cmd => (
 	)
 );
 
-const env_set = (version, debug) => (
+const env_set = (version, debug, api) => (
 	writeFile(
 		'./src/etc/env.js',
 `export const VERSION = '${version}';
 export const DEBUG = ${debug};
+export const API = '${api}';
 `,
 		'utf8'
 	)
@@ -54,7 +55,7 @@ async function build_css() {
 }
 
 async function build_js() {
-	await env_set(version, false);
+	await env_set(version, false, '/api/minicraft/');
 
 	console.log('js pass 1...');
 	console.log((await exec(
@@ -127,7 +128,7 @@ try {
 	]);
 }
 finally {
-	await env_set('dev', true);
+	await env_set('dev', true, '//l3p3.de/api/minicraft/');
 }
 
 console.log('done.');

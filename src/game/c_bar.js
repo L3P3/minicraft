@@ -13,11 +13,11 @@ import {
 	Math_min,
 } from '../etc/helpers.js';
 
-import Stack from './c_stack.js';
-
 import {
 	tiles_data,
 } from './m_renderer.js';
+
+import Stack from './c_stack.js';
 
 export default function Bar({
 	player,

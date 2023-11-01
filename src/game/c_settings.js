@@ -1,4 +1,6 @@
 import {
+	defer,
+	defer_end,
 	hook_dom,
 	hook_effect,
 	hook_static,
@@ -6,16 +8,17 @@ import {
 } from '../etc/lui.js';
 
 import {
+	APP_VIEW_WORLDS,
 	MENU_NONE,
 } from '../etc/constants.js';
 import {
 	clearTimeout_,
 	setTimeout_,
 } from '../etc/helpers.js';
+
 import {
 	game_mouse_catch,
 	game_save,
-	game_world_close,
 } from './m_game.js';
 
 export default function Settings({
@@ -26,6 +29,7 @@ export default function Settings({
 	},
 	config,
 	game,
+	view_set,
 }) {
 	hook_effect(() => (
 		game_save(game),
@@ -41,19 +45,19 @@ export default function Settings({
 
 	return [
 		node_dom('h1[innerText=Einstellungen]'),
-		node_dom('center', null, [
+		hook_static(node_dom('center', null, [
 			node_dom('button[innerText=Zurück zum Spiel]', {
-				onclick: hook_static(() => (
-					game.menu = MENU_NONE,
-					game.world.flag_paused = false,
-					game_mouse_catch(game)
-				)),
+				onclick: () => {
+					game.menu = MENU_NONE;
+					game.world.flag_paused = false;
+					game_mouse_catch(game);
+				},
 			}),
-		]),
+		])),
 		node_dom('div[className=settings]', null, [
 			node_dom('button', {
 				innerText: (
-					'Oberflächen: ' +
+					'Oberflächen:\n' +
 					(config.flag_textures ? 'Texturiert' : 'Einfarbig')
 				),
 				onclick: hook_static(() => (
@@ -103,16 +107,17 @@ export default function Settings({
 				}),
 			]),
 		]),
-		node_dom('center', null, [
+		hook_static(node_dom('center', null, [
 			node_dom('button[innerText=Welt verlassen]', {
-				onclick: hook_static(() => (
-					game.menu = MENU_NONE,
-					game_world_close(game),
+				onclick: () => {
+					defer();
 					config_set({
 						world_last: -1,
-					})
-				)),
+					});
+					view_set(APP_VIEW_WORLDS);
+					defer_end();
+				},
 			}),
-		]),
+		])),
 	];
 }

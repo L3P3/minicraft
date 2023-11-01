@@ -17,6 +17,7 @@ body {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	cursor: default;
+	touch-action: none;
 }
 div {
 	box-sizing: border-box;
@@ -214,6 +215,7 @@ button {
 	background: black;
 	transform: rotate(45deg);
 }
+
 .game > .menu {
 	position: absolute;
 	width: 100%;
@@ -231,6 +233,27 @@ button {
 .game > .menu > center button {
 	width: 12rem;
 	height: 3rem;
+}
+.game > .menu > .worlds {
+	width: 100%;
+	max-width: 30rem;
+	margin: 1rem auto;
+	height: calc(100vh - 18rem);
+	overflow-y: auto;
+	touch-action: pan-y;
+}
+.game > .menu > .worlds > * {
+	cursor: pointer;
+	padding: .2rem .5rem;
+}
+.game > .menu > .worlds > :nth-child(odd) {
+	background: #222;
+}
+.game > .menu > .worlds > .selected {
+	background: green;
+}
+.game > .menu > .worlds > * > :last-child {
+	float: right;
 }
 .game > .menu > .settings {
 	margin: 1rem;
@@ -283,6 +306,13 @@ button {
 	padding: 1rem;
 	gap: 1rem;
 	font-family: Minecraft, 'Courier New', Courier, monospace;
+}
+.game > .terminal > .toolbar {
+	text-align: right;
+}
+.game > .terminal > .toolbar > button {
+	width: 2rem;
+	height: 2rem;
 }
 .game > .terminal > .history {
 	flex: 1;

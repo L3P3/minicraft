@@ -15,6 +15,7 @@ import {
 
 import {
 	game_message_send,
+	game_mouse_catch,
 } from './m_game.js';
 
 const Message = ({
@@ -34,10 +35,16 @@ export default function Terminal({
 	game,
 	messages,
 }) {
-	hook_dom('div[className=menu overlay terminal]');
-
 	const ref = hook_static({
 		history: null,
+		input: null,
+	});
+
+	hook_dom('div[className=menu overlay terminal]', {
+		onclick: event => {
+			if (event.target !== ref.input)
+				ref.input.focus();
+		},
 	});
 
 	hook_effect(id => {
@@ -51,6 +58,15 @@ export default function Terminal({
 	]);
 
 	return [
+		hook_static(node_dom('div[className=toolbar]', null, [
+			node_dom('button[innerText=❌]', {
+				onclick: () => {
+					game.menu = MENU_NONE;
+					game.world.flag_paused = false;
+					game_mouse_catch(game);
+				},
+			}),
+		])),
 		node_dom('div[className=history]', {
 			R: hook_static(element => {
 				ref.history = element;
@@ -58,29 +74,27 @@ export default function Terminal({
 		}, [
 			node_map(Message, messages),
 		]),
-		node_dom(
-			'input[enterkeyhint=send][mozactionhint=send][name=message][required]',
-			hook_static({
-				onkeydown: event => {
-					const {
-						keyCode,
-						target,
-					} = event;
-					if (keyCode === 13) {
-						game_message_send(game, target.value);
-						target.value = '';
-					}
-					else if (keyCode === 27) {
-						game.flag_paused = false;
-						game.menu = MENU_NONE;
-					}
-				},
-				R: element => (
-					setTimeout_(() => (
-						element.focus()
-					), 0)
-				),
-			})
-		),
+		hook_static(node_dom('input[enterkeyhint=send][mozactionhint=send][name=message][required]', {
+			onkeydown: event => {
+				const {
+					keyCode,
+					target,
+				} = event;
+				if (keyCode === 13) {
+					game_message_send(game, target.value);
+					target.value = '';
+				}
+				else if (keyCode === 27) {
+					game.flag_paused = false;
+					game.menu = MENU_NONE;
+				}
+			},
+			R: element => {
+				ref.input = element;
+				setTimeout_(() => (
+					element.focus()
+				), 0);
+			},
+		})),
 	];
 }

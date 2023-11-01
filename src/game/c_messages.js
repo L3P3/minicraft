@@ -3,7 +3,9 @@ import {
 	node_map,
 } from '../etc/lui.js';
 
-import {Math_min} from '../etc/helpers.js';
+import {
+	Math_min,
+} from '../etc/helpers.js';
 
 const Message = ({
 	I: {
