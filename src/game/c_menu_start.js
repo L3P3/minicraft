@@ -14,7 +14,8 @@ import {
 	APP_VIEW_GAME,
 } from '../etc/constants.js';
 import {
-	API, VERSION,
+	API,
+	VERSION,
 } from '../etc/env.js';
 import {
 	datify,
@@ -30,7 +31,7 @@ function WorldItem({
 			selected: I === world_selected,
 		},
 		onclick: () => {
-			world_selected_set([I.id, I.local]);
+			world_selected_set(I.id);
 		},
 	});
 
@@ -40,7 +41,7 @@ function WorldItem({
 			title: I.local ? '' : 'Besitzer: ' + I.account_name,
 		}),
 		node_dom('span', {
-			innerText: datify(I.modified),
+			innerText: I.local ? '' : datify(I.modified),
 		}),
 	];
 }
@@ -83,7 +84,7 @@ export default function MenuStart({
 				...world_list_last_ref.value
 				.map(world => ({
 					account_name: world.account_name,
-					id: world.id,
+					id: -1 - world.id,
 					label: world.label,
 					local: false,
 					modified: world.modified,
@@ -91,18 +92,26 @@ export default function MenuStart({
 			);
 		}
 
-		return list.sort((a, b) => b.modified - a.modified);
+		list.sort((a, b) => b.modified - a.modified);
+
+		list.unshift({
+			account_name: '',
+			id: 0,
+			label: 'Lokale Welt',
+			local: true,
+			modified: 0,
+		});
+
+		return list;
 	}, [
 		world_list_resolved,
 	]);
 
-	const [world_selected_pair, world_selected_set] = hook_state([-1, false]);
-	const world_selected = hook_memo((
-		[selected_id, selected_local],
-	) => (
+	const [world_selected_pair, world_selected_set] = hook_state(null);
+	const world_selected = hook_memo(selected_id => (
+		selected_id !== null &&
 		world_list.find(world => (
-			world.id === selected_id &&
-			world.local === selected_local
+			world.id === selected_id
 		)) || null
 	), [
 		world_selected_pair,
@@ -119,13 +128,12 @@ export default function MenuStart({
 		]),
 		node_dom('center', null, [
 			node_dom('button[innerText=Öffnen]', {
-				disabled: !world_selected,
+				disabled: !world_selected || !world_selected.local,
 				onclick: () => {
 					// TODO download world if not local
-					const id = world_selected.local ? world_selected.id : 0;
 					defer();
 					actions.config_set({
-						world_last: id,
+						world_last: world_selected.id,
 					});
 					view_set(APP_VIEW_GAME);
 					defer_end();
