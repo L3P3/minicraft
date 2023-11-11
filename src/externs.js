@@ -278,3 +278,13 @@ var ASSETS;
 	}}
 */
 var TYPE_WORLD_META;
+
+/**
+	@typedef {{
+		account_name: string,
+		id: number,
+		label: string,
+		modified: number,
+	}}
+*/
+var TYPE_WORLD_LISTING;

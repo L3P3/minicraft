@@ -63,6 +63,11 @@ export default function MenuStart({
 		[refreshes],
 		null
 	);
+	/**
+		@type {{
+			value: ?Array<TYPE_WORLD_LISTING>,
+		}}
+	*/
 	const world_list_last_ref = API && hook_static({
 		value: null,
 	});
