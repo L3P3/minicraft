@@ -1,4 +1,5 @@
 import {
+	hook_assert,
 	hook_effect,
 	hook_model,
 	hook_static,
@@ -7,10 +8,16 @@ import {
 } from './etc/lui.js';
 
 import {
+	DEBUG,
+} from './etc/env.js';
+import {
 	reducers,
 } from './etc/state.js';
 import {
+	Object_keys,
 	handler_noop,
+	localStorage_,
+	localStorage_removeItem,
 } from './etc/helpers.js';
 
 import {
@@ -28,18 +35,32 @@ lui_.init(() => {
 	});
 
 	hook_effect(() => {
+		if (
+			DEBUG &&
+			location.hash === '#purge'
+		) {
+			for (const key of Object_keys(localStorage_)) {
+				localStorage_removeItem(key);
+			}
+			location.href = '/app-dev.html';
+			hook_assert(false);
+		}
+
 		let unloaded = false;
 
 		// shotgun method
 		onbeforeunload = onunload = onpagehide = onblur = () => {
 			if (unloaded) return;
 			unloaded = true;
-			actions.config_save();
 			if (ref.game) game_save(ref.game);
+			actions.config_save();
 		};
 		onpageshow = onfocus = () => {
 			unloaded = false;
 		};
+		setInterval(() => {
+			actions.config_save();
+		}, 500);
 	});
 
 	const handler_key = hook_static(event => {

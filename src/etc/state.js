@@ -17,6 +17,8 @@ export const reducers = {
 			view_angle: 120,
 			view_distance: 64,
 			world_last: 0,
+			/** @type {!Array<TYPE_WORLD_LISTING_LOCAL>} */
+			worlds: [],
 		};
 		const config_raw = localStorage_getItem('minicraft.config');
 		if (config_raw) {
@@ -35,6 +37,22 @@ export const reducers = {
 				tmp = config_loaded['world_last']
 			) != null)
 				config.world_last = tmp;
+			if ((
+				tmp = config_loaded['worlds']
+			) != null)
+				config.worlds = tmp;
+			else if (
+				localStorage_getItem('minicraft.world.0:meta')
+			) {
+				config.worlds[0] = {
+					id: 0,
+					label: (
+						prompt('Es wurde eine namenlose lokale Welt gefunden. Wie soll sie heißen?', '') || 'Unbekannte Welt'
+					).substring(0, 16),
+					mod_l: Date.now(),
+					mod_r: 0,
+				};
+			}
 		}
 		return {
 			config,
@@ -54,6 +72,7 @@ export const reducers = {
 			'view_angle': config.view_angle,
 			'view_distance': config.view_distance,
 			'world_last': config.world_last,
+			'worlds': config.worlds,
 		}));
 		return {
 			...state,
@@ -71,6 +90,37 @@ export const reducers = {
 		config: {
 			...state.config,
 			...patch,
+		},
+	}),
+	world_add: (state, world) => ({
+		...state,
+		config: {
+			...state.config,
+			worlds: [
+				...state.config.worlds,
+				world,
+			],
+		},
+	}),
+	world_remove: (state, id) => ({
+		...state,
+		config: {
+			...state.config,
+			worlds: state.config.worlds.filter(world => world.id !== id),
+		},
+	}),
+	world_prop: (state, id, patch) => ({
+		...state,
+		config: {
+			...state.config,
+			worlds: state.config.worlds.map(world => (
+				world.id === id
+				?	{
+						...world,
+						...patch,
+					}
+				:	world
+			)),
 		},
 	}),
 };

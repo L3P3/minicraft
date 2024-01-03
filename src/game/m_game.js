@@ -95,8 +95,7 @@ import {
 let message_id_counter = 0;
 
 export const game_create = (actions, frame_element, config) => {
-	// TODO: world id from config
-	const world = world_create(0);
+	const world = world_create(config.world_last);
 
 	const player = player_create(world);
 
@@ -146,7 +145,10 @@ export const game_renderer_init = (model, canvas_element) => {
 }
 
 export const game_save = model => {
-	world_save(model.world, model.player)
+	world_save(model.world, model.player);
+	model.actions.world_prop(model.world.id, {
+		mod_l: Date.now(),
+	});
 }
 
 export const game_resolution_update = model => {
@@ -670,8 +672,7 @@ export const game_message_send = (model, value) => {
 			break;
 		case 'save':
 			game_save(model);
-			model.actions.config_save();
-			game_message_print(model, 'world+config saved', true);
+			game_message_print(model, 'game saved', true);
 			break;
 		case 'smart':
 			player.name = 'LFF5644';

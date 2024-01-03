@@ -281,10 +281,22 @@ var TYPE_WORLD_META;
 
 /**
 	@typedef {{
+		id: number,
+		label: string,
+		mod_l: number,
+		mod_r: number,
+	}}
+*/
+var TYPE_WORLD_LISTING_LOCAL;
+
+/**
+	@typedef {{
 		account_name: string,
+		hash: number,
 		id: number,
 		label: string,
 		modified: number,
+		writable: boolean,
 	}}
 */
-var TYPE_WORLD_LISTING;
+var TYPE_WORLD_LISTING_REMOTE;

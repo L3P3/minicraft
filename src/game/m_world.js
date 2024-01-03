@@ -17,8 +17,8 @@ import {
 import {
 	JSON_parse,
 	JSON_stringify,
-	localStorage_,
 	localStorage_getItem,
+	localStorage_removeItem,
 	localStorage_setItem,
 	Map_,
 	Math_floor,
@@ -44,10 +44,11 @@ const chunk_data_tmp_u8 = new Uint8Array_(chunk_data_tmp.buffer);
 const chunks_checklists = new Map_();
 
 export const world_create = id => ({
+	// blocks of superchunk
 	// uint8[]
 	blocks: null,
 	blocks_u32: null,
-	// all chunk metadata
+	// all chunk metadata currently in superchunk
 	chunks: null,
 	// {chunk metadata index, offset x, offset z}, sorted by loading order
 	chunks_checklist: null,
@@ -55,16 +56,16 @@ export const world_create = id => ({
 	chunks_checklist_index: 0,
 	// if world is paused
 	flag_paused: true,
-	// currently centered chunk (relative chunk position inside world tile)
+	// currently centered chunk (relative chunk position inside superchunk)
 	focus_x: 0,
 	focus_y: 0,
 	focus_z: 0,
 	// world id for storage
 	id,
-	// world tile offset in chunks
+	// superchunk offset in chunks
 	offset_x: 0,
 	offset_z: 0,
-	// log2 of world tile width
+	// log2 of superchunk width
 	size_l2: 0,
 	// block position of player spawn
 	spawn_x: 0.5,
@@ -377,7 +378,7 @@ export const world_chunk_reset = model => {
 			model.chunks_checklist_index = 0
 		].chunks_index
 	];
-	localStorage_.removeItem(
+	localStorage_removeItem(
 		world_chunk_key(
 			model,
 			chunk.x_abs, chunk.z_abs, chunk.y

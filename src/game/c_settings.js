@@ -1,6 +1,4 @@
 import {
-	defer,
-	defer_end,
 	hook_dom,
 	hook_effect,
 	hook_static,
@@ -11,10 +9,6 @@ import {
 	APP_VIEW_WORLDS,
 	MENU_NONE,
 } from '../etc/constants.js';
-import {
-	clearTimeout_,
-	setTimeout_,
-} from '../etc/helpers.js';
 
 import {
 	game_mouse_catch,
@@ -24,7 +18,6 @@ import {
 export default function Settings({
 	actions: {
 		config_reduce,
-		config_save,
 		config_set,
 	},
 	config,
@@ -32,14 +25,8 @@ export default function Settings({
 	view_set,
 }) {
 	hook_effect(() => (
-		game_save(game),
-		config_save
+		game_save(game)
 	));
-	hook_effect(() => {
-		const timeout = setTimeout_(config_save, 1e3);
-
-		return () => clearTimeout_(timeout);
-	}, [config]);
 
 	hook_dom('div[className=menu overlay]');
 
@@ -110,12 +97,7 @@ export default function Settings({
 		hook_static(node_dom('center', null, [
 			node_dom('button[innerText=Welt verlassen]', {
 				onclick: () => {
-					defer();
-					config_set({
-						world_last: -1,
-					});
 					view_set(APP_VIEW_WORLDS);
-					defer_end();
 				},
 			}),
 		])),

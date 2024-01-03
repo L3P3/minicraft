@@ -239,7 +239,7 @@ button {
 	max-width: 30rem;
 	margin: 1rem auto;
 	height: calc(100vh - 18rem);
-	overflow-y: auto;
+	overflow-y: scroll;
 	touch-action: pan-y;
 }
 .game > .menu > .worlds > * {

@@ -1,5 +1,4 @@
 import {
-	hook_dom,
 	hook_effect,
 	hook_memo,
 	hook_rerender,
