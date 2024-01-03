@@ -10,6 +10,7 @@ import {
 
 export const reducers = {
 	init: () => {
+		let needs_save = false;
 		const config = {
 			flag_textures: true,
 			mouse_sensitivity: 3,
@@ -52,7 +53,14 @@ export const reducers = {
 					mod_l: Date.now(),
 					mod_r: 0,
 				};
+				needs_save = true;
 			}
+		}
+		if (needs_save) {
+			return reducers.config_save({
+				config,
+				config_saved: null,
+			});
 		}
 		return {
 			config,

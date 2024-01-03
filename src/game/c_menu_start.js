@@ -71,7 +71,6 @@ function WorldItem({
 		}),
 		node_dom('span', {
 			innerText: datify(Math.max(I.local, I.remote)),
-			title: `Lokal: ${datify(I.local)}\nServer: ${datify(I.remote)}`,
 		}),
 	];
 }
