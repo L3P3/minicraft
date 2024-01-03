@@ -300,3 +300,13 @@ var TYPE_WORLD_LISTING_LOCAL;
 	}}
 */
 var TYPE_WORLD_LISTING_REMOTE;
+
+/**
+	@typedef {{
+		data: !Object,
+		label: string,
+		what: string,
+		world: number,
+	}}
+*/
+var TYPE_WORLD_API;
