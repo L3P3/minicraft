@@ -127,8 +127,9 @@ export default function Game({
 	), [config]);
 
 	hook_effect((width, height, ratio) => (
-		model.resolution_raw_x = Math_max(1, width * ratio),
-		model.resolution_raw_y = Math_max(1, height * ratio),
+		model.resolution_css_ratio = ratio,
+		model.resolution_raw_x = Math_max(1, width),
+		model.resolution_raw_y = Math_max(1, height),
 		game_resolution_update(model)
 	), [
 		frame.offsetWidth,

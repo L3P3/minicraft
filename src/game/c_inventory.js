@@ -136,7 +136,7 @@ export default function Inventory({
 
 	return tiles_data && [
 		node_dom('div[className=window]', null, [
-			node_dom('div[innerText=Inventory]'),
+			node_dom('div[innerText=Inventar]'),
 			game.player.gamemode === GAMEMODE_CREATIVE &&
 			node(Palette, {
 				slot_hand,

@@ -58,7 +58,6 @@ import {
 	Math_log2,
 	Math_max,
 	Math_PI,
-	Math_round,
 	Number_,
 	setInterval_,
 } from '../etc/helpers.js';
@@ -117,6 +116,7 @@ export const game_create = (actions, frame_element, config) => {
 		messages: [],
 		player,
 		renderer: null,
+		resolution_css_ratio: 1,
 		resolution_raw_x: 1,
 		resolution_raw_y: 1,
 		resolution_x: 0,
@@ -153,8 +153,8 @@ export const game_save = model => {
 
 export const game_resolution_update = model => {
 	const {resolution_scaling} = model.config;
-	const x = Math_max(1, Math_round(model.resolution_raw_x / resolution_scaling));
-	const y = Math_max(1, Math_round(model.resolution_raw_y / resolution_scaling));
+	const x = Math_ceil(model.resolution_raw_x * model.resolution_css_ratio / resolution_scaling);
+	const y = Math_ceil(model.resolution_raw_y * model.resolution_css_ratio / resolution_scaling);
 
 	if (
 		x === model.resolution_x &&
@@ -200,10 +200,10 @@ export const game_mouse_catch = async model => {
 
 export const game_mouse_move = (model, event) => {
 	if (!model.world.flag_paused) {
-		const factor = model.config.mouse_sensitivity * Math_PI / Math_max(
+		const factor = model.config.mouse_sensitivity * Math_PI / (Math_max(
 			model.resolution_raw_x,
 			model.resolution_raw_y
-		);
+		) * model.resolution_css_ratio);
 		player_rotate(
 			model.player,
 			event.movementX * factor,

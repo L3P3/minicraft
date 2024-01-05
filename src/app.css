@@ -13,9 +13,9 @@ body {
 	font-family: Minecraft, sans-serif;
 	background: #333;
 	color: #ddd;
-	user-select: none;
 	-webkit-user-select: none;
 	-moz-user-select: none;
+	user-select: none;
 	cursor: default;
 	touch-action: none;
 }

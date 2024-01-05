@@ -26,6 +26,7 @@ import {
 	Math_floor,
 	Math_min,
 	Math_PI_180d,
+	Math_round,
 	Math_sin,
 	Math_sqrt,
 	number_padStart2,
@@ -490,11 +491,21 @@ export const renderer_render = (model, now) => {
 }
 
 export const renderer_canvas_init = model => {
+	const {
+		canvas_element,
+		game,
+	} = model;
 	(
 		model.canvas_surface = model.canvas_context.createImageData(
-			model.canvas_element.width = model.game.resolution_x,
-			model.canvas_element.height = model.game.resolution_y
+			canvas_element.width = game.resolution_x,
+			canvas_element.height = game.resolution_y
 		)
 	).data.fill(0xff);
+	const canvas_width = game.resolution_x * game.config.resolution_scaling / game.resolution_css_ratio;
+	const canvas_height = game.resolution_y * game.config.resolution_scaling / game.resolution_css_ratio;
+	canvas_element.style.width = canvas_width + 'px';
+	canvas_element.style.height = canvas_height + 'px';
+	canvas_element.style.left = Math_round((game.resolution_raw_x - canvas_width) / 2) + 'px';
+	canvas_element.style.top = Math_round((game.resolution_raw_y - canvas_height) / 2) + 'px';
 	model.canvas_context.fillStyle = 'rgba(255,255,255,.5)';
 }
