@@ -10,6 +10,7 @@ import cssnano from 'cssnano';
 const GCC_COMMAND = './node_modules/.bin/google-closure-compiler --';
 const TMP_FILE = '/tmp/app.js';
 
+const prod = !!process.env.CI;
 const {version} = JSON.parse(
 	await readFile('./package.json', 'utf-8')
 );
@@ -56,7 +57,12 @@ async function build_css() {
 }
 
 async function build_js() {
-	await env_set(version, false, '/api/minicraft/', '/static/minicraft/worlds/');
+	await env_set(
+		prod ? version : 'dev',
+		false,
+		prod ? '/api/minicraft/' : '//l3p3.de/api/minicraft/',
+		prod ? '/static/minicraft/worlds/' : '//l3p3.de/static/minicraft/worlds/'
+	);
 
 	console.log('js pass 1...');
 	console.log((await exec(
@@ -120,7 +126,7 @@ if(
 await exec('mkdir -p ./dist');
 await exec('rm ./dist/*');
 
-console.log(`build ${version}...`);
+console.log(`build ${version} (${prod ? 'production' : 'dev'})...`);
 
 try {
 	await Promise.all([

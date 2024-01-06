@@ -318,6 +318,7 @@ var TYPE_WORLD_API;
 			rank: number,
 		},
 		worlds: !Array<TYPE_WORLD_LISTING_REMOTE>,
+		version_latest: string,
 	}}
 */
 var TYPE_RESPONSE_INITIAL;

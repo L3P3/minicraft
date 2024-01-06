@@ -107,6 +107,13 @@ export default function MenuStart({
 				const json = await response.json();
 				if (!initial) return /** @type {!Array<TYPE_WORLD_LISTING_REMOTE>} */ (json);
 				const json_initial = /** @type {TYPE_RESPONSE_INITIAL} */ (json);
+				if (
+					VERSION !== 'dev' &&
+					json_initial.version_latest !== VERSION
+				) {
+					location.reload();
+					return null;
+				}
 				defer();
 				actions.account_set(json_initial.account);
 				return json_initial.worlds;
