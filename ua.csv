@@ -1,0 +1,79 @@
+amount: Номер
+back_to_game: Повернуться в игру
+chunk_regenerated: Участки відновлени.
+chunks_loaded: Участки будуть завантаженні.
+commands: Укази 
+download_world_from_server: Завантажити світ з сервера
+download: Завантажити
+error_amount_minimum_1: Номер повинен бути як мінімум 1!
+error_conflict_1: Конфлікт! Світ "
+error_conflict_2: " Було змінено як тут, так і в інших місцях.\nOK: прийняти ті з сервера (
+error_conflict_3: ) | Скасувати: Завантажте це сюди (
+error_conflict_4: )
+error_connection: Ошибка поключения
+error_download_world: Помилка завантаження світу: 
+error_gamemode_range: Ігровий режим повинен бути 0..2!
+error_invalid_block_type: Недійсний тип блоку!
+error_inventory_full: Інвентар повний!
+error_list_is_loading: Список ще завантажується!
+error_loading_worldlist: Помилка завантаження списку світ: 
+error_name_too_long: Назва занадто довга!
+error_no_permission_logged_in: Нема авторизації. Зареєстрований?
+error_no_world_selected: Не вибраний світ!
+error_not_logged_in: Не зареєстрований!
+error_only_vert_supported: Підтримується тільки "vert"!
+error_pitch: Невдачя!
+error_selection_required: Необхідний вибір!
+error_storage: Недостатньо місця!
+error_upload_world: Помилка завантаження світу:
+error_world_is_loading: Світ ще завантажується!
+error_world_is_present_both_sides: Світ уже існує на сайті!
+error_world_not_downloaded: Світ ще не завантажений!
+game_saved: Игра сохранена.
+gamemode_set_to: Ігровий режим встановлен на
+inventory_cleared: Інвентар теперь порожній
+inventory: Інвентар
+item_labels: Повітря,Камінь,Блок трави,Земля,Бутовий камінь,Дошка,Корінна порода,Колода,Лістя,Кирпичи,Шерсть,Песок,Гравій,Стекло,Bücherregal,Обсидіан,Камені кирпич,Пісковик,Блок лазуриту,Залізний блок,Золотий блок,Алмазний блок,Смарагдовий блок,Редстоун блок,Кварцові блок
+items_given: Дані предмети
+join_selected_world: Ввійти у вибраний світ 
+login: Зареєструватися
+mouse_mode_normal: Звичайний режим миші.
+mouse_mode_selection: Виділення кнопками миші.
+mouse_sensitivity: Чутливість миші
+name_new_world: Имя новому світу:\n(макс. 16 Символів)
+new_world: Новий світ
+only_local: Тільки локальні світ.
+open: Відчинити
+player: Игрок
+project_page: Сторінка проекту
+refresh: Оновити
+reload_list: Оновити список
+resolution: Дозвіл
+selection_expanded: Вибір розширен.
+selection_none: нічого 
+selection_primary_short: Перший
+selection_primary: Перша точка вибору
+selection_secondary_short: Другий
+selection_secondary: Друга точка вибору
+settings: Налаштування
+spawn_updated: Початкова точка оновлена.
+surfaces_colored: Однотонні 
+surfaces_textured: Текстурований
+surfaces: Поверхности
+teleported_to_spawn: Перемістился до початкової точки.
+teleported_to: Переміститися к
+transfer: Перемістит 
+unknown_command: Недійсна команда 
+unknown_world: Недійсни світ
+unknown_world_found: Бул знайден безіменний локальний світ.  Як ії назвати?
+upload_world_to_server: Завантажити світ на сервер
+upload: Завантажити
+user_colon: Користувач:
+version_1: Версія 
+version_2:  от L3P3
+view_angle: Точка огляду
+view_distance: Видимість
+warn_world_remote_missing_1: Світ "
+warn_world_remote_missing_2: " був не знайден на сервере, тому він тепер локальний!
+world_leave: Покинуті світ
+worlds: Світі
