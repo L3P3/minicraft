@@ -29,6 +29,45 @@ import {
 	localStorage_removeItem,
 	localStorage_setItem,
 } from '../etc/helpers.js';
+import {
+	locale_download_world_from_server,
+	locale_download,
+	locale_error_conflict_1,
+	locale_error_conflict_2,
+	locale_error_conflict_3,
+	locale_error_conflict_4,
+	locale_error_connection,
+	locale_error_download_world,
+	locale_error_list_is_loading,
+	locale_error_loading_worldlist,
+	locale_error_name_too_long,
+	locale_error_no_permission_logged_in,
+	locale_error_no_world_selected,
+	locale_error_not_logged_in,
+	locale_error_storage,
+	locale_error_upload_world,
+	locale_error_world_is_loading,
+	locale_error_world_is_present_both_sides,
+	locale_error_world_not_downloaded,
+	locale_join_selected_world,
+	locale_login,
+	locale_name_new_world,
+	locale_new_world,
+	locale_only_local,
+	locale_open,
+	locale_project_page,
+	locale_refresh,
+	locale_reload_list,
+	locale_transfer,
+	locale_upload_world_to_server,
+	locale_upload,
+	locale_user_colon,
+	locale_version_1,
+	locale_version_2,
+	locale_warn_world_remote_missing_1,
+	locale_warn_world_remote_missing_2,
+	locale_worlds,
+} from '../etc/locale.js';
 
 function WorldItem({
 	I,
@@ -67,7 +106,7 @@ function WorldItem({
 	return [
 		node_dom('span', {
 			innerText: `${flags} ${I.label}`,
-			title: I.account_name ? 'Nutzer: ' + I.account_name : 'Nur lokale Welt',
+			title: I.account_name ? locale_user_colon + I.account_name : locale_only_local,
 		}),
 		node_dom('span', {
 			innerText: datify(Math.max(I.local, I.remote)),
@@ -103,7 +142,7 @@ export default function MenuStart({
 			try {
 				const initial = !world_list_remote_ref.value && !refreshes;
 				const response = await fetch(API + `world?what=${initial ? 'initial' : 'meta_all'}`);
-				if (!response.ok) throw new Error('Verbindungsfehler.');
+				if (!response.ok) throw new Error(locale_error_connection);
 				const json = await response.json();
 				if (!initial) return /** @type {!Array<TYPE_WORLD_LISTING_REMOTE>} */ (json);
 				const json_initial = /** @type {TYPE_RESPONSE_INITIAL} */ (json);
@@ -119,7 +158,7 @@ export default function MenuStart({
 				return json_initial.worlds;
 			}
 			catch (error) {
-				alert('Fehler beim Laden der Weltenliste: ' + error.message);
+				alert(locale_error_loading_worldlist + error.message);
 				return [];
 			}
 		},
@@ -160,7 +199,14 @@ export default function MenuStart({
 					last_change_here > last_sync &&
 					last_change_there > last_sync
 				) {
-					if (confirm(`Konflikt! Die Welt "${world_local.label}" wurde sowohl hier als auch woanders geändert.\nOK: Die vom Server übernehmen (${datify(last_change_there)}) | Abbrechen: Die hier hochladen (${datify(last_change_here)})`)) {
+					if (confirm(
+						locale_error_conflict_1 +
+						world_local.label +
+						locale_error_conflict_2 +
+						datify(last_change_there) + locale_error_conflict_3 +
+						datify(last_change_here) +
+						locale_error_conflict_4
+					)) {
 						actions.world_prop(world_local.id, {
 							mod_l: world_list_item.local = last_sync,
 						});
@@ -178,7 +224,11 @@ export default function MenuStart({
 					world_list_remote &&
 					world_list_remote.length
 				) {
-					alert(`Die Welt "${world_local.label}" wurde auf dem Server nicht gefunden, ist also jetzt eine lokale!`);
+					alert(
+						locale_warn_world_remote_missing_1 +
+						world_local.label +
+						locale_warn_world_remote_missing_2
+					);
 					actions.world_prop(world_local.id, {
 						mod_r: 0,
 					});
@@ -245,7 +295,7 @@ export default function MenuStart({
 			.catch(error => {
 				if (cancelled) return;
 				if (error.name === 'QuotaExceededError') {
-					alert('Der Speicherplatz reicht nicht!');
+					alert(locale_error_storage);
 					for (const key of Object_keys(localStorage_)) {
 						if (key.startsWith(prefix)) {
 							localStorage_removeItem(key);
@@ -253,7 +303,7 @@ export default function MenuStart({
 					}
 					actions.world_remove(world_busy_id);
 				}
-				else alert('Fehler beim Herunterladen der Welt: ' + error.message);
+				else alert(locale_error_download_world + error.message);
 			});
 		}
 		else {
@@ -280,8 +330,8 @@ export default function MenuStart({
 					.then(response => {
 						if (!response.ok) throw new Error(
 							response.status === 403
-							?	'Keine Berechtigung. Angemeldet?'
-							:	'Verbindungsfehler.'
+							?	locale_error_no_permission_logged_in
+							:	locale_error_connection
 						);
 						return response.json();
 					})
@@ -311,8 +361,8 @@ export default function MenuStart({
 			.then(response => {
 				if (!response.ok) throw new Error(
 					response.status === 403
-					?	'Keine Berechtigung. Angemeldet?'
-					:	'Verbindungsfehler.'
+					?	locale_error_no_permission_logged_in
+					:	locale_error_connection
 				);
 				return response.json();
 			})
@@ -356,7 +406,7 @@ export default function MenuStart({
 			})
 			.catch(error => {
 				if (cancelled) return;
-				alert('Fehler beim Hochladen der Welt: ' + error.message);
+				alert(locale_error_upload_world + error.message);
 				defer();
 				actions.world_prop(world_busy_id, {
 					mod_r: 0,
@@ -371,14 +421,14 @@ export default function MenuStart({
 	}, [world_busy_id]);
 
 	return [
-		node_dom('h1[innerText=Welten]'),
-		node_dom('button[innerText=Aktualisieren][style=position:absolute;left:0;top:0;height:2rem][title=Liste neu laden]', {
+		node_dom(`h1[innerText=${locale_worlds}]`),
+		node_dom(`button[innerText=${locale_refresh}][style=position:absolute;left:0;top:0;height:2rem][title=${locale_reload_list}]`, {
 			disabled: !world_list_remote,
 			onclick: refresh,
 		}),
 		node_dom('button[style=position:absolute;right:0;top:0;height:2rem]', {
 			disabled: account.rank > 0,
-			innerText: account.rank ? account.label : 'Anmelden',
+			innerText: account.rank ? account.label : locale_login,
 			onclick: () => {
 				location.href = '/account?redir=minicraft';
 			},
@@ -392,7 +442,7 @@ export default function MenuStart({
 			}),
 		]),
 		node_dom('center', null, [
-			node_dom('button[innerText=Öffnen]', {
+			node_dom(`button[innerText=${locale_open}]`, {
 				disabled: (
 					!world_selected ||
 					!world_selected.local ||
@@ -408,12 +458,12 @@ export default function MenuStart({
 				},
 				title: (
 					!world_selected
-					?	'Keine Welt ausgewählt!'
+					?	locale_error_no_world_selected
 					: !world_selected.local
-					?	'Die Welt ist noch nicht heruntergeladen!'
+					?	locale_error_world_not_downloaded
 					: world_selected.remote > world_selected.local
-					?	'Die Welt wird noch geladen!'
-					:	'Ausgewählte Welt betreten'
+					?	locale_error_world_is_loading
+					:	locale_join_selected_world
 				),
 			}),
 			node_dom('button', {
@@ -425,10 +475,10 @@ export default function MenuStart({
 				),
 				innerText: (
 					world_selected && !world_selected.local
-					?	'Herunterladen'
+					?	locale_download
 					: world_list_remote && world_selected && !world_selected.remote
-					?	'Hochladen'
-					:	'Übertragen'
+					?	locale_upload
+					:	locale_transfer
 				),
 				onclick: () => {
 					if (!world_selected.local) {
@@ -447,27 +497,27 @@ export default function MenuStart({
 				},
 				title: (
 					!world_list_remote
-					?	'Liste wird noch geladen!'
+					?	locale_error_list_is_loading
 					: !world_selected
-					?	'Keine Welt ausgewählt!'
+					?	locale_error_no_world_selected
 					: !world_selected.local
-					?	'Welt von Server herunterladen'
+					?	locale_download_world_from_server
 					: world_selected.remote
-					?	'Die Welt ist schon auf beiden Seiten vorhanden!'
+					?	locale_error_world_is_present_both_sides
 					: account.rank
-					?	'Welt auf den Server hochladen'
-					:	'Nicht angemeldet!'
+					?	locale_upload_world_to_server
+					:	locale_error_not_logged_in
 				),
 			}),
 		]),
 		node_dom('hr'),
 		node_dom('center', null, [
-			node_dom('button[innerText=Neue Welt]', {
+			node_dom(`button[innerText=${locale_new_world}]`, {
 				onclick: () => {
-					const name = prompt('Name der neuen Welt:\n(max. 16 Zeichen)', 'Neue Welt');
+					const name = prompt(locale_name_new_world, locale_new_world);
 					if (!name) return;
 					if (name.length > 16) {
-						alert('Der Name ist zu lang!');
+						alert(locale_error_name_too_long);
 						return;
 					}
 					actions.world_add({
@@ -478,14 +528,14 @@ export default function MenuStart({
 					});
 				}
 			}),
-			node_dom('button[innerText=Projektseite]', {
+			node_dom(`button[innerText=${locale_project_page}]`, {
 				onclick: () => {
 					open('//github.com/L3P3/minicraft');
 				},
 			}),
 		]),
 		node_dom('center', null, [
-			node_dom('small[innerText=Version ' + VERSION + ' von L3P3]'),
+			node_dom(`small[innerText=${locale_version_1 + VERSION + locale_version_2}]`),
 		]),
 	];
 }

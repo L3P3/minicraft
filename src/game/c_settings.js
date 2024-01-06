@@ -9,6 +9,18 @@ import {
 	APP_VIEW_WORLDS,
 	MENU_NONE,
 } from '../etc/constants.js';
+import {
+	locale_back_to_game,
+	locale_mouse_sensitivity,
+	locale_resolution,
+	locale_settings,
+	locale_surfaces_colored,
+	locale_surfaces_textured,
+	locale_surfaces,
+	locale_view_angle,
+	locale_view_distance,
+	locale_world_leave,
+} from '../etc/locale.js';
 
 import {
 	game_mouse_catch,
@@ -31,9 +43,9 @@ export default function Settings({
 	hook_dom('div[className=menu overlay]');
 
 	return [
-		node_dom('h1[innerText=Einstellungen]'),
+		node_dom(`h1[innerText=${locale_settings}]`),
 		hook_static(node_dom('center', null, [
-			node_dom('button[innerText=Zurück zum Spiel]', {
+			node_dom(`button[innerText=${locale_back_to_game}]`, {
 				onclick: () => {
 					game.menu = MENU_NONE;
 					game.world.flag_paused = false;
@@ -44,8 +56,12 @@ export default function Settings({
 		node_dom('div[className=settings]', null, [
 			node_dom('button', {
 				innerText: (
-					'Oberflächen:\n' +
-					(config.flag_textures ? 'Texturiert' : 'Einfarbig')
+					locale_surfaces + ':\n' +
+					(
+						config.flag_textures
+						?	locale_surfaces_textured
+						:	locale_surfaces_colored
+					)
 				),
 				onclick: hook_static(() => (
 					config_reduce(config => ({
@@ -53,7 +69,7 @@ export default function Settings({
 					}))
 				)),
 			}),
-			node_dom('label[innerText=Auflösung:]', null, [
+			node_dom(`label[innerText=${locale_resolution}:]`, null, [
 				node_dom('input[type=range][min=1][max=100][step=1]', {
 					value: 101 - config.resolution_scaling,
 					onchange: hook_static(event => (
@@ -63,7 +79,7 @@ export default function Settings({
 					)),
 				}),
 			]),
-			node_dom('label[innerText=Blickwinkel:]', null, [
+			node_dom(`label[innerText=${locale_view_angle}:]`, null, [
 				node_dom('input[type=range][min=1][max=180][step=1]', {
 					value: config.view_angle,
 					onchange: hook_static(event => (
@@ -73,7 +89,7 @@ export default function Settings({
 					)),
 				}),
 			]),
-			node_dom('label[innerText=Sichtweite:]', null, [
+			node_dom(`label[innerText=${locale_view_distance}:]`, null, [
 				node_dom('input[type=range][min=1][max=128][step=1]', {
 					value: config.view_distance,
 					onchange: hook_static(event => (
@@ -83,7 +99,7 @@ export default function Settings({
 					)),
 				}),
 			]),
-			node_dom('label[innerText=Mausempfindlichkeit:]', null, [
+			node_dom(`label[innerText=${locale_mouse_sensitivity}:]`, null, [
 				node_dom('input[type=range][min=1][max=15][step=1]', {
 					value: config.mouse_sensitivity,
 					onchange: hook_static(event => (
@@ -95,7 +111,7 @@ export default function Settings({
 			]),
 		]),
 		hook_static(node_dom('center', null, [
-			node_dom('button[innerText=Welt verlassen]', {
+			node_dom(`button[innerText=${locale_world_leave}]`, {
 				onclick: () => {
 					view_set(APP_VIEW_WORLDS);
 				},

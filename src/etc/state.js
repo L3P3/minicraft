@@ -7,6 +7,10 @@ import {
 	localStorage_getItem,
 	localStorage_setItem,
 } from './helpers.js';
+import {
+	locale_unknown_world,
+	locale_unknown_world_found,
+} from './locale.js';
 
 export const reducers = {
 	init: () => {
@@ -48,7 +52,7 @@ export const reducers = {
 				config.worlds[0] = {
 					id: 0,
 					label: (
-						prompt('Es wurde eine namenlose lokale Welt gefunden. Wie soll sie heißen?', '') || 'Unbekannte Welt'
+						prompt(locale_unknown_world_found, '') || locale_unknown_world
 					).substring(0, 16),
 					mod_l: Date.now(),
 					mod_r: 0,

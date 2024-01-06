@@ -1,0 +1,79 @@
+amount: Anzahl
+back_to_game: Zurück zum Spiel
+chunk_regenerated: Chunk neu generiert.
+chunks_loaded: Chunks geladen.
+commands: Befehle
+download_world_from_server: Welt von Server herunterladen
+download: Herunterladen
+error_amount_minimum_1: Anzahl muss mindestens 1 sein!
+error_conflict_1: Konflikt! Die Welt "
+error_conflict_2: " wurde sowohl hier als auch woanders geändert.\nOK: Die vom Server übernehmen (
+error_conflict_3: ) | Abbrechen: Die hier hochladen (
+error_conflict_4: )
+error_connection: Verbindungsfehler.
+error_download_world: Fehler beim Herunterladen der Welt: 
+error_gamemode_range: Spielmodus muss in 0..2 sein!
+error_invalid_block_type: Ungültiger Blocktyp!
+error_inventory_full: Inventar ist voll!
+error_list_is_loading: Liste wird noch geladen!
+error_loading_worldlist: Fehler beim Laden der Weltenliste: 
+error_name_too_long: Der Name ist zu lang!
+error_no_permission_logged_in: Keine Berechtigung. Angemeldet?
+error_no_world_selected: Keine Welt ausgewählt!
+error_not_logged_in: Nicht angemeldet!
+error_only_vert_supported: Nur "vert" wird unterstützt!
+error_pitch: Pech!
+error_selection_required: Auswahl erforderlich!
+error_storage: Der Speicherplatz reicht nicht!
+error_upload_world: Fehler beim Hochladen der Welt: 
+error_world_is_loading: Die Welt wird noch geladen!
+error_world_is_present_both_sides: Die Welt ist schon auf beiden Seiten vorhanden!
+error_world_not_downloaded: Die Welt ist noch nicht heruntergeladen!
+game_saved: Spiel gespeichert.
+gamemode_set_to: Spielmodus gesetzt auf
+inventory_cleared: Inventar geleert
+inventory: Inventar
+item_labels: Luft,Stein,Grasblock,Erde,Bruchstein,Holzbretter,Grundgestein,Stamm,Laub,Ziegelsteine,Wolle,Sand,Kies,Glas,Bücherregal,Obsidian,Steinziegel,Sandstein,Lapislazuliblock,Eisenblock,Goldblock,Diamantblock,Smaragdblock,Redstoneblock,Quarzblock
+items_given: Items gegeben
+join_selected_world: Ausgewählte Welt betreten
+login: Anmelden
+mouse_mode_normal: Normaler Mausmodus.
+mouse_mode_selection: Auswahl mit Maustasten.
+mouse_sensitivity: Mausempfindlichkeit
+name_new_world: Name der neuen Welt:\n(max. 16 Zeichen)
+new_world: Neue Welt
+only_local: Nur lokale Welt
+open: Öffnen
+player: Spieler
+project_page: Projektseite
+refresh: Aktualisieren
+reload_list: Liste neu laden
+resolution: Auflösung
+selection_expanded: Auswahl erweitert.
+selection_none: nichts
+selection_primary_short: Erster
+selection_primary: Erster Auswahlpunkt
+selection_secondary_short: Zweiter
+selection_secondary: Zweiter Auswahlpunkt
+settings: Einstellungen
+spawn_updated: Startpunkt aktualisiert.
+surfaces_colored: Einfarbig
+surfaces_textured: Texturiert
+surfaces: Oberflächen
+teleported_to_spawn: Zum Startpunkt teleportiert.
+teleported_to: Teleportiert zu
+transfer: Übertragen
+unknown_command: Ungültiger Befehl
+unknown_world: Unbekannte Welt
+unknown_world_found: Es wurde eine namenlose lokale Welt gefunden. Wie soll sie heißen?
+upload_world_to_server: Welt auf den Server hochladen
+upload: Hochladen
+user_colon: Nutzer: 
+version_1: Version 
+version_2:  von L3P3
+view_angle: Blickwinkel
+view_distance: Sichtweite
+warn_world_remote_missing_1: Die Welt "
+warn_world_remote_missing_2: " wurde auf dem Server nicht gefunden, ist also jetzt eine lokale!
+world_leave: Welt verlassen
+worlds: Welten

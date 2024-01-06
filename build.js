@@ -1,6 +1,7 @@
 #!/bin/env node
 
 import {
+	readdir,
 	readFile,
 	writeFile,
 } from 'fs/promises';
@@ -12,8 +13,18 @@ const TMP_FILE = '/tmp/app.js';
 
 const prod = !!process.env.CI;
 const {version} = JSON.parse(
-	await readFile('./package.json', 'utf-8')
+	await readFile('./package.json', 'utf8')
 );
+
+let languages = ['de'];
+if (prod) {
+	const files = await readdir('./locales');
+	languages = (
+		files
+		.filter(name => name.endsWith('.csv'))
+		.map(name => name.split('.')[0])
+	);
+}
 
 const exec = cmd => (
 	new Promise(resolve =>
@@ -24,17 +35,36 @@ const exec = cmd => (
 	)
 );
 
-const env_set = (version, debug, api, api_download) => (
+async function lang_generate(lang) {
+	const csv = await readFile(`./locales/${lang}.csv`, 'utf8');
+	let output = '';
+	for (const line of csv.split('\n')) {
+		if (!line) continue;
+		const index_colon = line.indexOf(': ');
+		const key = line.substring(0, index_colon);
+		const value = line.substring(index_colon + 2);
+		output += `export const locale_${key} = '${value}';\n`;
+	}
+	return output;
+}
+
+const env_set = async (version, debug, lang, api, api_download) => Promise.all([
 	writeFile(
 		'./src/etc/env.js',
 `export const VERSION = '${version}';
 export const DEBUG = ${debug};
+export const LANG = '${lang}';
 export const API = '${api}';
 export const API_DOWNLOAD = '${api_download}';
 `,
 		'utf8'
-	)
-);
+	),
+	writeFile(
+		'./src/etc/locale.js',
+		await lang_generate(lang),
+		'utf8'
+	),
+]);
 
 async function build_css() {
 	const css_raw = await readFile('./src/app.css', 'utf8');
@@ -56,10 +86,11 @@ async function build_css() {
 	);
 }
 
-async function build_js() {
+async function build_js(lang) {
 	await env_set(
 		prod ? version : 'dev',
 		false,
+		lang,
 		prod ? '/api/minicraft/' : '//l3p3.de/api/minicraft/',
 		prod ? '/static/minicraft/worlds/' : '//l3p3.de/static/minicraft/worlds/'
 	);
@@ -101,7 +132,7 @@ async function build_js() {
 			'compilation_level SIMPLE',
 			'externs ./src/externs.js',
 			'js ' + TMP_FILE,
-			'js_output_file ./dist/app.js',
+			`js_output_file ./dist/app-${lang}.js`,
 			'language_in ECMASCRIPT6_STRICT',
 			'language_out ECMASCRIPT6_STRICT',
 			'rewrite_polyfills false',
@@ -110,7 +141,7 @@ async function build_js() {
 		]
 		.join(' --')
 	))[2]);
-	console.log('js done.');
+	console.log(`js ${lang} done.`);
 
 	await exec('rm ' + TMP_FILE);
 }
@@ -129,13 +160,15 @@ await exec('rm ./dist/*');
 console.log(`build ${version} (${prod ? 'production' : 'dev'})...`);
 
 try {
+	const lang_first = languages.shift();
 	await Promise.all([
 		build_css(),
-		build_js(),
+		build_js(lang_first),
 	]);
+	for (const lang of languages) await build_js(lang);
 }
 finally {
-	await env_set('dev', true, '//l3p3.de/api/minicraft/', '//l3p3.de/static/minicraft/worlds/');
+	await env_set('dev', true, 'de', '//l3p3.de/api/minicraft/', '//l3p3.de/static/minicraft/worlds/');
 }
 
 console.log('done.');

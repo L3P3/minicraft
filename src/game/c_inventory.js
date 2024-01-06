@@ -7,6 +7,7 @@ import {
 
 import {
 	GAMEMODE_CREATIVE,
+	GAMEMODE_SURVIVAL,
 	ITEM_HANDLES,
 	MENU_NONE,
 	PLAYER_SLOTS,
@@ -15,6 +16,9 @@ import {
 	Math_ceil,
 	Number_,
 } from '../etc/helpers.js';
+import {
+	locale_inventory,
+} from '../etc/locale.js';
 
 import {
 	game_mouse_catch,
@@ -62,9 +66,10 @@ function Palette({
 				},
 			}, [
 				node(Stack, {
-					id,
 					amount: 1,
 					data: null,
+					gamemode: GAMEMODE_CREATIVE,
+					id,
 				}),
 			])
 		))
@@ -75,6 +80,8 @@ export default function Inventory({
 	game,
 }) {
 	const slot_hand = hook_memo(() => slot_create(null));
+
+	const gamemode = game.player.gamemode;
 
 	hook_dom('div[className=menu overlay inventory]', hook_memo(() => ({
 		onclick: ({
@@ -136,8 +143,8 @@ export default function Inventory({
 
 	return tiles_data && [
 		node_dom('div[className=window]', null, [
-			node_dom('div[innerText=Inventar]'),
-			game.player.gamemode === GAMEMODE_CREATIVE &&
+			node_dom(`div[innerText=${locale_inventory}]`),
+			gamemode === GAMEMODE_CREATIVE &&
 			node(Palette, {
 				slot_hand,
 			}),
@@ -153,9 +160,10 @@ export default function Inventory({
 					}, [
 						content &&
 						node(Stack, {
-							id: content.id,
 							amount: content.amount,
 							data: content.data,
+							gamemode,
+							id: content.id,
 						}),
 					])
 				)
@@ -168,9 +176,10 @@ export default function Inventory({
 			},
 		}, [
 			node(Stack, {
-				id: slot_hand.content.id,
 				amount: slot_hand.content.amount,
 				data: slot_hand.content.data,
+				gamemode: GAMEMODE_SURVIVAL,
+				id: slot_hand.content.id,
 			}),
 		]),
 	];

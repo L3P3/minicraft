@@ -11,6 +11,9 @@ import {
 	Math_PI_h,
 	Math_sin,
 } from '../etc/helpers.js';
+import {
+	locale_player,
+} from '../etc/locale.js';
 
 import {
 	slot_create,
@@ -34,7 +37,7 @@ export const player_create = (world, account) => ({
 		.fill(null)
 		.map(() => slot_create(null)),
 	mouse_mode: MOUSE_MODE_NORMAL,
-	name: account.label || 'Spieler',
+	name: account.label || locale_player,
 	position_x: world.spawn_x,
 	position_y: world.spawn_y,
 	position_z: world.spawn_z,

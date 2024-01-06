@@ -24,6 +24,7 @@ import {
 	GAMEMODE_SPECTATOR,
 	GAMEMODE_SURVIVAL,
 	ITEM_HANDLES,
+	ITEM_LABELS,
 	KEY_MOUSE_DOWN,
 	KEY_MOUSE_LEFT,
 	KEY_MOUSE_MIDDLE,
@@ -49,6 +50,7 @@ import {
 } from '../etc/constants.js';
 import {
 	DEBUG,
+	LANG,
 	VERSION,
 } from '../etc/env.js';
 import {
@@ -61,6 +63,36 @@ import {
 	Number_,
 	setInterval_,
 } from '../etc/helpers.js';
+import {
+	locale_amount,
+	locale_chunk_regenerated,
+	locale_chunks_loaded,
+	locale_commands,
+	locale_error_amount_minimum_1,
+	locale_error_gamemode_range,
+	locale_error_invalid_block_type,
+	locale_error_inventory_full,
+	locale_error_only_vert_supported,
+	locale_error_pitch,
+	locale_error_selection_required,
+	locale_game_saved,
+	locale_gamemode_set_to,
+	locale_inventory_cleared,
+	locale_items_given,
+	locale_mouse_mode_normal,
+	locale_mouse_mode_selection,
+	locale_selection_expanded,
+	locale_selection_none,
+	locale_selection_primary_short,
+	locale_selection_primary,
+	locale_selection_secondary_short,
+	locale_selection_secondary,
+	locale_spawn_updated,
+	locale_teleported_to_spawn,
+	locale_teleported_to,
+	locale_unknown_command,
+} from '../etc/locale.js';
+
 import {
 	player_create,
 	player_rotate,
@@ -474,10 +506,7 @@ export const game_key = (model, code, state) => {
 			game_movement_x_update(model);
 			break;
 		case 69: // E
-			if (
-				player.gamemode !== GAMEMODE_SPECTATOR &&
-				model.menu === MENU_NONE
-			) {
+			if (model.menu === MENU_NONE) {
 				model.menu = MENU_INVENTORY;
 				// release all keys
 				for (const code of keys_active)
@@ -599,7 +628,7 @@ export const game_message_send = (model, value) => {
 			for (const slot of player.inventory) {
 				slot.content = null;
 			}
-			game_message_print(model, 'inventory cleared', true);
+			game_message_print(model, locale_inventory_cleared, true);
 			break;
 		//case 'exit':
 		//	game_message_print(model, 'use your pointer');
@@ -614,16 +643,16 @@ export const game_message_send = (model, value) => {
 					value % 1 === 0
 				) {
 					player.gamemode = value;
-					game_message_print(model, `gamemode set to ${value}`, true);
+					game_message_print(model, locale_gamemode_set_to + ': ' + value, true);
 				}
 				else {
-					game_message_print(model, 'gamemode must be in 0..2');
+					game_message_print(model, locale_error_gamemode_range);
 				}
 			}
 			break;
 		case 'give': {
 				if (args.length === 0) {
-					game_message_print(model, '/give <id> [amount]\n' + ITEM_HANDLES.join(' '));
+					game_message_print(model, `/give <id> [${locale_amount}]\n` + ITEM_HANDLES.join(' '));
 					break;
 				}
 				const handles_index = ITEM_HANDLES.indexOf(
@@ -645,34 +674,38 @@ export const game_message_send = (model, value) => {
 						game_message_print(
 							model,
 							slots_collect(player.inventory, stack_create(value, amount))
-							?	'inventory full'
-							:	`gave ${amount} ${ITEM_HANDLES[value]}`,
+							?	locale_error_inventory_full
+							:	`${locale_items_given} ${amount} ${
+								LANG === 'en'
+								?	ITEM_HANDLES[value]
+								:	ITEM_LABELS[value]
+							}`,
 							true
 						);
 					}
 					else {
-						game_message_print(model, 'amount must be at least 1');
+						game_message_print(model, locale_error_amount_minimum_1);
 					}
 				}
 				else {
-					game_message_print(model, 'invalid block type');
+					game_message_print(model, locale_error_invalid_block_type);
 				}
 			}
 			break;
 		case 'help':
-			game_message_print(model, 'commands: clear, clearinv, gamemode, give, help, load, me, save, spawn, teleport, version');
+			game_message_print(model, locale_commands + ': clear, clearinv, gamemode, give, help, load, me, save, spawn, teleport, version');
 			break;
 		case 'load':
 			world_chunk_load(world, true);
 			model.renderer.flag_dirty = true;
-			game_message_print(model, 'chunks loaded', true);
+			game_message_print(model, locale_chunks_loaded, true);
 			break;
 		case 'me':
 			game_message_print(model, player.name + ' ' + args.join(' '), true);
 			break;
 		case 'save':
 			game_save(model);
-			game_message_print(model, 'game saved', true);
+			game_message_print(model, locale_game_saved, true);
 			break;
 		case 'smart':
 			player.name = 'LFF5644';
@@ -682,7 +715,7 @@ export const game_message_send = (model, value) => {
 			world.spawn_x = player.position_x;
 			world.spawn_y = player.position_y;
 			world.spawn_z = player.position_z;
-			game_message_print(model, 'spawn updated', true);
+			game_message_print(model, locale_spawn_updated, true);
 			break;
 		case 'teleport':
 		case 'tp':
@@ -691,10 +724,10 @@ export const game_message_send = (model, value) => {
 				player.position_y = world.spawn_y;
 				player.position_z = world.spawn_z;
 				model.renderer.flag_dirty = true;
-				game_message_print(model, 'teleported to spawn', true);
+				game_message_print(model, locale_teleported_to_spawn, true);
 			}
 			else if (args.length === 3) {
-				game_message_print(model, `teleported to ${
+				game_message_print(model, locale_teleported_to + ` ${
 					player.position_x = coord_part_parse(player.position_x, args[0])
 				} ${
 					player.position_y = coord_part_parse(player.position_y, args[1])
@@ -704,7 +737,7 @@ export const game_message_send = (model, value) => {
 				model.renderer.flag_dirty = true;
 			}
 			else {
-				game_message_print(model, 'PITCH');
+				game_message_print(model, locale_error_pitch);
 			}
 			player.speed_x = 0;
 			player.speed_y = 0;
@@ -715,17 +748,17 @@ export const game_message_send = (model, value) => {
 			break;
 		case '/exit':
 			player.mouse_mode = MOUSE_MODE_NORMAL;
-			game_message_print(model, 'normal mouse mode', true);
+			game_message_print(model, locale_mouse_mode_normal, true);
 			break;
 		case '/expand':
 			if (game_block_assert(model)) {
 				if (args[0] === 'vert') {
 					player.block_select_a[1] = 0;
 					player.block_select_b[1] = CHUNK_HEIGHT - 1;
-					game_message_print(model, 'selection expanded', true);
+					game_message_print(model, locale_selection_expanded, true);
 				}
 				else {
-					game_message_print(model, 'only vert supported');
+					game_message_print(model, locale_error_only_vert_supported);
 				}
 			}
 			break;
@@ -743,29 +776,29 @@ export const game_message_send = (model, value) => {
 			break;
 		case '/regen':
 			world_chunk_reset(world);
-			game_message_print(model, 'regenerate chunk', true);
+			game_message_print(model, locale_chunk_regenerated, true);
 			model.renderer.flag_dirty = true;
 			break;
 		case '/show':
 			game_message_print(
 				model,
-				`first: ${
+				`${locale_selection_primary_short}: ${
 					player.block_select_a
 					?	player.block_select_a.join(' ')
-					:	'none'
-				}, second: ${
+					:	locale_selection_none
+				}, ${locale_selection_secondary_short}: ${
 					player.block_select_b
 					?	player.block_select_b.join(' ')
-					:	'none'
+					:	locale_selection_none
 				}`
 			);
 			break;
 		case '/wand':
 			player.mouse_mode = MOUSE_MODE_SELECT;
-			game_message_print(model, 'primary+secondary button for selection', true);
+			game_message_print(model, locale_mouse_mode_selection, true);
 			break;
 		default:
-			game_message_print(model, 'unknown command: ' + command);
+			game_message_print(model, locale_unknown_command + ': ' + command);
 		}
 	}
 	else {
@@ -789,7 +822,7 @@ export const game_block_assert = model => {
 		!model.player.block_select_a ||
 		!model.player.block_select_b
 	) {
-		game_message_print(model, 'selection required');
+		game_message_print(model, locale_error_selection_required);
 		return false;
 	}
 	return true;
@@ -803,9 +836,9 @@ export const game_block_select = (model, block, secondary) => {
 		model,
 		`${
 			secondary
-			?	'second'
-			:	'first'
-		} position: ${
+			?	locale_selection_secondary
+			:	locale_selection_primary
+		}: ${
 			block.join(' ')
 		}`,
 		true

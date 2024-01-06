@@ -5,8 +5,13 @@ import {
 } from '../etc/lui.js';
 
 import {
+	GAMEMODE_CREATIVE,
 	ITEM_HANDLES,
+	ITEM_LABELS,
 } from '../etc/constants.js';
+import {
+	LANG,
+} from '../etc/env.js';
 
 const Bitmap = ({
 	id,
@@ -22,10 +27,15 @@ const Bitmap = ({
 export default function Stack({
 	amount,
 	data,
+	gamemode,
 	id,
 }) {
 	hook_dom('div[className=stack]', {
-		title: ITEM_HANDLES[id],
+		title: (
+			LANG === 'en'
+			?	ITEM_HANDLES[id] + (gamemode === GAMEMODE_CREATIVE ? ` (${id})` : '')
+			:	ITEM_LABELS[id] + (gamemode === GAMEMODE_CREATIVE ? ` (${ITEM_HANDLES[id]}, ${id})` : '')
+		),
 	});
 
 	return [

@@ -41,6 +41,8 @@ export default function Bar({
 		},
 	});
 
+	const {gamemode} = player;
+
 	return (
 		tiles_data &&
 		player.inventory
@@ -58,6 +60,7 @@ export default function Bar({
 				node(Stack, {
 					amount: content.amount,
 					data: content.data,
+					gamemode,
 					id: content.id,
 				}),
 			])
