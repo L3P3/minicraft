@@ -93,10 +93,10 @@ import {
 
 let message_id_counter = 0;
 
-export const game_create = (actions, frame_element, config) => {
+export const game_create = (actions, frame_element, config, account) => {
 	const world = world_create(config.world_last);
 
-	const player = player_create(world);
+	const player = player_create(world, account);
 
 	world_load(world, player);
 

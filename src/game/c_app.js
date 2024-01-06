@@ -13,6 +13,7 @@ import Game from './c_game.js';
 import MenuStart from './c_menu_start.js';
 
 export default function App({
+	account,
 	actions,
 	config,
 	ref,
@@ -24,12 +25,14 @@ export default function App({
 	return [
 		view === APP_VIEW_WORLDS &&
 		node(MenuStart, {
+			account,
 			actions,
 			config,
 			view_set,
 		}),
 		view === APP_VIEW_GAME &&
 		node(Game, {
+			account,
 			actions,
 			config,
 			frame,

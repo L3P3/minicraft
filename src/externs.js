@@ -310,3 +310,14 @@ var TYPE_WORLD_LISTING_REMOTE;
 	}}
 */
 var TYPE_WORLD_API;
+
+/**
+	@typedef {{
+		account: {
+			label: string,
+			rank: number,
+		},
+		worlds: !Array<TYPE_WORLD_LISTING_REMOTE>,
+	}}
+*/
+var TYPE_RESPONSE_INITIAL;

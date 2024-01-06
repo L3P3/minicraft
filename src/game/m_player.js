@@ -16,7 +16,7 @@ import {
 	slot_create,
 } from './m_slot.js';
 
-export const player_create = world => ({
+export const player_create = (world, account) => ({
 	accel_x: 0.0,
 	accel_y: 0.0,
 	accel_z: 0.0,
@@ -34,7 +34,7 @@ export const player_create = world => ({
 		.fill(null)
 		.map(() => slot_create(null)),
 	mouse_mode: MOUSE_MODE_NORMAL,
-	name: 'Gast',
+	name: account.label || 'Spieler',
 	position_x: world.spawn_x,
 	position_y: world.spawn_y,
 	position_z: world.spawn_z,

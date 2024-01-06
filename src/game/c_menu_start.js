@@ -76,6 +76,7 @@ function WorldItem({
 }
 
 export default function MenuStart({
+	account,
 	actions,
 	config,
 	view_set,
@@ -88,21 +89,6 @@ export default function MenuStart({
 		refreshes_set(refreshes_get() + 1);
 	});
 
-	const world_list_remote = hook_async(
-		async () => {
-			try {
-				const response = await fetch(API + 'world?what=meta_all');
-				if (!response.ok) throw new Error('Verbindungsfehler.');
-				return await response.json();
-			}
-			catch (error) {
-				alert('Fehler beim Laden der Weltliste: ' + error.message);
-				return [];
-			}
-		},
-		[refreshes],
-		null
-	);
 	/**
 		last fetched world list
 		@type {{
@@ -112,9 +98,29 @@ export default function MenuStart({
 	const world_list_remote_ref = hook_static({
 		value: null,
 	});
+	const world_list_remote = hook_async(
+		async () => {
+			try {
+				const initial = !world_list_remote_ref.value && !refreshes;
+				const response = await fetch(API + `world?what=${initial ? 'initial' : 'meta_all'}`);
+				if (!response.ok) throw new Error('Verbindungsfehler.');
+				const json = await response.json();
+				if (!initial) return /** @type {!Array<TYPE_WORLD_LISTING_REMOTE>} */ (json);
+				const json_initial = /** @type {TYPE_RESPONSE_INITIAL} */ (json);
+				defer();
+				actions.account_set(json_initial.account);
+				return json_initial.worlds;
+			}
+			catch (error) {
+				alert('Fehler beim Laden der Weltenliste: ' + error.message);
+				return [];
+			}
+		},
+		[refreshes],
+		null
+	);
 	// merged local and remote world list
 	const world_list = hook_memo(() => {
-		const first = !world_list_remote_ref.value;
 		if (world_list_remote) {
 			world_list_remote_ref.value = world_list_remote;
 		}
@@ -359,6 +365,17 @@ export default function MenuStart({
 
 	return [
 		node_dom('h1[innerText=Welten]'),
+		node_dom('button[innerText=Aktualisieren][style=position:absolute;left:0;top:0;height:2rem][title=Liste neu laden]', {
+			disabled: !world_list_remote,
+			onclick: refresh,
+		}),
+		node_dom('button[style=position:absolute;right:0;top:0;height:2rem]', {
+			disabled: account.rank > 0,
+			innerText: account.rank ? account.label : 'Anmelden',
+			onclick: () => {
+				location.href = '/account?redir=minicraft';
+			},
+		}),
 		node_dom('div[className=worlds]', null, [
 			node_map(WorldItem, world_list, {
 				refreshes, // refresh dates as well
@@ -396,7 +413,8 @@ export default function MenuStart({
 				disabled: (
 					!world_list_remote ||
 					!world_selected ||
-					world_selected.local > 0 && world_selected.remote > 0
+					world_selected.local > 0 && world_selected.remote > 0 ||
+					!world_selected.remote && !account.rank
 				),
 				innerText: (
 					world_selected && !world_selected.local
@@ -427,14 +445,12 @@ export default function MenuStart({
 					?	'Keine Welt ausgewählt!'
 					: !world_selected.local
 					?	'Welt von Server herunterladen'
-					: !world_selected.remote
+					: world_selected.remote
+					?	'Die Welt ist schon auf beiden Seiten vorhanden!'
+					: account.rank
 					?	'Welt auf den Server hochladen'
-					:	'Die Welt ist schon auf beiden Seiten vorhanden!'
+					:	'Nicht angemeldet!'
 				),
-			}),
-			node_dom('button[innerText=Aktualisieren][title=Liste neu laden]', {
-				disabled: !world_list_remote,
-				onclick: refresh,
 			}),
 		]),
 		node_dom('hr'),

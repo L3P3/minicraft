@@ -88,6 +88,7 @@ lui_.init(() => {
 		ondragstart: handler_noop,
 	}, [
 		node(App, {
+			account: state.account,
 			actions,
 			config: state.config,
 			ref,

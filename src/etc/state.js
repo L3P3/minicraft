@@ -56,16 +56,19 @@ export const reducers = {
 				needs_save = true;
 			}
 		}
-		if (needs_save) {
-			return reducers.config_save({
-				config,
-				config_saved: null,
-			});
-		}
-		return {
+		const state = {
+			account: {
+				label: '',
+				rank: 0,
+			},
 			config,
 			config_saved: config,
 		};
+		if (needs_save) {
+			state.config_saved = null;
+			return reducers.config_save(state);
+		}
+		return state;
 	},
 	config_save: state => {
 		const {
@@ -87,6 +90,10 @@ export const reducers = {
 			config_saved: config,
 		};
 	},
+	account_set: (state, account) => ({
+		...state,
+		account,
+	}),
 	config_reduce: (state, reducer) => (
 		reducers.config_set(
 			state,

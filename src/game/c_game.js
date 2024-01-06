@@ -43,6 +43,7 @@ import Terminal from './c_terminal.js';
 import Touch from './c_touch.js';
 
 export default function Game({
+	account,
 	actions,
 	config,
 	frame,
@@ -53,7 +54,7 @@ export default function Game({
 	const pointer_locked = document_.pointerLockElement === frame;
 
 	const model = hook_memo(() => (
-		ref.game = game_create(actions, frame, config)
+		ref.game = game_create(actions, frame, config, account)
 	));
 
 	hook_effect(() => {
