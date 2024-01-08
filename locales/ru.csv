@@ -1,0 +1,79 @@
+amount: Число
+back_to_game: Назад к игру
+chunk_regenerated: Чанки перезагружаютца.
+chunks_loaded: Чанки загружаютца.
+commands: Команда
+download_world_from_server: Загрузит мир из сервера 
+download: Скачать
+error_amount_minimum_1: Число должно быт минимумь 1!
+error_conflict_1: Конфликт! Мир. "
+error_conflict_2: " было изменено как здесь, так и в других местах.\nОК: принять те, что с сервера (
+error_conflict_3: ) | Отменит: Вот это hochladen (
+error_conflict_4: )
+error_connection: Ошибка поключения.
+error_download_world: Ошыбка при загруске мира: 
+error_gamemode_range: Игровой режим должен быт  in 0..2!
+error_invalid_block_type: Неверный тип блока!
+error_inventory_full: Инвентар полный!
+error_list_is_loading: Список еще загружаетца!
+error_loading_worldlist: Ошыбка при загруске списка миров: 
+error_name_too_long: Имя слишком долгое!
+error_no_permission_logged_in: Нету разрешения. Зарегестрирован?
+error_no_world_selected: Мир был не выбрань!
+error_not_logged_in: Не зарегестрирован!
+error_only_vert_supported: Толко "vert" подержуваетца!
+error_pitch: Неповезло!
+error_selection_required: Выберите сначяло!
+error_storage: Нехватает памяти!
+error_upload_world: Ошыбка при загруске мира: 
+error_world_is_loading: Мир еще загружаетса!
+error_world_is_present_both_sides: Die Welt ist schon auf beiden Seiten vorhanden!
+error_world_not_downloaded: Мир еще не скачень!
+game_saved: Игра сохранена.
+gamemode_set_to: Игровой режим сменен на
+inventory_cleared: Инвентар пусть
+inventory: Инвентар
+item_labels: Воздух,Камень,Блок травы,Земля,Булыжник,Доска,Бедрок,Бревно,Листья,Кирпичи,Шерст,Песок,Гравий,Стекло,Книжня полка,Обсидиан,Каменые кирпичи,Пещяник,Блок лазурита,Блок железа,Блок золот,Блок алмаза,Блок изумруда,Блок редстоуна,Блок кварца
+items_given: Вещи даны
+join_selected_world: Зайти на выбраный сервер
+login: Зарегестрироватся
+mouse_mode_normal: Классический режим мыщы.
+mouse_mode_selection: Выборь с мыщы.
+mouse_sensitivity: Чуствителност мыщы.
+name_new_world: Имя нового Мира:\n(макс. 16 симболов)
+new_world: Новый мир
+only_local: Толко локалный мир
+open: Открыт
+player: Игрок
+project_page: Сайт проекта
+refresh: Обновит
+reload_list: Обновит список
+resolution: Качество
+selection_expanded: Выборь увеличен.
+selection_none: ничего
+selection_primary_short: Первый
+selection_primary: Первая выбраная точка
+selection_secondary_short: Второй
+selection_secondary: Вторая выбраная точка
+settings: Настроики
+spawn_updated: Началная точка обновлена
+surfaces_colored: Одноцветный
+surfaces_textured: С текстурами
+surfaces: Oberflächen
+teleported_to_spawn: Переместитца к стартовой точки
+teleported_to: Перенестица к
+transfer: Перенести
+unknown_command: Неправилная Команда
+unknown_world: Неизвестный Мир
+unknown_world_found: Был найден безмяный локалный мир. Как его назвать?
+upload_world_to_server: Загрузит мир на сервер
+upload: Загрузит
+user_colon: Ползовател: 
+version_1: Версия
+version_2:  от L3P3
+view_angle: Радиус зрения
+view_distance: Далность зрения
+warn_world_remote_missing_1: Мир "
+warn_world_remote_missing_2: " был на сервере не найдень, поэтому он теперь локалный!
+world_leave: Покинут Мир
+worlds: Миры
