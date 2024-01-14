@@ -311,6 +311,14 @@ var TYPE_WORLD_LISTING_REMOTE;
 */
 var TYPE_WORLD_API;
 
+
+/**
+	@typedef {{
+		msg: string,
+	}}
+*/
+var TYPE_CHAT_API;
+
 /**
 	@typedef {{
 		account: {

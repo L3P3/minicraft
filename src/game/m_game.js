@@ -3,6 +3,7 @@ import {
 } from '../etc/lui.js';
 
 import {
+	API_CHAT,
 	BLOCK_TYPE_AIR,
 	BLOCK_TYPE_BEDROCK,
 	BLOCK_TYPE_COBBLE,
@@ -55,6 +56,8 @@ import {
 } from '../etc/env.js';
 import {
 	clearInterval_,
+	clearTimeout_,
+	JSON_stringify,
 	Math_ceil,
 	Math_floor,
 	Math_log2,
@@ -62,6 +65,7 @@ import {
 	Math_PI,
 	Number_,
 	setInterval_,
+	setTimeout_,
 } from '../etc/helpers.js';
 import {
 	locale_amount,
@@ -147,6 +151,7 @@ export const game_create = (actions, frame_element, config, account) => {
 		menu: MENU_NONE,
 		messages: [],
 		player,
+		poll_timeout: null,
 		renderer: null,
 		resolution_css_ratio: 1,
 		resolution_raw_x: 1,
@@ -159,12 +164,14 @@ export const game_create = (actions, frame_element, config, account) => {
 		world,
 	};
 
+	game_poll(model, null);
 	game_mouse_catch(model);
 
 	return model;
 };
 
 export const game_destroy = model => {
+	clearTimeout_(model.poll_timeout);
 	clearInterval_(model.tick_interval);
 
 	world_save(model.world, model.player);
@@ -802,19 +809,35 @@ export const game_message_send = (model, value) => {
 		}
 	}
 	else {
-		game_message_print(model, `<${player.name}> ` + value);
+		const message_local = game_message_print(model, `<${player.name}> ` + value);
+		game_poll(model, value)
+		.then(sent => {
+			if (sent) {
+				game_message_delete(model, message_local);
+			}
+		});
 	}
 }
 
 const game_message_print = (model, value, minor = false) => {
+	const id = ++message_id_counter;
 	(
 		model.messages = model.messages.slice(-49)
 	).push({
-		id: ++message_id_counter,
+		id,
 		minor,
 		time: now(),
 		value,
 	});
+	return id;
+}
+const game_message_delete = (model, id) => {
+	const index = model.messages.findIndex(message =>
+		message.id === id
+	);
+	if (index >= 0) {
+		model.messages.splice(index, 1);
+	}
 }
 
 export const game_block_assert = model => {
@@ -844,3 +867,43 @@ export const game_block_select = (model, block, secondary) => {
 		true
 	);
 }
+
+const game_poll = (model, msg) => (
+	clearTimeout_(model.poll_timeout),
+	(
+		msg
+		?	fetch(API_CHAT, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON_stringify(/** @type {TYPE_CHAT_API} */ ({
+					msg,
+				})),
+			})
+		:	fetch(API_CHAT)
+	)
+	.then(res => {
+		if (!res.ok) return;
+		return res.text()
+	})
+	.then(text => {
+		if (text) {
+			const lines = text.split('\n').filter(Boolean);
+			for (const line of lines) {
+				if (line.startsWith('<')) {
+					game_message_print(model, line);
+				}
+			}
+			return lines.length > 0;
+		}
+		return false;
+	})
+	.catch(error => false)
+	.then(value => {
+		model.poll_timeout = setTimeout_(() => {
+			game_poll(model, null);
+		}, 5e3);
+		return value;
+	})
+)

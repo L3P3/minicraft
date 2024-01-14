@@ -1,4 +1,7 @@
 import {
+	VERSION,
+} from './env.js';
+import {
 	locale_item_labels,
 } from './locale.js';
 
@@ -121,3 +124,5 @@ export const MENU_WORLDS = 4;
 
 export const MOUSE_MODE_NORMAL = 0;
 export const MOUSE_MODE_SELECT = 1;
+
+export const API_CHAT = (VERSION === 'dev' ? '//l3p3.de' : '') + '/api/chat';
