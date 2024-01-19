@@ -1,5 +1,5 @@
 amount: Число
-back_to_game: Назад к игру
+back_to_game: Назад к игре
 chunk_regenerated: Чанки перезагружаютца.
 chunks_loaded: Чанки загружаютца.
 commands: Команда
@@ -27,7 +27,7 @@ error_selection_required: Выберите сначяло!
 error_storage: Нехватает памяти!
 error_upload_world: Ошыбка при загруске мира: 
 error_world_is_loading: Мир еще загружаетса!
-error_world_is_present_both_sides: Die Welt ist schon auf beiden Seiten vorhanden!
+error_world_is_present_both_sides: Мир уже есть на двух страниц!
 error_world_not_downloaded: Мир еще не скачень!
 game_saved: Игра сохранена.
 gamemode_set_to: Игровой режим сменен на
@@ -59,7 +59,7 @@ settings: Настроики
 spawn_updated: Началная точка обновлена
 surfaces_colored: Одноцветный
 surfaces_textured: С текстурами
-surfaces: Oberflächen
+surfaces: Поверхность
 teleported_to_spawn: Переместитца к стартовой точки
 teleported_to: Перенестица к
 transfer: Перенести
