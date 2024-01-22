@@ -1,3 +1,7 @@
+import {
+	locale_today,
+} from '../etc/locale.js';
+
 export const window_ = window;
 export const document_ = document;
 const Math_ = Math;
@@ -73,7 +77,7 @@ export const touch_id_get = event => event.changedTouches[0].identifier;
 */
 export const handler_noop = () => false;
 
-export const datify = time => {
+export const datify = (time, short) => {
 	const date_now = new Date_();
 	const date_then = new Date_(time);
 
@@ -101,8 +105,11 @@ export const datify = time => {
 		result ||
 		date < date_now.getDate()
 	) {
-		result += date + '/';
+		result += date;
 	}
+
+	if (short) return result || locale_today;
+	if (result) result += '/';
 
 	return result + date_then.getHours() + ':' + number_padStart2(date_then.getMinutes(), '0');
 }

@@ -296,6 +296,7 @@ var TYPE_WORLD_LISTING_LOCAL;
 		id: number,
 		label: string,
 		modified: number,
+		public: boolean,
 		writable: boolean,
 	}}
 */
@@ -330,3 +331,10 @@ var TYPE_CHAT_API;
 	}}
 */
 var TYPE_RESPONSE_INITIAL;
+
+/**
+	@typedef {{
+		busy: boolean,
+	}}
+*/
+var TYPE_CSS_CLASSES;

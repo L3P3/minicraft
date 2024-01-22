@@ -1,8 +1,14 @@
 amount: Номер
+ask_world_delete_1: Світ "
+ask_world_delete_2: " дійсно видалити?
 back_to_game: Повернуться в игру
+change_world_name: Змінити имя світу
 chunk_regenerated: Участки відновлени.
 chunks_loaded: Участки будуть завантаженні.
 commands: Укази 
+delete_local: видалити (локальні)
+delete_world: Видалити світ 
+delete: видалити 
 download_world_from_server: Завантажити світ з сервера
 download: Завантажити
 error_amount_minimum_1: Номер повинен бути як мінімум 1!
@@ -11,7 +17,9 @@ error_conflict_2: " Було змінено як тут, так і в інших
 error_conflict_3: ) | Скасувати: Завантажте це сюди (
 error_conflict_4: )
 error_connection: Ошибка поключения
+error_delete_world: Помилка при видалення світу: 
 error_download_world: Помилка завантаження світу: 
+error_edit_world: Помилка редагування світу: 
 error_gamemode_range: Ігровий режим повинен бути 0..2!
 error_invalid_block_type: Недійсний тип блоку!
 error_inventory_full: Інвентар повний!
@@ -19,6 +27,7 @@ error_list_is_loading: Список ще завантажується!
 error_loading_worldlist: Помилка завантаження списку світ: 
 error_name_too_long: Назва занадто довга!
 error_no_permission_logged_in: Нема авторизації. Зареєстрований?
+error_no_permission: Відсутня авторизація!
 error_no_world_selected: Не вибраний світ!
 error_not_logged_in: Не зареєстрований!
 error_only_vert_supported: Підтримується тільки "vert"!
@@ -29,6 +38,7 @@ error_upload_world: Помилка завантаження світу:
 error_world_is_loading: Світ ще завантажується!
 error_world_is_present_both_sides: Світ уже існує на сайті!
 error_world_not_downloaded: Світ ще не завантажений!
+error_world_not_uploaded: Світ ще ни завантажень!
 game_saved: Игра сохранена.
 gamemode_set_to: Ігровий режим встановлен на
 inventory_cleared: Інвентар теперь порожній
@@ -37,17 +47,24 @@ item_labels: Повітря,Камінь,Блок трави,Земля,Буто
 items_given: Дані предмети
 join_selected_world: Ввійти у вибраний світ 
 login: Зареєструватися
+modification: Зміни
 mouse_mode_normal: Звичайний режим миші.
 mouse_mode_selection: Виділення кнопками миші.
 mouse_sensitivity: Чутливість миші
+name_existing_world: Нове имя світу:\n(макс. 16 символів)
 name_new_world: Имя новому світу:\n(макс. 16 Символів)
 new_world: Новий світ
+no: Ні
 only_local: Тільки локальні світ.
 open: Відчинити
+owner: Власник
 player: Игрок
 project_page: Сторінка проекту
+public: Публічно 
+publish_world: Зробіть світ публічним
 refresh: Оновити
 reload_list: Оновити список
+rename: Перейменувати
 resolution: Дозвіл
 selection_expanded: Вибір розширен.
 selection_none: нічого 
@@ -56,24 +73,28 @@ selection_primary: Перша точка вибору
 selection_secondary_short: Другий
 selection_secondary: Друга точка вибору
 settings: Налаштування
+show_world_settings: Акції/Показати Налаштування Світу.
 spawn_updated: Початкова точка оновлена.
 surfaces_colored: Однотонні 
 surfaces_textured: Текстурований
 surfaces: Поверхности
 teleported_to_spawn: Перемістился до початкової точки.
 teleported_to: Переміститися к
+today: сегодня
 transfer: Перемістит 
 unknown_command: Недійсна команда 
+unknown_world_found: Бул знайден безіменний локальний світ. Як ії назвати?
 unknown_world: Недійсни світ
-unknown_world_found: Бул знайден безіменний локальний світ.  Як ії назвати?
+unpublish_world: Зробіть світ приватним
 upload_world_to_server: Завантажити світ на сервер
 upload: Завантажити
-user_colon: Користувач:
 version_1: Версія 
 version_2:  от L3P3
 view_angle: Точка огляду
 view_distance: Видимість
 warn_world_remote_missing_1: Світ "
 warn_world_remote_missing_2: " був не знайден на сервере, тому він тепер локальний!
+world_etc: Світ...
 world_leave: Покинуті світ
 worlds: Світі
+yes: Так 

@@ -30,6 +30,12 @@ import {
 	localStorage_setItem,
 } from '../etc/helpers.js';
 import {
+	locale_ask_world_delete_1,
+	locale_ask_world_delete_2,
+	locale_change_world_name,
+	locale_delete,
+	locale_delete_local,
+	locale_delete_world,
 	locale_download_world_from_server,
 	locale_download,
 	locale_error_conflict_1,
@@ -37,10 +43,13 @@ import {
 	locale_error_conflict_3,
 	locale_error_conflict_4,
 	locale_error_connection,
+	locale_error_delete_world,
 	locale_error_download_world,
+	locale_error_edit_world,
 	locale_error_list_is_loading,
 	locale_error_loading_worldlist,
 	locale_error_name_too_long,
+	locale_error_no_permission,
 	locale_error_no_permission_logged_in,
 	locale_error_no_world_selected,
 	locale_error_not_logged_in,
@@ -49,24 +58,35 @@ import {
 	locale_error_world_is_loading,
 	locale_error_world_is_present_both_sides,
 	locale_error_world_not_downloaded,
+	locale_error_world_not_uploaded,
 	locale_join_selected_world,
 	locale_login,
+	locale_modification,
+	locale_name_existing_world,
 	locale_name_new_world,
 	locale_new_world,
+	locale_no,
 	locale_only_local,
 	locale_open,
+	locale_owner,
 	locale_project_page,
+	locale_public,
+	locale_publish_world,
 	locale_refresh,
 	locale_reload_list,
+	locale_rename,
+	locale_show_world_settings,
 	locale_transfer,
+	locale_unpublish_world,
 	locale_upload_world_to_server,
 	locale_upload,
-	locale_user_colon,
 	locale_version_1,
 	locale_version_2,
 	locale_warn_world_remote_missing_1,
 	locale_warn_world_remote_missing_2,
+	locale_world_etc,
 	locale_worlds,
+	locale_yes,
 } from '../etc/locale.js';
 
 function WorldItem({
@@ -97,7 +117,11 @@ function WorldItem({
 		)
 		:	'_'
 	}${
-		I.remote ? 'R' : '_'
+		!I.remote
+		?	'_'
+		: I.public
+		?	'R'
+		:	'r'
 	}`;
 	if (world_busy_id === I.id) {
 		flags = `[${flags}]`;
@@ -106,10 +130,14 @@ function WorldItem({
 	return [
 		node_dom('span', {
 			innerText: `${flags} ${I.label}`,
-			title: I.account_name ? locale_user_colon + I.account_name : locale_only_local,
+			title: (
+				I.account_name
+				?	locale_owner + ': ' + I.account_name
+				:	locale_only_local
+			),
 		}),
 		node_dom('span', {
-			innerText: datify(Math.max(I.local, I.remote)),
+			innerText: datify(Math.max(I.local, I.remote), true),
 		}),
 	];
 }
@@ -182,6 +210,7 @@ export default function MenuStart({
 					id: world.id,
 					label: world.label,
 					local: 0,
+					public: world.public,
 					remote: world.modified,
 					writable: world.writable,
 				}))
@@ -203,8 +232,8 @@ export default function MenuStart({
 						locale_error_conflict_1 +
 						world_local.label +
 						locale_error_conflict_2 +
-						datify(last_change_there) + locale_error_conflict_3 +
-						datify(last_change_here) +
+						datify(last_change_there, false) + locale_error_conflict_3 +
+						datify(last_change_here, false) +
 						locale_error_conflict_4
 					)) {
 						actions.world_prop(world_local.id, {
@@ -240,6 +269,7 @@ export default function MenuStart({
 					id: world_local.id,
 					label: world_local.label,
 					local: world_local.mod_l,
+					public: false,
 					remote: world_local.mod_r === 1 ? 1 : 0,
 					writable: true,
 				});
@@ -420,6 +450,10 @@ export default function MenuStart({
 		};
 	}, [world_busy_id]);
 
+	const [menu_opened, menu_opened_set] = hook_state(false);
+	if (!world_selected) menu_opened_set(false);
+	const [busy, busy_set] = hook_state(false);
+
 	return [
 		node_dom(`h1[innerText=${locale_worlds}]`),
 		node_dom(`button[innerText=${locale_refresh}][style=position:absolute;left:0;top:0;height:2rem][title=${locale_reload_list}]`, {
@@ -466,47 +500,18 @@ export default function MenuStart({
 					:	locale_join_selected_world
 				),
 			}),
-			node_dom('button', {
+			node_dom(`button[innerText=${locale_world_etc}]`, {
 				disabled: (
-					!world_list_remote ||
 					!world_selected ||
-					world_selected.local > 0 && world_selected.remote > 0 ||
-					!world_selected.remote && !account.rank
-				),
-				innerText: (
-					world_selected && !world_selected.local
-					?	locale_download
-					: world_list_remote && world_selected && !world_selected.remote
-					?	locale_upload
-					:	locale_transfer
+					menu_opened
 				),
 				onclick: () => {
-					if (!world_selected.local) {
-						actions.world_add({
-							id: world_selected.id,
-							label: world_selected.label,
-							mod_l: 1,
-							mod_r: world_selected.remote,
-						});
-					}
-					else if (!world_selected.remote) {
-						actions.world_prop(world_selected.id, {
-							mod_r: 1,
-						});
-					}
+					menu_opened_set(true);
 				},
 				title: (
-					!world_list_remote
-					?	locale_error_list_is_loading
-					: !world_selected
-					?	locale_error_no_world_selected
-					: !world_selected.local
-					?	locale_download_world_from_server
-					: world_selected.remote
-					?	locale_error_world_is_present_both_sides
-					: account.rank
-					?	locale_upload_world_to_server
-					:	locale_error_not_logged_in
+					world_selected
+					?	locale_show_world_settings
+					:	locale_error_no_world_selected
 				),
 			}),
 		]),
@@ -536,6 +541,242 @@ export default function MenuStart({
 		]),
 		node_dom('center', null, [
 			node_dom(`small[innerText=${locale_version_1 + VERSION + locale_version_2}]`),
+		]),
+		menu_opened &&
+		world_selected &&
+		node_dom('div', {
+			F: {
+				'menu overlay advanced': true,
+				busy,
+			},
+			onclick: event => {
+				if (event.target.className === 'menu overlay advanced') {
+					menu_opened_set(false);
+				}
+			},
+		}, [
+			node_dom('div[className=window]', null, [
+				node_dom('h2', {
+					innerText: '"' + world_selected.label +'"',
+				}),
+				node_dom('table', null, [
+					!!world_selected.account_name &&
+					node_dom('tr', null, [
+						node_dom(`td[innerText=${locale_owner}:]`),
+						node_dom('td', {
+							innerText: world_selected.account_name,
+						}),
+					]),
+					node_dom('tr', null, [
+						node_dom(`td[innerText=${locale_modification}:]`),
+						node_dom('td', {
+							innerText: datify(Math.max(
+								world_selected.local,
+								world_selected.remote
+							), false),
+						}),
+					]),
+				]),
+				node_dom('center', null, [
+					node_dom(`button[innerText=${locale_rename}]`, {
+						disabled: (
+							busy ||
+							!world_selected.writable
+						),
+						onclick: () => {
+							const name = prompt(locale_name_existing_world, world_selected.label);
+							if (
+								!name ||
+								name === world_selected.label ||
+								name.length > 16
+							) return;
+							if (world_selected.local) {
+								actions.world_prop(world_selected.id, {
+									label: name,
+								});
+							}
+							if (world_selected.remote) {
+								busy_set(true);
+								fetch(API + 'world', {
+									method: 'POST',
+									headers: {'Content-Type': 'application/json'},
+									body: JSON_stringify({
+										what: 'meta',
+										world: world_selected.id,
+										label: name,
+									}),
+								})
+								.then(response => {
+									if (!response.ok) throw new Error(
+										response.status === 403
+										?	locale_error_no_permission_logged_in
+										:	locale_error_connection
+									);
+									return response.json();
+								})
+								.catch(error => {
+									alert(locale_error_edit_world + error.message);
+								})
+								.then(() => {
+									busy_set(false);
+								});
+							}
+						},
+						title: (
+							world_selected.writable
+							?	locale_change_world_name
+							:	locale_error_no_permission
+						),
+					}),
+					node_dom('button', {
+						disabled: (
+							busy ||
+							!world_selected.local &&
+							!world_selected.writable
+						),
+						innerText: (
+							world_selected.local
+							?	locale_delete_local
+							:	locale_delete
+						),
+						onclick: () => {
+							if (!confirm(
+								locale_ask_world_delete_1 + world_selected.label + locale_ask_world_delete_2
+							)) return;
+							if (world_selected.local) {
+								actions.world_remove(world_selected.id);
+							}
+							else {
+								busy_set(true);
+								fetch(API + 'world', {
+									method: 'DELETE',
+									headers: {'Content-Type': 'application/json'},
+									body: JSON_stringify({
+										what: 'world',
+										world: world_selected.id,
+									}),
+								})
+								.then(response => {
+									if (!response.ok) throw new Error(
+										response.status === 403
+										?	locale_error_no_permission_logged_in
+										:	locale_error_connection
+									);
+									defer();
+									world_selected_id_set(null);
+									menu_opened_set(false);
+									refresh();
+									busy_set(false);
+									defer_end();
+									return response.json();
+								})
+								.catch(error => {
+									alert(locale_error_delete_world + error.message);
+									busy_set(false);
+								});
+							}
+						},
+						title: (
+							!world_selected.local &&
+							!world_selected.writable
+							?	locale_error_no_permission
+							:	locale_delete_world
+						),
+					}),
+				]),
+				node_dom('center', null, [
+					node_dom('button', {
+						disabled: (
+							busy ||
+							!world_selected.remote ||
+							!world_selected.writable
+						),
+						innerText: `${locale_public}: ${
+							world_selected.public
+							?	locale_yes
+							:	locale_no
+						}`,
+						onclick: () => {
+							busy_set(true);
+							fetch(API + 'world', {
+								method: 'POST',
+								headers: {'Content-Type': 'application/json'},
+								body: JSON_stringify({
+									what: 'meta',
+									world: world_selected.id,
+									public: !world_selected.public,
+								}),
+							})
+							.then(response => {
+								if (!response.ok) throw new Error(
+									response.status === 403
+									?	locale_error_no_permission_logged_in
+									:	locale_error_connection
+								);
+								defer();
+								refresh();
+								busy_set(false);
+								defer_end();
+								return response.json();
+							})
+							.catch(error => {
+								alert(locale_error_edit_world + error.message);
+								busy_set(false);
+							});
+						},
+						title: (
+							!world_selected.remote
+							?	locale_error_world_not_uploaded
+							: !world_selected.writable
+							?	locale_error_no_permission
+							: world_selected.public
+							?	locale_unpublish_world
+							:	locale_publish_world
+						),
+					}),
+					node_dom('button', {
+						disabled: (
+							busy ||
+							!world_list_remote ||
+							world_selected.local > 0 && world_selected.remote > 0 ||
+							!world_selected.remote && !account.rank
+						),
+						innerText: (
+							!world_selected.local
+							?	locale_download
+							: world_list_remote && world_selected && !world_selected.remote
+							?	locale_upload
+							:	locale_transfer
+						),
+						onclick: () => {
+							if (!world_selected.local) {
+								actions.world_add({
+									id: world_selected.id,
+									label: world_selected.label,
+									mod_l: 1,
+									mod_r: world_selected.remote,
+								});
+							}
+							else if (!world_selected.remote) {
+								actions.world_prop(world_selected.id, {
+									mod_r: 1,
+								});
+							}
+						},
+						title: (
+							!world_list_remote
+							?	locale_error_list_is_loading
+							: !world_selected.local
+							?	locale_download_world_from_server
+							: world_selected.remote
+							?	locale_error_world_is_present_both_sides
+							: account.rank
+							?	locale_upload_world_to_server
+							:	locale_error_not_logged_in
+						),
+					}),
+				]),
+			]),
 		]),
 	];
 }

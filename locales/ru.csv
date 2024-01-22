@@ -1,8 +1,14 @@
 amount: Число
+ask_world_delete_1: Мир "
+ask_world_delete_2: " реално удалить?
 back_to_game: Назад к игре
+change_world_name: Изменит имя миру
 chunk_regenerated: Чанки перезагружаютца.
 chunks_loaded: Чанки загружаютца.
 commands: Команда
+delete_local: Удалить (локал)
+delete_world: Удалить мир
+delete: Удалить
 download_world_from_server: Загрузит мир из сервера 
 download: Скачать
 error_amount_minimum_1: Число должно быт минимумь 1!
@@ -11,24 +17,28 @@ error_conflict_2: " было изменено как здесь, так и в д
 error_conflict_3: ) | Отменит: Вот это hochladen (
 error_conflict_4: )
 error_connection: Ошибка поключения.
-error_download_world: Ошыбка при загруске мира: 
+error_delete_world: Ошибка при удаления мира: 
+error_download_world: Ошибка при загруске мира: 
+error_edit_world: Ошибка при изменения мира: 
 error_gamemode_range: Игровой режим должен быт  in 0..2!
 error_invalid_block_type: Неверный тип блока!
 error_inventory_full: Инвентар полный!
 error_list_is_loading: Список еще загружаетца!
-error_loading_worldlist: Ошыбка при загруске списка миров: 
+error_loading_worldlist: Ошибка при загруске списка миров: 
 error_name_too_long: Имя слишком долгое!
 error_no_permission_logged_in: Нету разрешения. Зарегестрирован?
+error_no_permission: Нету авторизации!
 error_no_world_selected: Мир был не выбрань!
 error_not_logged_in: Не зарегестрирован!
 error_only_vert_supported: Толко "vert" подержуваетца!
 error_pitch: Неповезло!
 error_selection_required: Выберите сначяло!
 error_storage: Нехватает памяти!
-error_upload_world: Ошыбка при загруске мира: 
+error_upload_world: Ошибка при загруске мира: 
 error_world_is_loading: Мир еще загружаетса!
 error_world_is_present_both_sides: Мир уже есть на двух страниц!
 error_world_not_downloaded: Мир еще не скачень!
+error_world_not_uploaded: Мир не загружен!
 game_saved: Игра сохранена.
 gamemode_set_to: Игровой режим сменен на
 inventory_cleared: Инвентар пусть
@@ -37,17 +47,24 @@ item_labels: Воздух,Камень,Блок травы,Земля,Булыж
 items_given: Вещи даны
 join_selected_world: Зайти на выбраный сервер
 login: Зарегестрироватся
+modification: Изменения
 mouse_mode_normal: Классический режим мыщы.
 mouse_mode_selection: Выборь с мыщы.
 mouse_sensitivity: Чуствителност мыщы.
+name_existing_world: Новое имя мира:\n(макс. 16 символов)
 name_new_world: Имя нового Мира:\n(макс. 16 симболов)
 new_world: Новый мир
+no: Нет
 only_local: Толко локалный мир
 open: Открыт
+owner: Владелец
 player: Игрок
 project_page: Сайт проекта
+public: Публичный
+publish_world: Опубликоват мир
 refresh: Обновит
 reload_list: Обновит список
+rename: Переименовать
 resolution: Качество
 selection_expanded: Выборь увеличен.
 selection_none: ничего
@@ -56,24 +73,28 @@ selection_primary: Первая выбраная точка
 selection_secondary_short: Второй
 selection_secondary: Вторая выбраная точка
 settings: Настроики
+show_world_settings: Акции/Показать настройки мира
 spawn_updated: Началная точка обновлена
 surfaces_colored: Одноцветный
 surfaces_textured: С текстурами
 surfaces: Поверхность
 teleported_to_spawn: Переместитца к стартовой точки
 teleported_to: Перенестица к
+today: сегодня
 transfer: Перенести
 unknown_command: Неправилная Команда
-unknown_world: Неизвестный Мир
 unknown_world_found: Был найден безмяный локалный мир. Как его назвать?
+unknown_world: Неизвестный м
+unpublish_world: Заприватит мир
 upload_world_to_server: Загрузит мир на сервер
 upload: Загрузит
-user_colon: Ползовател: 
 version_1: Версия
 version_2:  от L3P3
 view_angle: Радиус зрения
 view_distance: Далность зрения
 warn_world_remote_missing_1: Мир "
 warn_world_remote_missing_2: " был на сервере не найдень, поэтому он теперь локалный!
-world_leave: Покинут Мир
+world_etc: Мир...
+world_leave: Покинут мир
 worlds: Миры
+yes: Да

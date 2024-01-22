@@ -23,7 +23,8 @@ div {
 	box-sizing: border-box;
 }
 button {
-	font-family: inherit;
+	cursor: unset;
+	font-family: unset;
 }
 
 .game {
@@ -46,7 +47,6 @@ button {
 .game > .bar {
 	position: absolute;
 	width: 22.5rem;
-	max-width: 100%;
 	left: 50%;
 	margin-left: -11.25rem;
 	bottom: 0;
@@ -58,6 +58,7 @@ button {
 	.game > .bar {
 		left: 0;
 		margin-left: 0;
+		width: 100%;
 	}
 }
 .game > .bar > * {
@@ -216,25 +217,31 @@ button {
 	transform: rotate(45deg);
 }
 
-.game > .menu {
+.game .menu {
 	position: absolute;
 	width: 100%;
 	height: 100%;
 }
-.game > .menu.overlay {
+.game .menu.busy {
+	cursor: wait;
+}
+.game .menu.overlay {
+	left: 0;
+	top: 0;
 	background: rgba(0, 0, 0, .7);
 }
-.game > .menu > h1 {
+.game .menu h1 {
 	text-align: center;
 }
-.game > .menu > center {
+.game .menu > center {
 	margin: 1rem 0;
 }
-.game > .menu > center button {
+.game .menu center button {
 	width: 12rem;
+	max-width: calc(50vw - 1rem);
 	height: 3rem;
 }
-.game > .menu > .worlds {
+.game .menu > .worlds {
 	width: 100%;
 	max-width: 30rem;
 	margin: 1rem auto;
@@ -242,32 +249,32 @@ button {
 	overflow-y: scroll;
 	touch-action: pan-y;
 }
-.game > .menu > .worlds > * {
+.game .menu > .worlds > * {
 	cursor: pointer;
 	padding: .2rem .5rem;
 }
-.game > .menu > .worlds > :nth-child(odd) {
+.game .menu > .worlds > :nth-child(odd) {
 	background: #222;
 }
-.game > .menu > .worlds > .selected {
+.game .menu > .worlds > .selected {
 	background: green;
 }
-.game > .menu > .worlds > * > :last-child {
+.game .menu > .worlds > * > :last-child {
 	float: right;
 }
-.game > .menu > .settings {
+.game .menu > .settings {
 	margin: 1rem;
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
 	grid-template-rows: 3rem;
 	gap: 1rem;
 }
-.game > .menu.inventory {
+.game .menu.inventory, .game .menu.advanced {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 }
-.game > .menu.inventory > .window {
+.game .menu > .window {
 	border-radius: .5rem;
 	background: #ccc;
 	display: flex;
@@ -276,21 +283,25 @@ button {
 	gap: .5rem;
 	color: #333;
 }
-.game > .menu.inventory > .window > .grid {
+.game .menu > .window > h2 {
+	margin: 0;
+	font-size: unset;
+}
+.game .menu.inventory > .window > .grid {
 	display: grid;
 	grid-template-columns: repeat(9, 2rem);
 	gap: .25rem;
 }
-.game > .menu.inventory > .window > .grid > * {
+.game .menu.inventory > .window > .grid > * {
 	width: 2rem;
 	height: 2rem;
 	background: #aaa;
 }
-.game > .menu.inventory > .window > .grid > .first {
+.game .menu.inventory > .window > .grid > .first {
 	grid-row-start: 4;
 	background: #999;
 }
-.game > .menu.inventory > .hand {
+.game .menu.inventory > .hand {
 	position: absolute;
 	left: 0;
 	top: 0;
@@ -335,8 +346,9 @@ button {
 .game > .terminal > input {
 	border: none;
 	background: black;
-	color: inherit;
-	font: inherit;
+	color: unset;
+	font: unset;
+	padding: 4px;
 }
 .game > .messages {
 	position: absolute;
