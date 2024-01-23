@@ -1,23 +1,23 @@
 amount: Номер
 ask_world_delete_1: Світ "
 ask_world_delete_2: " дійсно видалити?
-back_to_game: Повернуться в игру
-change_world_name: Змінити имя світу
-chunk_regenerated: Участки відновлени.
+back_to_game: Повернуться в гру
+change_world_name: Змінити ім'я світу
+chunk_regenerated: Участки відновлені.
 chunks_loaded: Участки будуть завантаженні.
 commands: Укази 
 delete_local: видалити (локальні)
 delete_world: Видалити світ 
 delete: видалити 
-download_world_from_server: Завантажити світ з сервера
+download_world_from_server: Завантажити світ з серверу
 download: Завантажити
 error_amount_minimum_1: Номер повинен бути як мінімум 1!
 error_conflict_1: Конфлікт! Світ "
-error_conflict_2: " Було змінено як тут, так і в інших місцях.\nOK: прийняти ті з сервера (
+error_conflict_2: " Було змінено як тут, так і в інших місцях.\nOK: прийняти з сервера (
 error_conflict_3: ) | Скасувати: Завантажте це сюди (
 error_conflict_4: )
-error_connection: Ошибка поключения
-error_delete_world: Помилка при видалення світу: 
+error_connection: Помилка підключения
+error_delete_world: Помилка при видаленні світу: 
 error_download_world: Помилка завантаження світу: 
 error_edit_world: Помилка редагування світу: 
 error_gamemode_range: Ігровий режим повинен бути 0..2!
@@ -38,19 +38,19 @@ error_upload_world: Помилка завантаження світу:
 error_world_is_loading: Світ ще завантажується!
 error_world_is_present_both_sides: Світ уже існує на сайті!
 error_world_not_downloaded: Світ ще не завантажений!
-error_world_not_uploaded: Світ ще ни завантажень!
-game_saved: Игра сохранена.
-gamemode_set_to: Ігровий режим встановлен на
+error_world_not_uploaded: Світ не завантажений!
+game_saved: Гра збережена.
+gamemode_set_to: Ігровий режим встановлений на
 inventory_cleared: Інвентар теперь порожній
 inventory: Інвентар
-item_labels: Повітря,Камінь,Блок трави,Земля,Бутовий камінь,Дошка,Корінна порода,Колода,Лістя,Кирпичи,Шерсть,Песок,Гравій,Стекло,Bücherregal,Обсидіан,Камені кирпич,Пісковик,Блок лазуриту,Залізний блок,Золотий блок,Алмазний блок,Смарагдовий блок,Редстоун блок,Кварцові блок
-items_given: Дані предмети
+item_labels: Повітря,Камінь,Блок трави,Земля,Бутовий камінь,Дошка,Корінна порода,Колода,Листья,Кирпичи,Шерсть,Пісок,Гравій,Стекло,Книжна шафа,Обсидіан,Каменний кирпич,Пісковик,Блок лазуриту,Залізний блок,Золотий блок,Алмазний блок,Смарагдовий блок,Редстоун блок,Кварцовий блок
+items_given: Данні предмети
 join_selected_world: Ввійти у вибраний світ 
 login: Зареєструватися
 modification: Зміни
-mouse_mode_normal: Звичайний режим миші.
-mouse_mode_selection: Виділення кнопками миші.
-mouse_sensitivity: Чутливість миші
+mouse_mode_normal: Звичайний режим компьютерної мишки.
+mouse_mode_selection: Виділення кнопками компьютерної мишки.
+mouse_sensitivity: Чутливість компьютерної мишки
 name_existing_world: Нове имя світу:\n(макс. 16 символів)
 name_new_world: Имя новому світу:\n(макс. 16 Символів)
 new_world: Новий світ
@@ -58,7 +58,7 @@ no: Ні
 only_local: Тільки локальні світ.
 open: Відчинити
 owner: Власник
-player: Игрок
+player: Грок
 project_page: Сторінка проекту
 public: Публічно 
 publish_world: Зробіть світ публічним
@@ -66,26 +66,26 @@ refresh: Оновити
 reload_list: Оновити список
 rename: Перейменувати
 resolution: Дозвіл
-selection_expanded: Вибір розширен.
+selection_expanded: Вибір розширився.
 selection_none: нічого 
 selection_primary_short: Перший
-selection_primary: Перша точка вибору
+selection_primary: Перша крапка вибору
 selection_secondary_short: Другий
-selection_secondary: Друга точка вибору
+selection_secondary: Друга крапка вибору
 settings: Налаштування
-show_world_settings: Акції/Показати Налаштування Світу.
-spawn_updated: Початкова точка оновлена.
+show_world_settings: Акції/Показати налаштування світу.
+spawn_updated: Початкова крапка оновлена.
 surfaces_colored: Однотонні 
 surfaces_textured: Текстурований
-surfaces: Поверхности
-teleported_to_spawn: Перемістился до початкової точки.
-teleported_to: Переміститися к
-today: сегодня
-transfer: Перемістит 
+surfaces: Поверхности 
+teleported_to_spawn: Перемістився до початкової.
+teleported_to: Переміститися до
+today: сегодня 
+transfer: Перемістити 
 unknown_command: Недійсна команда 
-unknown_world_found: Бул знайден безіменний локальний світ. Як ії назвати?
+unknown_world_found: Був знайден без назви локальний світ. Як його назвати?
 unknown_world: Недійсни світ
-unpublish_world: Зробіть світ приватним
+unpublish_world: Зробіть світ приватний 
 upload_world_to_server: Завантажити світ на сервер
 upload: Завантажити
 version_1: Версія 
@@ -93,7 +93,7 @@ version_2:  от L3P3
 view_angle: Точка огляду
 view_distance: Видимість
 warn_world_remote_missing_1: Світ "
-warn_world_remote_missing_2: " був не знайден на сервере, тому він тепер локальний!
+warn_world_remote_missing_2: " був не знайден на сервері, тому він тепер локальний!
 world_etc: Світ...
 world_leave: Покинуті світ
 worlds: Світі
