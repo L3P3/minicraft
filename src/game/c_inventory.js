@@ -143,7 +143,7 @@ export default function Inventory({
 
 	return tiles_data && [
 		node_dom('div[className=window]', null, [
-			node_dom(`div[innerText=${locale_inventory}]`),
+			node_dom(`h2[innerText=${locale_inventory}]`),
 			gamemode === GAMEMODE_CREATIVE &&
 			node(Palette, {
 				slot_hand,

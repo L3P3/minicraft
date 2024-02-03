@@ -338,3 +338,12 @@ var TYPE_RESPONSE_INITIAL;
 	}}
 */
 var TYPE_CSS_CLASSES;
+
+/**
+	@typedef {{
+		world: number,
+		coords: string,
+		data: string,
+	}}
+*/
+var TYPE_INDEXEDDB_CHUNK;

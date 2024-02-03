@@ -4,13 +4,38 @@ import {
 import {
 	JSON_parse,
 	JSON_stringify,
+	Object_keys,
+	localStorage_,
 	localStorage_getItem,
+	localStorage_removeItem,
 	localStorage_setItem,
 } from './helpers.js';
 import {
 	locale_unknown_world,
 	locale_unknown_world_found,
 } from './locale.js';
+
+let config_loaded = localStorage_getItem('minicraft.config');
+config_loaded = config_loaded && JSON_parse(config_loaded);
+
+// HACK remove deleted worlds' chunks (i am so sorry)
+if (
+	config_loaded &&
+	config_loaded['worlds'] &&
+	config_loaded['version'].startsWith('0.9.')
+) {
+	const prefixes_keep = new Set(
+		config_loaded['worlds']
+		.map(world => 'minicraft.world.' + world.id)
+	);
+	for (const key of Object_keys(localStorage_))
+	if (
+		key.startsWith('minicraft.world.') &&
+		!prefixes_keep.has(key.split(':')[0])
+	) {
+		localStorage_removeItem(key);
+	}
+}
 
 export const reducers = {
 	init: () => {
@@ -25,9 +50,7 @@ export const reducers = {
 			/** @type {!Array<TYPE_WORLD_LISTING_LOCAL>} */
 			worlds: [],
 		};
-		const config_raw = localStorage_getItem('minicraft.config');
-		if (config_raw) {
-			let config_loaded = JSON_parse(config_raw);
+		if (config_loaded) {
 			let tmp = config_loaded['flag_textures'];
 			if (tmp != null)
 				config.flag_textures = tmp;
@@ -44,8 +67,9 @@ export const reducers = {
 				config.world_last = tmp;
 			if ((
 				tmp = config_loaded['worlds']
-			) != null)
+			) != null) {
 				config.worlds = tmp;
+			}
 			else if (
 				localStorage_getItem('minicraft.world.0:meta')
 			) {
@@ -59,6 +83,7 @@ export const reducers = {
 				};
 				needs_save = true;
 			}
+			config_loaded = null;
 		}
 		const state = {
 			account: {

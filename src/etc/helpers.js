@@ -22,12 +22,14 @@ export const String_fromCharCode = String.fromCharCode;
 
 const Date_ = Date;
 const JSON_ = JSON;
+export const Promise_ = Promise;
 export const JSON_stringify = JSON_.stringify;
 export const JSON_parse = JSON_.parse;
 export const localStorage_ = localStorage;
 export const localStorage_getItem = key => localStorage_.getItem(key);
 export const localStorage_setItem = localStorage_.setItem.bind(localStorage_);
 export const localStorage_removeItem = localStorage_.removeItem.bind(localStorage_);
+export const indexedDB_ = window_.indexedDB;
 export const Uint8Array_ = Uint8Array;
 export const Uint32Array_ = Uint32Array;
 export const Map_ = Map;

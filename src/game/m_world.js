@@ -18,13 +18,13 @@ import {
 	JSON_parse,
 	JSON_stringify,
 	localStorage_getItem,
-	localStorage_removeItem,
 	localStorage_setItem,
 	Map_,
 	Math_floor,
 	Math_max,
 	Math_min,
 	number_square,
+	Promise_,
 	Uint32Array_,
 	Uint8Array_,
 } from '../etc/helpers.js';
@@ -32,6 +32,11 @@ import {
 	compress,
 	decompress,
 } from '../etc/lz.js';
+import {
+	chunk_delete,
+	chunk_get,
+	chunk_set,
+} from '../etc/storage.js';
 
 import {
 	stack_create,
@@ -48,6 +53,8 @@ export const world_create = id => ({
 	// uint8[]
 	blocks: null,
 	blocks_u32: null,
+	// currently saving a chunk
+	busy: false,
 	// all chunk metadata currently in superchunk
 	chunks: null,
 	// {chunk metadata index, offset x, offset z}, sorted by loading order
@@ -214,7 +221,7 @@ const world_offset_update = (model, player, force) => {
 		);
 		world_chunk_load_setup(model);
 	}
-	world_chunk_load(model, false);
+	if (!model.busy) world_chunk_load(model, false);
 }
 
 const world_chunk_load_setup = model => {
@@ -285,11 +292,6 @@ const world_chunk_load_setup = model => {
 }
 
 export const world_save = (model, player) => {
-	for (const chunk of model.chunks)
-	if (chunk.dirty) {
-		world_chunk_save(model, chunk);
-	}
-
 	const i = player.inventory.map(({content}) =>
 		content && [
 			content.id,
@@ -324,6 +326,12 @@ export const world_save = (model, player) => {
 			],
 			v: WORLD_FORMAT,
 		}))
+	);
+
+	return Promise_.all(
+		model.chunks
+		.filter(chunk => chunk.dirty)
+		.map(chunk => world_chunk_save(model, chunk))
 	);
 }
 
@@ -363,30 +371,32 @@ export const world_load = (model, player) => {
 	}
 }
 
-const world_chunk_key = (model, x_abs, z_abs, y) => (
-	// console.log('chunk', chunk.x_abs, chunk.z_abs, chunk.y),
-	`minicraft.world.${model.id}:${x_abs}/${z_abs}` + (
+const world_chunk_key = (x_abs, z_abs, y) => (
+	`${x_abs}/${z_abs}` + (
 		y > 0
 		?	'/' + y
 		:	''
 	)
 );
 
-export const world_chunk_reset = model => {
+export const world_chunk_reset = async model => {
 	const chunk = model.chunks[
 		model.chunks_checklist[
 			model.chunks_checklist_index = 0
 		].chunks_index
 	];
-	localStorage_removeItem(
+	await chunk_delete(
+		model.id,
 		world_chunk_key(
-			model,
-			chunk.x_abs, chunk.z_abs, chunk.y
+			chunk.x_abs,
+			chunk.z_abs,
+			chunk.y
 		)
 	);
 	chunk.dirty = false;
+	// force reload
 	++chunk.x_abs;
-	world_chunk_load(model, false);
+	return world_chunk_load(model, false);
 }
 
 const world_chunk_save = (model, chunk) => {
@@ -423,17 +433,19 @@ const world_chunk_save = (model, chunk) => {
 	}
 
 	// console.log('chunk_save', chunk.x_abs, chunk.z_abs);
-	localStorage_setItem(
+	chunk.dirty = false;
+	return chunk_set(
+		model.id,
 		world_chunk_key(
-			model,
-			chunk.x_abs, chunk.z_abs, y
+			chunk.x_abs,
+			chunk.z_abs,
+			y
 		),
 		compress(chunk_data_tmp_u8)
 	);
-	chunk.dirty = false;
 }
 
-export const world_chunk_load = (model, all) => {
+export const world_chunk_load = async (model, all) => {
 	const {
 		chunks,
 		chunks_checklist,
@@ -455,13 +467,13 @@ export const world_chunk_load = (model, all) => {
 			x_abs !== chunk.x_abs ||
 			z_abs !== chunk.z_abs
 		) {
-			if (chunk.dirty) world_chunk_save(model, chunk);
 			// console.log('chunk_load', x_abs, z_abs);
-			chunk.loaded = true;
+			chunk.loaded = model.busy = true;
+			const save_promise = chunk.dirty && world_chunk_save(model, chunk);
 			const chunk_stored = decompress(
-				localStorage_getItem(
+				await chunk_get(
+					model.id,
 					world_chunk_key(
-						model,
 						chunk.x_abs = x_abs,
 						chunk.z_abs = z_abs,
 						y
@@ -469,6 +481,8 @@ export const world_chunk_load = (model, all) => {
 				),
 				chunk_data_tmp_u8
 			);
+			await save_promise;
+			model.busy = false;
 			if (
 				loaded ||
 				y === 0 ||

@@ -21,13 +21,8 @@ import {
 } from '../etc/env.js';
 import {
 	JSON_stringify,
-	Object_entries,
-	Object_keys,
+	Promise_,
 	datify,
-	localStorage_,
-	localStorage_getItem,
-	localStorage_removeItem,
-	localStorage_setItem,
 } from '../etc/helpers.js';
 import {
 	locale_ask_world_delete_1,
@@ -88,6 +83,12 @@ import {
 	locale_worlds,
 	locale_yes,
 } from '../etc/locale.js';
+import {
+	chunks_delete,
+	chunks_get,
+	chunks_rename,
+	chunks_set,
+} from '../etc/storage.js';
 
 function WorldItem({
 	I,
@@ -310,28 +311,22 @@ export default function MenuStart({
 			.then(response => response.json())
 			.then(json => {
 				if (cancelled) return;
-				for (const [key, value] of Object_entries(json)) {
-					localStorage_setItem(prefix + key, value);
-				}
-				// assert margin for metadata
-				localStorage_setItem('__margin', new Array(4097).join('x'));
-				localStorage_removeItem('__margin');
-				// when everything went fine
-				actions.world_prop(world_busy_id, {
-					mod_l: world_busy.remote,
-					mod_r: world_busy.remote,
-				});
+				return (
+					chunks_set(world_busy_id, json)
+					.then(() => {
+						actions.world_prop(world_busy_id, {
+							mod_l: world_busy.remote,
+							mod_r: world_busy.remote,
+						});
+					})
+				);
 			})
 			.catch(error => {
 				if (cancelled) return;
 				if (error.name === 'QuotaExceededError') {
 					alert(locale_error_storage);
-					for (const key of Object_keys(localStorage_)) {
-						if (key.startsWith(prefix)) {
-							localStorage_removeItem(key);
-						}
-					}
 					actions.world_remove(world_busy_id);
+					chunks_delete(world_busy_id);
 				}
 				else alert(locale_error_download_world + error.message);
 			});
@@ -368,16 +363,14 @@ export default function MenuStart({
 					.then(json => {
 						id_new = json.id;
 					})
-				:	Promise.resolve()
+				:	Promise_.resolve()
 			)
 			.then(() => {
 				if (cancelled) throw null;
-				const json = {};
-				for (const key of Object_keys(localStorage_)) {
-					if (key.startsWith(prefix)) {
-						json[key.substr(prefix_length)] = localStorage_getItem(key);
-					}
-				}
+				return chunks_get(world_busy_id);
+			})
+			.then(json => {
+				if (cancelled) throw null;
 				return fetch(API + 'world', {
 					method: 'POST',
 					headers: {'Content-Type': 'application/json'},
@@ -406,17 +399,7 @@ export default function MenuStart({
 				}
 				else {
 					// replace the id
-					const prefix_new = `minicraft.world.${id_new}:`;
-					for (const key of Object_keys(localStorage_)) {
-						if (key.startsWith(prefix)) {
-							const value = localStorage_getItem(key);
-							localStorage_removeItem(key);
-							localStorage_setItem(
-								prefix_new + key.substr(prefix_length),
-								value
-							);
-						}
-					}
+					chunks_rename(world_busy_id, id_new);
 					actions.world_remove(world_busy_id);
 					actions.world_add({
 						id: id_new,
@@ -558,6 +541,7 @@ export default function MenuStart({
 			node_dom('div[className=window]', null, [
 				node_dom('h2', {
 					innerText: '"' + world_selected.label +'"',
+					title: world_selected.id,
 				}),
 				node_dom('table', null, [
 					!!world_selected.account_name &&
@@ -645,6 +629,7 @@ export default function MenuStart({
 							)) return;
 							if (world_selected.local) {
 								actions.world_remove(world_selected.id);
+								chunks_delete(world_selected.id);
 							}
 							else {
 								busy_set(true);

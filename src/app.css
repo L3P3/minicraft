@@ -286,6 +286,7 @@ button {
 .game .menu > .window > h2 {
 	margin: 0;
 	font-size: unset;
+	color: #666;
 }
 .game .menu.inventory > .window > .grid {
 	display: grid;

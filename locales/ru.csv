@@ -51,7 +51,7 @@ modification: Изменения
 mouse_mode_normal: Классический режим компьютерной мышки.
 mouse_mode_selection: Выборь с компьютерной мышки.
 mouse_sensitivity: Чуствительность компьютерной мышки.
-e_existing_world: Новое имя мира:\n(макс. 16 символов)
+name_existing_world: Новое имя мира:\n(макс. 16 символов)
 name_new_world: Имя нового Мира:\n(макс. 16 симболов)
 new_world: Новый мир
 no: Нет
@@ -88,7 +88,7 @@ unknown_world: Неизвестный мир
 unpublish_world: Приватизировать мир
 upload_world_to_server: Загрузит мир на сервер
 upload: Загрузит
-version_1: Версия
+version_1: Версия 
 version_2:  от L3P3
 view_angle: Радиус зрения
 view_distance: Далность зрения

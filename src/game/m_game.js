@@ -703,9 +703,11 @@ export const game_message_send = (model, value) => {
 			game_message_print(model, locale_commands + ': clear, clearinv, gamemode, give, help, load, me, save, spawn, teleport, version');
 			break;
 		case 'load':
-			world_chunk_load(world, true);
-			model.renderer.flag_dirty = true;
-			game_message_print(model, locale_chunks_loaded, true);
+			world_chunk_load(world, true)
+			.then(() => {
+				model.renderer.flag_dirty = true;
+				game_message_print(model, locale_chunks_loaded, true);
+			});
 			break;
 		case 'me':
 			game_message_print(model, player.name + ' ' + args.join(' '), true);
@@ -782,9 +784,11 @@ export const game_message_send = (model, value) => {
 			);
 			break;
 		case '/regen':
-			world_chunk_reset(world);
-			game_message_print(model, locale_chunk_regenerated, true);
-			model.renderer.flag_dirty = true;
+			world_chunk_reset(world)
+			.then(() => {
+				model.renderer.flag_dirty = true;
+				game_message_print(model, locale_chunk_regenerated, true);
+			});
 			break;
 		case '/show':
 			game_message_print(
