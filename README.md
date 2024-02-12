@@ -41,25 +41,25 @@ Heavily inspired by and somewhat based on the work of [@xNotch](https://github.c
 - [x] higher world
 - [x] inventory
 - [x] gamemode
+- [x] multiple worlds
+- [x] download/upload worlds
 - [ ] world edit
-- [ ] styled ui
-- [ ] multiple worlds
+- [ ] multiplayer
+- [ ] sound
 - [ ] entity models
 - [ ] collision
+- [ ] good styled ui
 - [ ] good mobile view
-- [ ] download/upload worlds
-- [ ] multiplayer?
 - [ ] migrate to typescript?
 - [ ] support older browsers
-- [ ] multi-threading
 - [ ] time of day
 - [ ] sky elements
 - [ ] non-cubic blocks
 - [ ] visible entities
 - [ ] particles
+- [ ] multi-threading?
 - [ ] use gpu?
-- [ ] sound?
-- [ ] get a lawyer against Mojang?
+- [ ] get a lawyer?
 
 ## How to use while developing
 
@@ -76,7 +76,7 @@ To bundle the app, run `npm run build`. The result will be put into the `/dist` 
 - Browser + DevTools for testing and debugging
 - [code-server](https://github.com/cdr/code-server) for development on any device
 - [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) for developer preview
-- [lui](https://github.com/L3P3/lui) for DOM handling
+- [lui](https://github.com/L3P3/lui) for GUI
 - [Closure Compiler](https://github.com/google/closure-compiler) for packing JS
 - [cssnano](https://cssnano.co) for packing CSS
 - [GitHub Actions](https://github.com/features/actions) for automatic building
