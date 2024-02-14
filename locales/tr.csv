@@ -1,0 +1,100 @@
+amount: Miktar
+ask_world_delete_1: "
+ask_world_delete_2: " isimli dünya gerçekten silinsin mi?
+back_to_game: Oyuna geri dön
+change_world_name: Dünyayı değiştir
+chunk_regenerated: Parça yenilendi.
+chunks_loaded: Parçalar yüklendi.
+commands: Komutlar
+delete_local: Sil (yerel)
+delete_world: Dünyaylı sil
+delete: Sil
+download_world_from_server: Dünyayı sunucudan indir
+download: İndir
+error_amount_minimum_1: Miktar en az 1 olmalıdır!
+error_conflict_1: Çakışma! "
+error_conflict_2: " isimli dünya burada ve başka bir yerde değiştirildi.\nOK: Sunucudaki versiyonu al (
+error_conflict_3: ) | İptal: Yerel versiyonu sakla (
+error_conflict_4: )
+error_connection: Bağlantı hatası.
+error_delete_world: Dünyayı silerken hata oluştu: 
+error_download_world: Dünyayı indirirken hata oluştu: 
+error_edit_world: Dünyayı düzenlerken hata oluştu: 
+error_gamemode_range: Oyun modu 0..2 arasında olmalıdır!
+error_invalid_block_type: Geçersiz blok tipi!
+error_inventory_full: Envanter dolu!
+error_list_is_loading: Liste yükleniyor!
+error_loading_worldlist: Dünya listesini yüklemede hata oluştu: 
+error_name_too_long: İsim çok uzun!
+error_no_permission_logged_in: İzniniz yok. Giriş yaptınız mı?
+error_no_permission: İzniniz yok!
+error_no_world_selected: Hiçbir dünya seçilmedi!
+error_not_logged_in: Giriş yapılmamış!
+error_only_vert_supported: Sadece "vert" desteklenir!
+error_pitch: Kahretsin!
+error_selection_required: Seçim gerekli!
+error_storage: Yetersiz depolama alanı!
+error_upload_world: Dünyayı yüklerken hata oluştu: 
+error_world_is_loading: Dünya hala yükleniyor!
+error_world_is_present_both_sides: Dünya hem cihazınızda hem de sunucuda mevcut!
+error_world_not_downloaded: Dünya henüz indirilmedi!
+error_world_not_uploaded: Dünya henüz yüklenmedi!
+game_saved: Oyun kaydedildi.
+gamemode_set_to: Oyun modu ayarlandı: 
+inventory_cleared: Envanter temizlendi.
+inventory: Envanter
+item_labels: Hava,Taş,Çimen,Toprak,Parke Taşı,Kalas,Katman Kayası,Kütük,Yapraklar,Tuğlalar,Yün,Kum,Çakıl,Cam,Kitaplık,Obsidyen,Lapis Lazuli,Taş Tuğlalar,Kumtaşı,Lapis Lazuli Bloğu,Demir Blok,Altın Blok,Elmas Blok,Zümrüt Blok,Kızıltaş Blok,Kuvars Blok
+items_given: Verilen eşyalar: 
+join_selected_world: Seçili dünyaya katıl
+login: Giriş yap
+modification: Değiştirildi
+mouse_mode_normal: Normal fare modu.
+mouse_mode_selection: Fareyi kullanarak seçin.
+mouse_sensitivity: Fare hassasiyeti
+name_existing_world: Dünya\'nın yeni adı:\n(maks. 16 karakter)
+name_new_world: Yeni dünya'nın adı:\n(maks. 16 karakter)
+new_world: Yeni dünya
+no: Hayır
+only_local: Sadece yerel
+open: Aç
+owner: Sahip
+player: Oyuncu
+project_page: Proje sayfası
+public: Genel
+publish_world: Dünyayı yayınla
+refresh: Yenile
+reload_list: Listeyi yenile
+rename: Yeniden adlandır
+resolution: Çözünürlük
+selection_expanded: Seçimi genişlet
+selection_none: hiçbirini seçme
+selection_primary_short: Birinci
+selection_primary: Birinci seçim noktası
+selection_secondary_short: İkinci
+selection_secondary: İkince seçim noktası
+settings: Ayarlar
+show_world_settings: Dünya ayarlarını göster
+spawn_updated: Spawn güncellendi.
+surfaces_colored: Sade
+surfaces_textured: Dokulu
+surfaces: Yüzeyler
+teleported_to_spawn: Spawn'a ışınlandı.
+teleported_to: Şuraya ışınlandı: 
+today: bugün
+transfer: Transfer
+unknown_command: Bilinmeyen komut
+unknown_world_found: Bilinmeyen dünya bulundu. Nasıl adlandırılsın?
+unknown_world: Bilinmeyen dünya
+unpublish_world: Dünyayı yayından kaldır
+upload_world_to_server: Dünyayı sunucuya yükle
+upload: Yükle
+version_1: L3P3 tarafından 
+version_2:  sürümü
+view_angle: Görüş açısı
+view_distance: Görüş mesafesi
+warn_world_remote_missing_1: "
+warn_world_remote_missing_2: " isimli dünya sunucuda bulunamadı, bu yüzden artık yerel bir dünya.
+world_etc: Dünya...
+world_leave: Dünyadan ayrıl
+worlds: Dünyalar
+yes: Evet
