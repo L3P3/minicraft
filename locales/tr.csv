@@ -52,7 +52,7 @@ mouse_mode_normal: Normal fare modu.
 mouse_mode_selection: Fareyi kullanarak seçin.
 mouse_sensitivity: Fare hassasiyeti
 name_existing_world: Dünya\'nın yeni adı:\n(maks. 16 karakter)
-name_new_world: Yeni dünya'nın adı:\n(maks. 16 karakter)
+name_new_world: Yeni dünya\'nın adı:\n(maks. 16 karakter)
 new_world: Yeni dünya
 no: Hayır
 only_local: Sadece yerel
@@ -78,7 +78,7 @@ spawn_updated: Spawn güncellendi.
 surfaces_colored: Sade
 surfaces_textured: Dokulu
 surfaces: Yüzeyler
-teleported_to_spawn: Spawn'a ışınlandı.
+teleported_to_spawn: Spawn\'a ışınlandı.
 teleported_to: Şuraya ışınlandı: 
 today: bugün
 transfer: Transfer
