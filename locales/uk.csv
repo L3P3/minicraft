@@ -2,7 +2,7 @@ amount: Номер
 ask_world_delete_1: Світ "
 ask_world_delete_2: " дійсно видалити?
 back_to_game: Повернуться в гру
-change_world_name: Змінити ім'я світу
+change_world_name: Змінити ім\'я світу
 chunk_regenerated: Участки відновлені.
 chunks_loaded: Участки будуть завантаженні.
 commands: Укази 
