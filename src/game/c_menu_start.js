@@ -179,7 +179,7 @@ export default function MenuStart({
 					VERSION !== 'dev' &&
 					json_initial.version_latest !== VERSION
 				) {
-					location.reload();
+					location.reload(true);
 					return null;
 				}
 				defer();

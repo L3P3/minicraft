@@ -41,6 +41,8 @@ export const setTimeout_ = setTimeout;
 export const setInterval_ = setInterval;
 export const clearTimeout_ = clearTimeout;
 export const clearInterval_ = clearInterval;
+export const addEventListener_ = addEventListener;
+export const removeEventListener_ = removeEventListener;
 
 /**
 	@param {number} num

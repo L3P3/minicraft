@@ -7,15 +7,12 @@ import {
 } from '../etc/lui.js';
 
 import {
-	MENU_NONE,
-} from '../etc/constants.js';
-import {
 	setTimeout_,
 } from '../etc/helpers.js';
 
 import {
+	game_menu_close,
 	game_message_send,
-	game_mouse_catch,
 } from './m_game.js';
 
 const Message = ({
@@ -61,9 +58,7 @@ export default function Terminal({
 		hook_static(node_dom('div[className=toolbar]', null, [
 			node_dom('button[innerText=❌]', {
 				onclick: () => {
-					game.menu = MENU_NONE;
-					game.world.flag_paused = false;
-					game_mouse_catch(game);
+					game_menu_close(game);
 				},
 			}),
 		])),
@@ -85,8 +80,7 @@ export default function Terminal({
 					target.value = '';
 				}
 				else if (keyCode === 27) {
-					game.flag_paused = false;
-					game.menu = MENU_NONE;
+					game_menu_close(game);
 				}
 			},
 			R: element => {

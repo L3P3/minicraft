@@ -69,8 +69,8 @@ export const player_tick = (model, delay) => {
 
 	player_rotate(
 		model,
-		model.rotation_h * time_factor,
-		model.rotation_v * time_factor
+		model.rotation_h * time_factor * 1.5,
+		model.rotation_v * time_factor * 1.5
 	);
 
 	model.position_x += model.speed_x * time_factor;

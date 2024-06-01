@@ -9,7 +9,6 @@ import {
 	GAMEMODE_CREATIVE,
 	GAMEMODE_SURVIVAL,
 	ITEM_HANDLES,
-	MENU_NONE,
 	PLAYER_SLOTS,
 } from '../etc/constants.js';
 import {
@@ -21,7 +20,7 @@ import {
 } from '../etc/locale.js';
 
 import {
-	game_mouse_catch,
+	game_menu_close,
 } from './m_game.js';
 import {
 	tiles_data,
@@ -92,9 +91,7 @@ export default function Inventory({
 					slot_hand.content = null;
 				}
 				else {
-					game.menu = MENU_NONE;
-					game.world.flag_paused = false;
-					game_mouse_catch(game);
+					game_menu_close(game);
 				}
 			}
 			else{
@@ -117,8 +114,7 @@ export default function Inventory({
 		}) => {
 			if (target.className === 'menu overlay inventory') {
 				if (!slot_hand.content) {
-					game.menu = MENU_NONE;
-					game_mouse_catch(game);
+					game_menu_close(game);
 				}
 				else if (--slot_hand.content.amount <= 0) {
 					slot_hand.content = null;

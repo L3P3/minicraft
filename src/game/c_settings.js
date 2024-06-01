@@ -7,7 +7,6 @@ import {
 
 import {
 	APP_VIEW_WORLDS,
-	MENU_NONE,
 } from '../etc/constants.js';
 import {
 	locale_back_to_game,
@@ -23,7 +22,7 @@ import {
 } from '../etc/locale.js';
 
 import {
-	game_mouse_catch,
+	game_menu_close,
 	game_save,
 } from './m_game.js';
 
@@ -47,9 +46,7 @@ export default function Settings({
 		hook_static(node_dom('center', null, [
 			node_dom(`button[innerText=${locale_back_to_game}]`, {
 				onclick: () => {
-					game.menu = MENU_NONE;
-					game.world.flag_paused = false;
-					game_mouse_catch(game);
+					game_menu_close(game);
 				},
 			}),
 		])),

@@ -42,6 +42,7 @@ export const reducers = {
 		let needs_save = false;
 		const config = {
 			flag_textures: true,
+			flag_touch: false, // not saved
 			mouse_sensitivity: 3,
 			resolution_scaling: 4,
 			view_angle: 120,
@@ -52,19 +53,22 @@ export const reducers = {
 		};
 		if (config_loaded) {
 			let tmp = config_loaded['flag_textures'];
-			if (tmp != null)
+			if (tmp != null) {
 				config.flag_textures = tmp;
+			}
 			if ((
 				tmp = config_loaded['mouse_sensitivity']
-			) != null)
+			) != null) {
 				config.mouse_sensitivity = tmp;
+			}
 			config.resolution_scaling = config_loaded['resolution_scaling'];
 			config.view_angle = config_loaded['view_angle'];
 			config.view_distance = config_loaded['view_distance'];
 			if ((
 				tmp = config_loaded['world_last']
-			) != null)
+			) != null) {
 				config.world_last = tmp;
+			}
 			if ((
 				tmp = config_loaded['worlds']
 			) != null) {
@@ -136,6 +140,13 @@ export const reducers = {
 			...patch,
 		},
 	}),
+	config_touch_set: (state, flag_touch) => (
+		state.config.flag_touch === flag_touch
+		?	state
+		:	reducers.config_set(state, {
+				flag_touch,
+			})
+	),
 	world_add: (state, world) => ({
 		...state,
 		config: {

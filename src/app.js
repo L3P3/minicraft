@@ -14,10 +14,12 @@ import {
 	reducers,
 } from './etc/state.js';
 import {
-	Object_keys,
+	addEventListener_,
 	handler_noop,
 	localStorage_,
 	localStorage_removeItem,
+	Object_keys,
+	removeEventListener_,
 } from './etc/helpers.js';
 
 import {
@@ -32,6 +34,7 @@ lui_.init(() => {
 
 	const ref = hook_static({
 		game: null,
+		last_touch_event: 0,
 	});
 
 	hook_effect(() => {
@@ -58,9 +61,11 @@ lui_.init(() => {
 		onpageshow = onfocus = () => {
 			unloaded = false;
 		};
-		setInterval(() => {
-			actions.config_save();
-		}, 500);
+		setInterval(actions.config_save, 500);
+
+		addEventListener_('touchend', event => {
+			ref.last_touch_event = event.timeStamp;
+		}, true);
 	});
 
 	const handler_key = hook_static(event => {
@@ -69,7 +74,7 @@ lui_.init(() => {
 			!ref.game
 		) return true;
 
-		ref.game.flag_touch = false;
+		actions.config_touch_set(false);
 
 		game_key(
 			ref.game,
@@ -77,9 +82,30 @@ lui_.init(() => {
 			event.type === 'keydown'
 		);
 
-		event.preventDefault();
 		return false;
 	});
+	const handler_touch = hook_static(() => {
+		actions.config_touch_set(true);
+	});
+	const handler_mouse = hook_static(event => {
+		if (event.timeStamp - ref.last_touch_event > 999) {
+			actions.config_touch_set(false);
+		}
+	});
+
+	const {flag_touch} = state.config;
+	hook_effect(() => {
+		if (flag_touch) {
+			addEventListener_('mousedown', handler_mouse, true);
+			addEventListener_('mouseup', handler_mouse, true);
+			removeEventListener_('touchstart', handler_touch, true);
+		}
+		else {
+			removeEventListener_('mousedown', handler_mouse, true);
+			removeEventListener_('mouseup', handler_mouse, true);
+			addEventListener_('touchstart', handler_touch, true);
+		}
+	}, [flag_touch]);
 
 	return [{
 		onkeydown: handler_key,

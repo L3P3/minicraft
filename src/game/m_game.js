@@ -143,7 +143,6 @@ export const game_create = (actions, frame_element, config, account) => {
 		cursor_y: 0,
 		flag_diagnostics: DEBUG,
 		flag_hud: true,
-		flag_touch: DEBUG,
 		frame_element,
 		frame_last: 0,
 		keys_active: new Set,
@@ -227,10 +226,17 @@ export const game_view_distance_update = model => {
 		world_data_init(world, model.player, size_l2);
 }
 
+export const game_menu_close = model => {
+	model.menu = MENU_NONE;
+	model.world.flag_paused = false;
+	game_mouse_catch(model);
+}
+
 /**
 	@noinline
 */
 export const game_mouse_catch = async model => {
+	if (model.config.flag_touch) return;
 	try {
 		await model.frame_element.requestPointerLock();
 	}
@@ -522,9 +528,9 @@ export const game_key = (model, code, state) => {
 			break;
 		case 80: // P
 			if (model.world)
-				model.world.flag_paused = !model.world.flag_paused;
+				model.world.flag_paused = true;
 			break;
-		case 81: {// Q
+		case 81: { // Q
 			const slot = player.inventory[player.slot_index];
 			if (
 				keys_active.has(17) ||
@@ -554,10 +560,10 @@ export const game_key = (model, code, state) => {
 			break;
 		case 114: // F3
 			model.flag_diagnostics = !model.flag_diagnostics;
-			break;
 		case 116: // F5
-			if (DEBUG)
-				location.reload();
+		case 122: // F11
+		case 123: // F12
+			break;
 		default:
 			return false;
 		}

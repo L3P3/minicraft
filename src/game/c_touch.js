@@ -20,6 +20,9 @@ import {
 	KEY_ROTATE_UP,
 } from '../etc/constants.js';
 import {
+	Number_,
+	addEventListener_,
+	removeEventListener_,
 	touch_id_get,
 } from '../etc/helpers.js';
 
@@ -72,21 +75,21 @@ export default function Touch({
 		'div[className=touch]',
 		hook_static({
 			ontouchstart: event => {
-				event.preventDefault();
-				const code = Number(event.target.dataset.code);
+				let {code} = event.target.dataset;
 				if (
 					code != null &&
-					game_key(game, code, true)
+					game_key(game, code = Number_(code), true)
 				) {
 					const touch_id = touch_id_get(event);
 					const onend = event => {
 						if (touch_id_get(event) === touch_id) {
-							removeEventListener('touchend', onend);
+							removeEventListener_('touchend', onend);
 							game_key(game, code, false);
 						}
 					}
-					addEventListener('touchend', onend);
+					addEventListener_('touchend', onend);
 				}
+				return false;
 			}
 		})
 	);

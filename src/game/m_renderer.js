@@ -394,8 +394,9 @@ export const renderer_render = (model, now) => {
 			flag_hud &&
 			cursor_cross
 		) {
-			const cross_width_h = Math_ceil(
-				resolution_min * .05
+			const cross_width_h = Math_min(
+				Math_ceil(resolution_min * .05),
+				8
 			);
 			const cross_width = cross_width_h << 1;
 			canvas_context.fillRect(

@@ -61,23 +61,29 @@ export default function Game({
 		const handler_mousebutton = event => {
 			if (model.menu !== MENU_NONE) return true;
 
-			model.flag_touch = false;
-
-			if (document_.pointerLockElement === frame)
+			if (document_.pointerLockElement === frame) {
 				game_key(
 					model,
 					-1 - event.button,
 					event.type === 'mousedown'
 				);
-			else
+			}
+			else {
 				game_mouse_catch(model);
+			}
 
-			event.preventDefault();
 			return false;
 		};
-		const handler_mousemove = event => game_mouse_move(model, event);
+		const handler_mousemove = event => {
+			if (
+				model.menu !== MENU_NONE ||
+				document_.pointerLockElement === frame
+			) {
+				game_mouse_move(model, event);
+			}
+		};
 		const handler_mousewheel = event => {
-			model.flag_touch = false;
+			actions.config_touch_set(false);
 
 			if (
 				model.menu === MENU_NONE &&
@@ -90,15 +96,7 @@ export default function Game({
 					:	KEY_MOUSE_UP;
 				game_key(model, key, true);
 				game_key(model, key, false);
-				event.preventDefault();
-			}
-		};
-		const handler_touchstart = event => {
-			model.flag_touch = true;
-
-			if (model.menu === MENU_NONE) {
-				model.world.flag_paused = false;
-				event.preventDefault();
+				return false;
 			}
 		};
 
@@ -106,14 +104,12 @@ export default function Game({
 		frame.addEventListener('mouseup', handler_mousebutton);
 		frame.addEventListener('mousemove', handler_mousemove);
 		frame.addEventListener('wheel', handler_mousewheel);
-		frame.addEventListener('touchstart', handler_touchstart);
 
 		return () => {
 			frame.removeEventListener('mousedown', handler_mousebutton);
 			frame.removeEventListener('mouseup', handler_mousebutton);
 			frame.removeEventListener('mousemove', handler_mousemove);
 			frame.removeEventListener('wheel', handler_mousewheel);
-			frame.removeEventListener('touchstart', handler_touchstart);
 			game_destroy(model);
 			ref.game = null;
 		};
@@ -140,17 +136,22 @@ export default function Game({
 	]);
 
 	// two-way binding for lock and pause
-	hook_effect(() => {
+	hook_effect(ingame => {
 		// esc pressed ingame or focus lost
 		if (
-			!pointer_locked &&
+			!ingame &&
 			!model.world.flag_paused &&
 			model.menu === MENU_NONE
-		)
+		) {
 			model.menu = MENU_SETTINGS;
+		}
 
-		model.world.flag_paused = !pointer_locked;
-	}, [pointer_locked]);
+		model.world.flag_paused = !ingame;
+	}, [
+		config.flag_touch &&
+		model.menu === MENU_NONE ||
+		pointer_locked,
+	]);
 
 	hook_effect(shouldRelease => (
 		pointer_locked &&
@@ -184,7 +185,7 @@ export default function Game({
 		node_dom('div[className=diagnostics]', {
 			innerText: model.renderer.diagnostics,
 		}),
-		model.flag_touch &&
+		config.flag_touch &&
 		node(Touch, {
 			game: model,
 			keys_active_check: model.keys_active_check,
