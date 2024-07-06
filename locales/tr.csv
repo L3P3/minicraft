@@ -40,7 +40,7 @@ error_world_is_present_both_sides: Dünya hem cihazınızda hem de sunucuda mevc
 error_world_not_downloaded: Dünya henüz indirilmedi!
 error_world_not_uploaded: Dünya henüz yüklenmedi!
 game_saved: Oyun kaydedildi.
-gamemode_set_to: Oyun modu ayarlandı: 
+gamemode_set_to: Oyun modu ayarlandı
 inventory_cleared: Envanter temizlendi.
 inventory: Envanter
 item_labels: Hava,Taş,Çimen,Toprak,Parke Taşı,Kalas,Katman Kayası,Kütük,Yapraklar,Tuğlalar,Yün,Kum,Çakıl,Cam,Kitaplık,Obsidyen,Lapis Lazuli,Taş Tuğlalar,Kumtaşı,Lapis Lazuli Bloğu,Demir Blok,Altın Blok,Elmas Blok,Zümrüt Blok,Kızıltaş Blok,Kuvars Blok
@@ -58,6 +58,7 @@ no: Hayır
 only_local: Sadece yerel
 open: Aç
 owner: Sahip
+pixel_grouping: Piksel gruplaması
 player: Oyuncu
 project_page: Proje sayfası
 public: Genel

@@ -11,6 +11,7 @@ import {
 import {
 	locale_back_to_game,
 	locale_mouse_sensitivity,
+	locale_pixel_grouping,
 	locale_resolution,
 	locale_settings,
 	locale_surfaces_colored,
@@ -92,6 +93,16 @@ export default function Settings({
 					onchange: hook_static(event => (
 						config_set({
 							view_distance: Number(event.target.value),
+						})
+					)),
+				}),
+			]),
+			node_dom(`label[innerText=${locale_pixel_grouping}:]`, null, [
+				node_dom('input[type=range][min=1][max=6][step=1]', {
+					value: config.pixel_grouping,
+					onchange: hook_static(event => (
+						config_set({
+							pixel_grouping: Number(event.target.value),
 						})
 					)),
 				}),

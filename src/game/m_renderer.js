@@ -87,6 +87,7 @@ export const renderer_create = (game, canvas_element) => {
 			desynchronized: true,
 		}),
 		canvas_surface: null,
+		canvas_surface_data: null,
 		diagnostics: '',
 		flag_dirty: false,
 		fps: 0,
@@ -97,7 +98,7 @@ export const renderer_create = (game, canvas_element) => {
 		), 1e3),
 		game,
 	};
-	if (tiles_data === null) {
+	if (!tiles_data) {
 		tiles_data_onload = () => model.flag_dirty = true;
 	}
 	renderer_canvas_init(model);
@@ -114,6 +115,7 @@ export const renderer_render = (model, now) => {
 	const {
 		canvas_context,
 		canvas_surface,
+		canvas_surface_data,
 		game,
 	} = model;
 	const {
@@ -133,9 +135,8 @@ export const renderer_render = (model, now) => {
 	) {
 		model.flag_dirty = false;
 
-		const canvas_surface_data = canvas_surface.data;
-
 		const {
+			pixel_grouping,
 			view_distance,
 		} = config;
 		const {
@@ -153,7 +154,6 @@ export const renderer_render = (model, now) => {
 			size_l2,
 		} = world;
 		const flag_textures = config.flag_textures && tiles_data !== null;
-		tiles_data = /** @type {Uint32Array!} */ (tiles_data);
 		const resolution_x_1d = 1 / resolution_x;
 		const resolution_y_1d = 1 / resolution_y;
 		const resolution_x_h = resolution_x >> 1;
@@ -179,16 +179,23 @@ export const renderer_render = (model, now) => {
 		const position_z_shifted_rest = position_z_shifted % 1;
 		const world_width_l2 = CHUNK_WIDTH_L2 + size_l2;
 		const world_width_m1 = (1 << world_width_l2) - 1;
+		const group_width = pixel_grouping < resolution_x ? pixel_grouping : 1;
+		const group_last = resolution_x - group_width;
 
 		let focus_distance_min =
 			player.gamemode === GAMEMODE_CREATIVE
 			?	PLAYER_FOCUS_DISTANCE_CREATIVE
 			:	PLAYER_FOCUS_DISTANCE_NORMAL;
-		let canvas_surface_data_index =
+		let canvas_surface_data_index_row =
 			player.block_focus_x =
 			player.block_focus_z =
 			player.block_focus_face = 0;
+		let dim_next = 0;
 		player.block_focus_y = -1;
+
+		tiles_data = /** @type {Uint32Array!} */ (tiles_data);
+
+		//canvas_surface_data.fill(0xff0000ff);
 
 		for (let canvas_y = 0; canvas_y < resolution_y; ++canvas_y) {
 			const canvas_y_relative = (resolution_y_h - canvas_y) * resolution_y_1d__fov_y;
@@ -198,25 +205,92 @@ export const renderer_render = (model, now) => {
 			const step_z_rot_sin = step_z_rot * angle_h_sin;
 			const step_z_rot_cos = step_z_rot * angle_h_cos;
 
-			for (let canvas_x = 0; canvas_x < resolution_x; ++canvas_x) {
+			let canvas_x = 0;
+			let group_color = 0;
+			let group_at_end = false;
+			let group_last_filled = false;
+
+			group: for (
+				let canvas_x_group = 0;
+				canvas_x_group < resolution_x;
+				canvas_x_group += group_width
+			)
+			for (
+				let group_index = group_last_filled ? 1 : 0;
+				group_index < group_width;
+				++group_index
+			) {
+				// pixel_grouping disabled
+				if (group_width < 2) canvas_x = canvas_x_group;
+				// first canvas_x_group
+				else if (canvas_x_group === 0) {
+					canvas_x = (
+						group_index === 0
+						?	0
+						: group_index === 1
+						?	group_width
+						:	group_index - 1
+					);
+					group_at_end = group_index === 1;
+				}
+				// middle canvas_x_group
+				else if (canvas_x_group < group_last) {
+					canvas_x = (
+						(
+							group_at_end = group_index === 1
+						)
+						?	canvas_x_group + group_width
+						:	canvas_x_group + group_index - 1
+					);
+				}
+				// last canvas_x_group
+				else {
+					if (
+						(
+							canvas_x = (
+								group_index === 0
+								?	canvas_x_group - 1
+								:	canvas_x_group + group_index
+							)
+						) >= resolution_x
+					) break group;
+					group_at_end = false;
+				}
+
 				const canvas_x_relative = (canvas_x - resolution_x_h) * resolution_x_1d__fov_x;
 
 				const step_x_raw = step_z_rot_sin + angle_h_cos * canvas_x_relative;
 				const step_z_raw = step_z_rot_cos - angle_h_sin * canvas_x_relative;
+
+				const dim_offset = dim_next;
 
 				let pixel_color = SKY_COLOR;
 				let pixel_factor = 1.0;
 
 				let check_distance_min = view_distance;
 				// step for each x, y, z
-				for (let dim = 0; dim < 3; ++dim) {
+				for (let dim_i = 0; dim_i < 3; ++dim_i) {
+					const dim = (dim_offset + dim_i) % 3;
+
 					// https://jsben.ch/AqXcR
 					let step_dim = step_z_raw;
-					if (dim === 0) step_dim = step_x_raw;
-					if (dim === 1) step_dim = step_y_raw;
+					// subblock distance to first intersection
+					let offset = position_z_shifted_rest;
+					if (dim === 0) {
+						step_dim = step_x_raw;
+						offset = position_x_shifted_rest;
+					}
+					if (dim === 1) {
+						step_dim = step_y_raw;
+						offset = position_y_shifted_rest;
+					}
+					let step_normal = -1 / step_dim;
+					if (step_dim > 0) {
+						offset = 1 - offset;
+						step_normal *= -1;
+					}
 
 					// https://jsben.ch/hKgi4
-					const step_normal = 1 / (step_dim < 0 ? -step_dim : step_dim);
 					const step_x = step_x_raw * step_normal;
 					const step_y = step_y_raw * step_normal;
 					const step_z = step_z_raw * step_normal;
@@ -226,12 +300,7 @@ export const renderer_render = (model, now) => {
 						step_z * step_z
 					);
 
-					// calculate distance to first intersection to then start on it
-					let offset = position_z_shifted_rest;
-					if (dim === 0) offset = position_x_shifted_rest;
-					if (dim === 1) offset = position_y_shifted_rest;
-					if (step_dim > 0) offset = 1 - offset;
-
+					// initial position
 					let check_x = position_x_shifted + step_x * offset - ((dim === 0)&(step_dim < 0)|0);
 					let check_y = position_y_shifted + step_y * offset - ((dim === 1)&(step_dim < 0)|0);
 					let check_z = position_z_shifted + step_z * offset - ((dim === 2)&(step_dim < 0)|0);
@@ -358,6 +427,7 @@ export const renderer_render = (model, now) => {
 									:	.2
 								)
 							);
+							dim_next = dim;
 							break;
 						}
 
@@ -365,14 +435,53 @@ export const renderer_render = (model, now) => {
 					}
 				}
 
-				canvas_surface_data[canvas_surface_data_index] =
-					(pixel_color & 0xff) * pixel_factor;
-				canvas_surface_data[++canvas_surface_data_index] =
-					((pixel_color >> 8) & 0xff) * pixel_factor;
-				canvas_surface_data[++canvas_surface_data_index] =
-					(pixel_color >> 16) * pixel_factor;
-				canvas_surface_data_index += 2;
+				// apply lighting and alpha
+				pixel_color = (
+					0xff000000 |
+					Math_min((pixel_color >> 16) * pixel_factor, 0xff) << 16 |
+					Math_min(((pixel_color >> 8) & 0xff) * pixel_factor, 0xff) << 8 |
+					Math_min((pixel_color & 0xff) * pixel_factor, 0xff)
+				);
+
+				if (
+					group_last_filled = (
+						(
+							group_at_end = group_at_end && (
+								canvas_y !== pixel_focus_y ||
+								canvas_x < pixel_focus_x ||
+								canvas_x > pixel_focus_x + group_width
+							)
+						) &&
+						group_color === pixel_color
+					)
+				) {
+					/*canvas_surface_data.fill(
+						//0xffff0000,
+						group_color,
+						canvas_surface_data_index_row + canvas_x_group + 1,
+						canvas_surface_data_index_row + canvas_x_group + group_width + 1
+					);*/
+					let i = canvas_surface_data_index_row + canvas_x_group + 1;
+					canvas_surface_data[i] = group_color;
+					canvas_surface_data[++i] = group_color;
+					if (group_width < 3) break;
+					canvas_surface_data[++i] = group_color;
+					if (group_width < 4) break;
+					canvas_surface_data[++i] = group_color;
+					if (group_width < 5) break;
+					canvas_surface_data[++i] = group_color;
+					if (group_width < 6) break;
+					canvas_surface_data[++i] = group_color;
+					break;
+				}
+				if (
+					group_at_end ||
+					canvas_x === 0
+				) group_color = pixel_color;
+				canvas_surface_data[canvas_surface_data_index_row + canvas_x] = pixel_color;
 			}
+
+			canvas_surface_data_index_row += resolution_x;
 		}
 
 		// cursor
@@ -381,11 +490,8 @@ export const renderer_render = (model, now) => {
 			!cursor_cross
 		) {
 			canvas_surface_data[
-				canvas_surface_data_index =
-					(resolution_x * pixel_focus_y + pixel_focus_x) << 2
-			] += 128;
-			canvas_surface_data[++canvas_surface_data_index] += 128;
-			canvas_surface_data[++canvas_surface_data_index] += 128;
+				resolution_x * pixel_focus_y + pixel_focus_x
+			] ^= 0xffffff;
 		}
 
 		canvas_context.putImageData(canvas_surface, 0, 0);
@@ -496,12 +602,14 @@ export const renderer_canvas_init = model => {
 		canvas_element,
 		game,
 	} = model;
-	(
-		model.canvas_surface = model.canvas_context.createImageData(
-			canvas_element.width = game.resolution_x,
-			canvas_element.height = game.resolution_y
-		)
-	).data.fill(0xff);
+	model.canvas_surface_data = new Uint32Array_(
+		(
+			model.canvas_surface = model.canvas_context.createImageData(
+				canvas_element.width = game.resolution_x,
+				canvas_element.height = game.resolution_y
+			)
+		).data.buffer
+	);
 	const canvas_width = game.resolution_x * game.config.resolution_scaling / game.resolution_css_ratio;
 	const canvas_height = game.resolution_y * game.config.resolution_scaling / game.resolution_css_ratio;
 	canvas_element.style.width = canvas_width + 'px';

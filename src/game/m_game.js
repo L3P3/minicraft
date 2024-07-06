@@ -722,10 +722,6 @@ export const game_message_send = (model, value) => {
 			game_save(model);
 			game_message_print(model, locale_game_saved, true);
 			break;
-		case 'smart':
-			player.name = 'LFF5644';
-			game_message_print(model, 'lff.smart: true', true);
-			break;
 		case 'spawn':
 			world.spawn_x = player.position_x;
 			world.spawn_y = player.position_y;

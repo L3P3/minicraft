@@ -43,6 +43,7 @@ export const reducers = {
 		const config = {
 			flag_textures: true,
 			flag_touch: false, // not saved
+			pixel_grouping: 1,
 			mouse_sensitivity: 3,
 			resolution_scaling: 4,
 			view_angle: 120,
@@ -55,6 +56,11 @@ export const reducers = {
 			let tmp = config_loaded['flag_textures'];
 			if (tmp != null) {
 				config.flag_textures = tmp;
+			}
+			if ((
+				tmp = config_loaded['pixel_grouping']
+			) != null) {
+				config.pixel_grouping = tmp;
 			}
 			if ((
 				tmp = config_loaded['mouse_sensitivity']
@@ -111,6 +117,7 @@ export const reducers = {
 		localStorage_setItem('minicraft.config', JSON_stringify({
 			'version': VERSION,
 			'flag_textures': config.flag_textures,
+			'pixel_grouping': config.pixel_grouping,
 			'mouse_sensitivity': config.mouse_sensitivity,
 			'resolution_scaling': config.resolution_scaling,
 			'view_angle': config.view_angle,

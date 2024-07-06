@@ -58,6 +58,7 @@ export const locale_no = 'Nein';
 export const locale_only_local = 'Nur lokale Welt';
 export const locale_open = 'Öffnen';
 export const locale_owner = 'Besitzer';
+export const locale_pixel_grouping = 'Pixelgruppierung';
 export const locale_player = 'Spieler';
 export const locale_project_page = 'Projektseite';
 export const locale_public = 'Öffentlich';

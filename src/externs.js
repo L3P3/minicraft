@@ -222,11 +222,12 @@ var localStorage = {
 function addEventListener(
 	/** string */ eventName,
 	/** function(Event) */ handler,
-	/** {passive: boolean}= */ options
+	/** (boolean|{passive: boolean})= */ options
 ){}
 function removeEventListener(
 	/** string */ eventName,
-	/** function(Event) */ handler
+	/** function(Event) */ handler,
+	/** boolean= */ options
 ){}
 
 /**

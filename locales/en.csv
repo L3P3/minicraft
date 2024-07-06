@@ -58,6 +58,7 @@ no: No
 only_local: Just a local world
 open: Enter
 owner: Owner
+pixel_grouping: Pixel grouping
 player: Player
 project_page: Project page
 public: Public

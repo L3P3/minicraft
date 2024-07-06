@@ -458,7 +458,7 @@ export const world_chunk_load = async (model, all) => {
 		const chunk = chunks[checklist_item.chunks_index];
 		const {
 			loaded,
-			x, y, z
+			x, y, z,
 		} = chunk;
 		const x_abs = offset_x + checklist_item.offset_x + x;
 		const z_abs = offset_z + checklist_item.offset_z + z;
