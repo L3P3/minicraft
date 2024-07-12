@@ -179,7 +179,7 @@ lui.hook_sub = function(getter, deps){}
 lui.hook_transition = function(target, msecs){}
 
 /**
-	@param {function():Array!} root
+	@param {TYPE_COMPONENT} root
 	@return {void}
 */
 lui.init = function(root){}

@@ -1,5 +1,6 @@
 import {
 	hook_assert,
+	hook_dom,
 	hook_effect,
 	hook_model,
 	hook_static,
@@ -107,17 +108,19 @@ lui_.init(() => {
 		}
 	}, [flag_touch]);
 
-	return [{
+	hook_dom('', {
 		onkeydown: handler_key,
 		onkeyup: handler_key,
 		oncontextmenu: handler_noop,
 		ondragstart: handler_noop,
-	}, [
+	});
+
+	return [
 		node(App, {
 			account: state.account,
 			actions,
 			config: state.config,
 			ref,
 		}),
-	]];
+	];
 });
