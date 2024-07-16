@@ -21,6 +21,8 @@ import {
 } from '../etc/env.js';
 import {
 	JSON_stringify,
+	Math_max,
+	Math_min,
 	Promise_,
 	datify,
 } from '../etc/helpers.js';
@@ -138,7 +140,7 @@ function WorldItem({
 			),
 		}),
 		node_dom('span', {
-			innerText: datify(Math.max(I.local, I.remote), true),
+			innerText: datify(Math_max(I.local, I.remote), true),
 		}),
 	];
 }
@@ -277,7 +279,7 @@ export default function MenuStart({
 			}
 		}
 
-		return world_list.sort((a, b) => Math.max(b.local, b.remote) - Math.max(a.local, a.remote));
+		return world_list.sort((a, b) => Math_max(b.local, b.remote) - Math_max(a.local, a.remote));
 	}, [
 		world_list_remote,
 		config.worlds,
@@ -509,7 +511,7 @@ export default function MenuStart({
 						return;
 					}
 					actions.world_add({
-						id: Math.min(0, ...config.worlds.map(world => world.id)) - 1,
+						id: Math_min(0, ...config.worlds.map(world => world.id)) - 1,
 						label: name,
 						mod_l: Date.now(),
 						mod_r: 0,
@@ -540,7 +542,7 @@ export default function MenuStart({
 		}, [
 			node_dom('div[className=window]', null, [
 				node_dom('h2', {
-					innerText: '"' + world_selected.label +'"',
+					innerText: `"${world_selected.label}"`,
 					title: world_selected.id,
 				}),
 				node_dom('table', null, [
@@ -554,7 +556,7 @@ export default function MenuStart({
 					node_dom('tr', null, [
 						node_dom(`td[innerText=${locale_modification}:]`),
 						node_dom('td', {
-							innerText: datify(Math.max(
+							innerText: datify(Math_max(
 								world_selected.local,
 								world_selected.remote
 							), false),

@@ -116,13 +116,15 @@ async function build_js(lang) {
 		.join(' --')
 	))[2]);
 
-	/*console.log('custom transformation...');
+	console.log('custom transformation...');
 	await writeFile(
 		TMP_FILE,
 		(await readFile(TMP_FILE, 'ascii'))
-		.split('const ').join('let '),
+		.split('actions').join('a')
+		.split('content').join('c')
+		.split('loaded').join('l'),
 		'ascii'
-	);*/
+	);
 
 	console.log('js pass 2...');
 	console.log((await exec(
