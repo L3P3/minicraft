@@ -268,6 +268,11 @@ var onmouseup;
 var ASSETS;
 
 /**
+	@type {boolean}
+*/
+var SSR;
+
+/**
 	@typedef {{
 		p: {
 			h: number,
