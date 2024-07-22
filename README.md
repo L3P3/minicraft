@@ -1,4 +1,4 @@
-# Minicraft
+# minicraft
 
 ![Screenshot](https://l3p3.de/media/minicraft1.png)
 
