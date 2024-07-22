@@ -16,7 +16,7 @@ const {version} = JSON.parse(
 	await readFile('./package.json', 'utf8')
 );
 
-let languages = ['de'];
+let languages = ['en'];
 if (prod) {
 	const files = await readdir('./locales');
 	languages = (
@@ -170,7 +170,7 @@ try {
 	for (const lang of languages) await build_js(lang);
 }
 finally {
-	await env_set('dev', true, 'de', '//l3p3.de/api/minicraft/', '//l3p3.de/static/minicraft/worlds/');
+	await env_set('dev', true, 'en', '//l3p3.de/api/minicraft/', '//l3p3.de/static/minicraft/worlds/');
 }
 
 console.log('done.');
