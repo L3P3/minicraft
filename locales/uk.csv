@@ -31,6 +31,7 @@ error_no_permission: Відсутня авторизація!
 error_no_world_selected: Не вибраний світ!
 error_not_logged_in: Не зареєстрований!
 error_only_vert_supported: Підтримується тільки "vert"!
+error_opened: миникрафт вже запущений!
 error_pitch: Невдачя!
 error_selection_required: Необхідний вибір!
 error_storage: Недостатньо місця!

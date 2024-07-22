@@ -31,6 +31,7 @@ error_no_permission: Fehlende Berechtigung!
 error_no_world_selected: Keine Welt ausgewählt!
 error_not_logged_in: Nicht angemeldet!
 error_only_vert_supported: Nur "vert" wird unterstützt!
+error_opened: minicraft läuft schon!
 error_pitch: Pech!
 error_selection_required: Auswahl erforderlich!
 error_storage: Der Speicherplatz reicht nicht!

@@ -4,8 +4,9 @@ import {
 	hook_effect,
 	hook_model,
 	hook_static,
-	lui_,
+	init,
 	node,
+	node_dom,
 } from './etc/lui.js';
 
 import {
@@ -16,12 +17,22 @@ import {
 } from './etc/state.js';
 import {
 	addEventListener_,
+	BroadcastChannel_,
+	clearTimeout_,
+	Date_,
 	handler_noop,
 	localStorage_,
+	localStorage_getItem,
 	localStorage_removeItem,
+	localStorage_setItem,
+	Number_,
 	Object_keys,
 	removeEventListener_,
+	setTimeout_,
 } from './etc/helpers.js';
+import {
+	locale_error_opened,
+} from './etc/locale.js';
 
 import {
 	game_key,
@@ -30,7 +41,7 @@ import {
 
 import App from './game/c_app.js';
 
-lui_.init(() => {
+function Root() {
 	const [state, actions] = hook_model(reducers);
 
 	const ref = hook_static({
@@ -62,7 +73,10 @@ lui_.init(() => {
 		onpageshow = onfocus = () => {
 			unloaded = false;
 		};
-		setInterval(actions.config_save, 500);
+		setInterval(() => (
+			actions.config_save(),
+			!BroadcastChannel_ && localStorage_setItem('minicraft.lock', Date_.now())
+		), 500);
 
 		addEventListener_('touchend', event => {
 			ref.last_touch_event = event.timeStamp;
@@ -123,4 +137,45 @@ lui_.init(() => {
 			ref,
 		}),
 	];
-});
+}
+
+function ErrorOpened() {
+	close();
+	return [
+		node_dom(`h1[innerText=${locale_error_opened}]`),
+	];
+}
+
+if (BroadcastChannel_) {
+	const channel_lock = new BroadcastChannel_('minicraft.lock');
+	const timeout = setTimeout_(() => {
+		init(Root);
+	}, 100);
+	channel_lock.addEventListener('message', event => {
+		if (event.data === 'yes') {
+			clearTimeout_(timeout);
+			channel_lock.close();
+			init(ErrorOpened);
+		}
+		else {
+			channel_lock.postMessage('yes');
+			focus();
+		}
+	});
+	channel_lock.postMessage('anyone there?');
+}
+else {
+	// first make sure lock has expired
+	const lock_found = Number_(localStorage_getItem('minicraft.lock'));
+	const lock_limit = Date_.now() - 1000;
+	// if already expired
+	if (lock_found < lock_limit) init(Root);
+	// if not, wait and check again
+	else setTimeout_(() => {
+		init(
+			Number_(localStorage_getItem('minicraft.lock')) === lock_found
+			?	Root
+			:	ErrorOpened
+		);
+	}, lock_found - lock_limit);
+}

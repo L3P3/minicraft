@@ -20,7 +20,8 @@ export const Math_sqrt = Math_.sqrt;
 export const Math_log2 = Math_.log2;
 export const String_fromCharCode = String.fromCharCode;
 
-const Date_ = Date;
+export const BroadcastChannel_ = BroadcastChannel;
+export const Date_ = Date;
 const JSON_ = JSON;
 export const Promise_ = Promise;
 export const JSON_stringify = JSON_.stringify;

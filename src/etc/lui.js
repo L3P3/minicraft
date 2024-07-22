@@ -22,6 +22,7 @@ export const hook_state = lui_.hook_state;
 export const hook_static = lui_.hook_static;
 export const hook_sub = lui_.hook_sub;
 export const hook_transition = lui_.hook_transition;
+export const init = lui_.init;
 export const node = lui_.node;
 export const node_dom = lui_.node_dom;
 export const node_map = lui_.node_map;

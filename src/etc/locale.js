@@ -31,6 +31,7 @@ export const locale_error_no_permission = 'No permission!';
 export const locale_error_no_world_selected = 'No world selected!';
 export const locale_error_not_logged_in = 'Not logged in!';
 export const locale_error_only_vert_supported = 'Only "vert" supported!';
+export const locale_error_opened = 'minicraft already running!';
 export const locale_error_pitch = 'Pitch!';
 export const locale_error_selection_required = 'Selection required!';
 export const locale_error_storage = 'Insufficient storage!';
