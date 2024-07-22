@@ -146,7 +146,10 @@ function ErrorOpened() {
 	];
 }
 
-if (BroadcastChannel_) {
+if (window.SSR) {
+	init(Root);
+}
+else if (BroadcastChannel_) {
 	const channel_lock = new BroadcastChannel_('minicraft.lock');
 	const timeout = setTimeout_(() => {
 		init(Root);
