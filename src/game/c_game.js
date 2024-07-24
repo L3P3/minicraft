@@ -28,7 +28,6 @@ import {
 	game_create,
 	game_destroy,
 	game_key,
-	game_message_print,
 	game_mouse_catch,
 	game_mouse_move_menu,
 	game_mouse_move_player,
@@ -155,7 +154,7 @@ export default function Game({
 				(model.rotate_last_h | model.rotate_last_v) &&
 				model.rotate_last_time > time_now - 100
 			) {
-				game_message_print(model, `move back ${Math.round(model.rotate_last_h*100)}% ${Math.round(model.rotate_last_v*100)}%`);
+				//game_message_print(model, `move back ${Math.round(model.rotate_last_h*100)}% ${Math.round(model.rotate_last_v*100)}%`);
 				player_rotate(
 					model.player,
 					-model.rotate_last_h,
