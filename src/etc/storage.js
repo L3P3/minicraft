@@ -8,6 +8,7 @@ import {
 	localStorage_getItem,
 	localStorage_removeItem,
 	localStorage_setItem,
+	navigator_,
 } from './helpers.js';
 
 // to assert chunk deletion fix is done before this
@@ -15,7 +16,7 @@ import './state.js';
 
 let chunks_db = null;
 if (indexedDB_) {
-	navigator.storage?.persist?.();
+	navigator_.storage?.persist?.();
 	const request = indexedDB_.open('minicraft', 1);
 	request.onupgradeneeded = event => {
 		// migrate from localStorage to indexedDB

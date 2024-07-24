@@ -2,6 +2,7 @@ import {
 	VERSION,
 } from './env.js';
 import {
+	Date_now,
 	JSON_parse,
 	JSON_stringify,
 	Object_keys,
@@ -88,7 +89,7 @@ export const reducers = {
 					label: (
 						prompt(locale_unknown_world_found, '') || locale_unknown_world
 					).substring(0, 16),
-					mod_l: Date.now(),
+					mod_l: Date_now(),
 					mod_r: 0,
 				};
 				needs_save = true;

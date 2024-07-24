@@ -4,6 +4,7 @@ import {
 
 export const window_ = window;
 export const document_ = document;
+export const navigator_ = navigator;
 const Math_ = Math;
 export const Math_PI = Math_.PI;
 export const Math_PI_h = Math_PI * .5;
@@ -21,7 +22,8 @@ export const Math_log2 = Math_.log2;
 export const String_fromCharCode = String.fromCharCode;
 
 export const BroadcastChannel_ = BroadcastChannel;
-export const Date_ = Date;
+const Date_ = Date;
+export const Date_now = () => Date_.now();
 const JSON_ = JSON;
 export const Promise_ = Promise;
 export const JSON_stringify = JSON_.stringify;
@@ -44,6 +46,7 @@ export const clearTimeout_ = clearTimeout;
 export const clearInterval_ = clearInterval;
 export const addEventListener_ = addEventListener;
 export const removeEventListener_ = removeEventListener;
+export const flag_chromium = navigator_.userAgent.includes('WebKit');
 
 /**
 	@param {number} num

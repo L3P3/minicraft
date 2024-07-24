@@ -19,21 +19,27 @@ import {
 } from '../etc/constants.js';
 import {
 	document_,
+	flag_chromium,
 	Math_max,
 	window_,
 } from '../etc/helpers.js';
 
 import {
 	game_create,
+	game_destroy,
 	game_key,
+	game_message_print,
 	game_mouse_catch,
-	game_mouse_move,
+	game_mouse_move_menu,
+	game_mouse_move_player,
 	game_render,
 	game_renderer_init,
 	game_resolution_update,
 	game_view_distance_update,
-	game_destroy,
 } from './m_game.js';
+import {
+	player_rotate,
+} from './m_player.js';
 
 import Bar from './c_bar.js';
 import Inventory from './c_inventory.js';
@@ -74,14 +80,11 @@ export default function Game({
 
 			return false;
 		};
-		const handler_mousemove = event => {
-			if (
-				model.menu !== MENU_NONE ||
-				document_.pointerLockElement === frame
-			) {
-				game_mouse_move(model, event);
-			}
-		};
+		const handler_mousemove = event => (
+			document_.pointerLockElement === frame
+			?	game_mouse_move_player(model, event)
+			:	game_mouse_move_menu(model, event)
+		);
 		const handler_mousewheel = event => {
 			actions.config_touch_set(false);
 
@@ -100,16 +103,18 @@ export default function Game({
 			}
 		};
 
+		const passive_true = {passive: true};
+
 		frame.addEventListener('mousedown', handler_mousebutton);
 		frame.addEventListener('mouseup', handler_mousebutton);
-		frame.addEventListener('mousemove', handler_mousemove);
-		frame.addEventListener('wheel', handler_mousewheel);
+		frame.addEventListener('mousemove', handler_mousemove, passive_true);
+		frame.addEventListener('wheel', handler_mousewheel, passive_true);
 
 		return () => {
 			frame.removeEventListener('mousedown', handler_mousebutton);
 			frame.removeEventListener('mouseup', handler_mousebutton);
-			frame.removeEventListener('mousemove', handler_mousemove);
-			frame.removeEventListener('wheel', handler_mousewheel);
+			frame.removeEventListener('mousemove', handler_mousemove, passive_true);
+			frame.removeEventListener('wheel', handler_mousewheel, passive_true);
 			game_destroy(model);
 			ref.game = null;
 		};
@@ -144,6 +149,21 @@ export default function Game({
 			model.menu === MENU_NONE
 		) {
 			model.menu = MENU_SETTINGS;
+			// #46 move camera back after accidental jump
+			if (
+				flag_chromium &&
+				(model.rotate_last_h | model.rotate_last_v) &&
+				model.rotate_last_time > time_now - 100
+			) {
+				game_message_print(model, `move back ${Math.round(model.rotate_last_h*100)}% ${Math.round(model.rotate_last_v*100)}%`);
+				player_rotate(
+					model.player,
+					-model.rotate_last_h,
+					-model.rotate_last_v
+				);
+				model.rotate_last_h = model.rotate_last_v = 0;
+				model.renderer.flag_dirty = true;
+			}
 		}
 
 		model.world.flag_paused = !ingame;

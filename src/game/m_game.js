@@ -57,6 +57,8 @@ import {
 import {
 	clearInterval_,
 	clearTimeout_,
+	Date_now,
+	flag_chromium,
 	JSON_stringify,
 	Math_ceil,
 	Math_floor,
@@ -157,6 +159,9 @@ export const game_create = (actions, frame_element, config, account) => {
 		resolution_raw_y: 1,
 		resolution_x: 0,
 		resolution_y: 0,
+		rotate_last_h: 0,
+		rotate_last_time: 0,
+		rotate_last_v: 0,
 		tick_interval: setInterval_(() => (
 			world_tick(world, player)
 		), 50),
@@ -185,7 +190,7 @@ export const game_renderer_init = (model, canvas_element) => {
 export const game_save = model => {
 	world_save(model.world, model.player);
 	model.actions.world_prop(model.world.id, {
-		mod_l: Date.now(),
+		mod_l: Date_now(),
 	});
 }
 
@@ -243,22 +248,24 @@ export const game_mouse_catch = async model => {
 	catch (error) {}
 }
 
-export const game_mouse_move = (model, event) => {
-	if (!model.world.flag_paused) {
-		const factor = model.config.mouse_sensitivity * Math_PI / (Math_max(
-			model.resolution_raw_x,
-			model.resolution_raw_y
-		) * model.resolution_css_ratio);
-		player_rotate(
-			model.player,
-			event.movementX * factor,
-			-event.movementY * factor
-		);
+export const game_mouse_move_player = (model, event) => {
+	const factor = model.config.mouse_sensitivity * Math_PI / (Math_max(
+		model.resolution_raw_x,
+		model.resolution_raw_y
+	) * model.resolution_css_ratio);
+	if (flag_chromium) {
+		model.rotate_last_time = event.timeStamp;
 	}
-	else {
-		model.cursor_x = event.clientX;
-		model.cursor_y = event.clientY;
-	}
+	player_rotate(
+		model.player,
+		model.rotate_last_h = event.movementX * factor,
+		model.rotate_last_v = -event.movementY * factor
+	);
+}
+
+export const game_mouse_move_menu = (model, event) => {
+	model.cursor_x = event.clientX;
+	model.cursor_y = event.clientY;
 }
 
 /**
@@ -825,7 +832,7 @@ export const game_message_send = (model, value) => {
 	}
 }
 
-const game_message_print = (model, value, minor = false) => {
+export const game_message_print = (model, value, minor = false) => {
 	const id = ++message_id_counter;
 	(
 		model.messages = model.messages.slice(-49)

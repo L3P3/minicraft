@@ -20,6 +20,7 @@ import {
 	VERSION,
 } from '../etc/env.js';
 import {
+	Date_now,
 	JSON_stringify,
 	Math_max,
 	Math_min,
@@ -513,7 +514,7 @@ export default function MenuStart({
 					actions.world_add({
 						id: Math_min(0, ...config.worlds.map(world => world.id)) - 1,
 						label: name,
-						mod_l: Date.now(),
+						mod_l: Date_now(),
 						mod_r: 0,
 					});
 				}

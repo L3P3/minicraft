@@ -19,7 +19,7 @@ import {
 	addEventListener_,
 	BroadcastChannel_,
 	clearTimeout_,
-	Date_,
+	Date_now,
 	handler_noop,
 	localStorage_,
 	localStorage_getItem,
@@ -75,7 +75,7 @@ function Root() {
 		};
 		setInterval(() => (
 			actions.config_save(),
-			!BroadcastChannel_ && localStorage_setItem('minicraft.lock', Date_.now())
+			!BroadcastChannel_ && localStorage_setItem('minicraft.lock', Date_now())
 		), 500);
 
 		addEventListener_('touchend', event => {
@@ -170,7 +170,7 @@ else if (BroadcastChannel_) {
 else {
 	// first make sure lock has expired
 	const lock_found = Number_(localStorage_getItem('minicraft.lock'));
-	const lock_limit = Date_.now() - 1000;
+	const lock_limit = Date_now() - 1000;
 	// if already expired
 	if (lock_found < lock_limit) init(Root);
 	// if not, wait and check again
