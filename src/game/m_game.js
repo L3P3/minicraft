@@ -58,6 +58,7 @@ import {
 	clearInterval_,
 	clearTimeout_,
 	Date_now,
+	fetch_,
 	flag_chromium,
 	JSON_stringify,
 	Math_ceil,
@@ -66,6 +67,7 @@ import {
 	Math_max,
 	Math_PI,
 	Number_,
+	Set_,
 	setInterval_,
 	setTimeout_,
 } from '../etc/helpers.js';
@@ -147,7 +149,7 @@ export const game_create = (actions, frame_element, config, account) => {
 		flag_hud: true,
 		frame_element,
 		frame_last: 0,
-		keys_active: new Set,
+		keys_active: new Set_,
 		keys_active_check: '',
 		menu: MENU_NONE,
 		messages: [],
@@ -885,7 +887,7 @@ const game_poll = (model, msg) => (
 	clearTimeout_(model.poll_timeout),
 	(
 		msg
-		?	fetch(API_CHAT, {
+		?	fetch_(API_CHAT, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -894,7 +896,7 @@ const game_poll = (model, msg) => (
 					msg,
 				})),
 			})
-		:	fetch(API_CHAT)
+		:	fetch_(API_CHAT)
 	)
 	.then(res => {
 		if (!res.ok) return;

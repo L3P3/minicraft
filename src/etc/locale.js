@@ -1,6 +1,7 @@
 export const locale_amount = 'Amount';
 export const locale_ask_world_delete_1 = 'Really delete world "';
 export const locale_ask_world_delete_2 = '"?';
+export const locale_back = 'Back';
 export const locale_back_to_game = 'Back to game';
 export const locale_change_world_name = 'Change world name';
 export const locale_chunk_regenerated = 'Chunk regenerated.';
@@ -78,7 +79,6 @@ export const locale_settings = 'Settings';
 export const locale_show_world_settings = 'Show world settings';
 export const locale_spawn_updated = 'Spawn updated.';
 export const locale_surfaces_colored = 'Plain';
-export const locale_surfaces_textured = 'Textured';
 export const locale_surfaces = 'Surfaces';
 export const locale_teleported_to_spawn = 'Teleported to spawn.';
 export const locale_teleported_to = 'Teleported to';

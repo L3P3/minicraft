@@ -1,6 +1,7 @@
 amount: Miktar
 ask_world_delete_1: "
 ask_world_delete_2: " isimli dünya gerçekten silinsin mi?
+back: Geri
 back_to_game: Oyuna geri dön
 change_world_name: Dünyayı değiştir
 chunk_regenerated: Parça yenilendi.
@@ -78,7 +79,6 @@ settings: Ayarlar
 show_world_settings: Dünya ayarlarını göster
 spawn_updated: Spawn güncellendi.
 surfaces_colored: Sade
-surfaces_textured: Dokulu
 surfaces: Yüzeyler
 teleported_to_spawn: Spawn\'a ışınlandı.
 teleported_to: Şuraya ışınlandı: 

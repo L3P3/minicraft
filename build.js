@@ -48,14 +48,14 @@ async function lang_generate(lang) {
 	return output;
 }
 
-const env_set = async (version, debug, lang, api, api_download) => Promise.all([
+const env_set = async (version, debug, lang, api, api_data) => Promise.all([
 	writeFile(
 		'./src/etc/env.js',
 `export const VERSION = '${version}';
 export const DEBUG = ${debug};
 export const LANG = '${lang}';
 export const API = '${api}';
-export const API_DOWNLOAD = '${api_download}';
+export const API_DATA = '${api_data}';
 `,
 		'utf8'
 	),
@@ -92,7 +92,7 @@ async function build_js(lang) {
 		false,
 		lang,
 		prod ? '/api/minicraft/' : '//l3p3.de/api/minicraft/',
-		prod ? '/static/minicraft/worlds/' : '//l3p3.de/static/minicraft/worlds/'
+		prod ? '/static/minicraft/' : '//l3p3.de/static/minicraft/'
 	);
 
 	console.log('js pass 1...');
@@ -170,7 +170,7 @@ try {
 	for (const lang of languages) await build_js(lang);
 }
 finally {
-	await env_set('dev', true, 'en', '//l3p3.de/api/minicraft/', '//l3p3.de/static/minicraft/worlds/');
+	await env_set('dev', true, 'en', '//l3p3.de/api/minicraft/', '//l3p3.de/static/minicraft/');
 }
 
 console.log('done.');

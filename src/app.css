@@ -82,7 +82,6 @@ button {
 }
 .game .bitmap {
 	background-size: 100% auto;
-	transform: scaleY(-1);
 }
 .game > .diagnostics {
 	position: absolute;
@@ -266,8 +265,10 @@ button {
 	margin: 1rem;
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-	grid-template-rows: 3rem;
 	gap: 1rem;
+}
+.game .menu > .settings > * {
+	min-height: 2rem;
 }
 .game .menu.inventory, .game .menu.advanced {
 	display: flex;

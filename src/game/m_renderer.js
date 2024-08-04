@@ -1,8 +1,4 @@
 import {
-	dom_define,
-} from '../etc/lui.js';
-
-import {
 	BLOCK_COLORS,
 	BLOCK_TYPE_AIR,
 	BLOCK_TYPE_FACE_LABELS,
@@ -16,6 +12,7 @@ import {
 	SKY_COLOR,
 } from '../etc/constants.js';
 import {
+	API_DATA,
 	VERSION,
 } from '../etc/env.js';
 import {
@@ -32,6 +29,7 @@ import {
 	number_padStart2,
 	number_square,
 	number_toFixed2,
+	Set_,
 	setInterval_,
 	Uint32Array_,
 } from '../etc/helpers.js';
@@ -52,32 +50,49 @@ import {
 } from '../etc/textures.js';
 
 // parse png
-export let tiles_data = null;
-let tiles_data_onload = null;
-let tiles_image = new Image();
-tiles_image.crossOrigin = 'anonymous';
-tiles_image.onload = () => {
-	const canvas_temp = document_.createElement('canvas');
-	canvas_temp.width = 1 << TILES_RESOLUTION_LOG2;
-	canvas_temp.height = TILES_COUNT << TILES_RESOLUTION_LOG2;
-	const context = canvas_temp.getContext('2d');
-	context.drawImage(tiles_image, 0, 0);
-	dom_define('tile', 'div[className=bitmap]', {
-		S: {
-			backgroundImage: `url(${canvas_temp.toDataURL()})`,
-		},
-	});
-	tiles_data = new Uint32Array_(
-		context.getImageData(
-			0, 0,
-			1 << TILES_RESOLUTION_LOG2,
-			TILES_COUNT << TILES_RESOLUTION_LOG2
-		).data.buffer
-	);
-	tiles_data_onload && tiles_data_onload();
-	tiles_image = tiles_data_onload = null;
+let tiles_data = null;
+let tiles_image_loading = null;
+const renderer_instances = new Set_;
+
+export const tiles_set = id => {
+	if (!id) {
+		tiles_data = null;
+	}
+	else {
+		const tiles_image = tiles_image_loading = new Image();
+		if (VERSION === 'dev') {
+			tiles_image.crossOrigin = 'anonymous';
+		}
+		tiles_image.onload = () => {
+			if (tiles_image_loading !== tiles_image) return;
+			const canvas_temp = document_.createElement('canvas');
+			canvas_temp.width = TILES_RESOLUTION;
+			canvas_temp.height = TILES_COUNT << TILES_RESOLUTION_LOG2;
+			const context = canvas_temp.getContext('2d');
+			// draw image flipped
+			context.scale(1, -1);
+			for (let tile = 0; tile < TILES_COUNT; ++tile) {
+				context.drawImage(
+					tiles_image,
+					0, tile << TILES_RESOLUTION_LOG2,
+					TILES_RESOLUTION, TILES_RESOLUTION,
+					0, -(tile << TILES_RESOLUTION_LOG2) - TILES_RESOLUTION,
+					TILES_RESOLUTION, TILES_RESOLUTION
+				);
+			}
+			tiles_data = new Uint32Array_(
+				context.getImageData(
+					0, 0,
+					TILES_RESOLUTION,
+					TILES_COUNT << TILES_RESOLUTION_LOG2
+				).data.buffer
+			);
+			for (const model of renderer_instances) model.flag_dirty = true;
+			tiles_image_loading = null;
+		}
+		tiles_image.src = `${API_DATA}textures/${id}.png`;
+	}
 }
-tiles_image.src = ASSETS + 'blocks.webp';
 
 export const renderer_create = (game, canvas_element) => {
 	const model = {
@@ -98,14 +113,13 @@ export const renderer_create = (game, canvas_element) => {
 		), 1e3),
 		game,
 	};
-	if (!tiles_data) {
-		tiles_data_onload = () => model.flag_dirty = true;
-	}
+	renderer_instances.add(model);
 	renderer_canvas_init(model);
 	return model;
 }
 
 export const renderer_destroy = model => (
+	renderer_instances.delete(model),
 	clearInterval_(model.fps_interval)
 );
 
@@ -153,7 +167,7 @@ export const renderer_render = (model, now) => {
 			blocks,
 			size_l2,
 		} = world;
-		const flag_textures = config.flag_textures && tiles_data !== null;
+		const flag_textures = tiles_data !== null;
 		const resolution_x_1d = 1 / resolution_x;
 		const resolution_y_1d = 1 / resolution_y;
 		const resolution_x_h = resolution_x >> 1;

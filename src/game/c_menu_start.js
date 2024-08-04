@@ -13,19 +13,22 @@ import {
 
 import {
 	APP_VIEW_GAME,
+	APP_VIEW_SETTINGS,
 } from '../etc/constants.js';
 import {
 	API,
-	API_DOWNLOAD,
+	API_DATA,
 	VERSION,
 } from '../etc/env.js';
 import {
 	Date_now,
+	Error_,
 	JSON_stringify,
 	Math_max,
 	Math_min,
 	Promise_,
 	datify,
+	fetch_,
 } from '../etc/helpers.js';
 import {
 	locale_ask_world_delete_1,
@@ -67,12 +70,12 @@ import {
 	locale_only_local,
 	locale_open,
 	locale_owner,
-	locale_project_page,
 	locale_public,
 	locale_publish_world,
 	locale_refresh,
 	locale_reload_list,
 	locale_rename,
+	locale_settings,
 	locale_show_world_settings,
 	locale_transfer,
 	locale_unpublish_world,
@@ -146,6 +149,11 @@ function WorldItem({
 	];
 }
 
+const headers_json_post = {
+	method: 'POST',
+	headers: {'Content-Type': 'application/json'},
+};
+
 export default function MenuStart({
 	account,
 	actions,
@@ -173,8 +181,8 @@ export default function MenuStart({
 		async () => {
 			try {
 				const initial = !world_list_remote_ref.value && !refreshes;
-				const response = await fetch(API + `world?what=${initial ? 'initial' : 'meta_all'}`);
-				if (!response.ok) throw new Error(locale_error_connection);
+				const response = await fetch_(`${API}world?what=${initial ? 'initial' : 'meta_all'}`);
+				if (!response.ok) throw Error_(locale_error_connection);
 				const json = await response.json();
 				if (!initial) return /** @type {!Array<TYPE_WORLD_LISTING_REMOTE>} */ (json);
 				const json_initial = /** @type {TYPE_RESPONSE_INITIAL} */ (json);
@@ -307,10 +315,9 @@ export default function MenuStart({
 		let cancelled = false;
 		const world_busy = world_list.find(world => world.id === world_busy_id);
 
-		const prefix = `minicraft.world.${world_busy_id}:`;
 		if (world_busy.local < world_busy.remote) {
 			// download
-			fetch(API_DOWNLOAD + `${world_busy.hash}.json`)
+			fetch_(`${API_DATA}worlds/${world_busy.hash}.json`)
 			.then(response => response.json())
 			.then(json => {
 				if (cancelled) return;
@@ -342,21 +349,19 @@ export default function MenuStart({
 				});
 				return;
 			}
-			const prefix_length = prefix.length;
 			let id_new = world_busy_id;
 			(
 				// register new world?
 				world_busy.remote === 1
-				?	fetch(API + 'world', {
-						method: 'POST',
-						headers: {'Content-Type': 'application/json'},
+				?	fetch_(API + 'world', {
+						...headers_json_post,
 						body: JSON_stringify({
 							what: 'meta',
 							label: world_busy.label,
 						}),
 					})
 					.then(response => {
-						if (!response.ok) throw new Error(
+						if (!response.ok) throw Error_(
 							response.status === 403
 							?	locale_error_no_permission_logged_in
 							:	locale_error_connection
@@ -374,9 +379,8 @@ export default function MenuStart({
 			})
 			.then(json => {
 				if (cancelled) throw null;
-				return fetch(API + 'world', {
-					method: 'POST',
-					headers: {'Content-Type': 'application/json'},
+				return fetch_(API + 'world', {
+					...headers_json_post,
 					body: JSON_stringify({
 						what: 'data',
 						world: id_new,
@@ -385,7 +389,7 @@ export default function MenuStart({
 				});
 			})
 			.then(response => {
-				if (!response.ok) throw new Error(
+				if (!response.ok) throw Error_(
 					response.status === 403
 					?	locale_error_no_permission_logged_in
 					:	locale_error_connection
@@ -519,9 +523,9 @@ export default function MenuStart({
 					});
 				}
 			}),
-			node_dom(`button[innerText=${locale_project_page}]`, {
+			node_dom(`button[innerText=${locale_settings}]`, {
 				onclick: () => {
-					open('//github.com/L3P3/minicraft');
+					view_set(APP_VIEW_SETTINGS);
 				},
 			}),
 		]),
@@ -584,7 +588,7 @@ export default function MenuStart({
 							}
 							if (world_selected.remote) {
 								busy_set(true);
-								fetch(API + 'world', {
+								fetch_(API + 'world', {
 									method: 'POST',
 									headers: {'Content-Type': 'application/json'},
 									body: JSON_stringify({
@@ -594,7 +598,7 @@ export default function MenuStart({
 									}),
 								})
 								.then(response => {
-									if (!response.ok) throw new Error(
+									if (!response.ok) throw Error_(
 										response.status === 403
 										?	locale_error_no_permission_logged_in
 										:	locale_error_connection
@@ -636,7 +640,7 @@ export default function MenuStart({
 							}
 							else {
 								busy_set(true);
-								fetch(API + 'world', {
+								fetch_(API + 'world', {
 									method: 'DELETE',
 									headers: {'Content-Type': 'application/json'},
 									body: JSON_stringify({
@@ -645,7 +649,7 @@ export default function MenuStart({
 									}),
 								})
 								.then(response => {
-									if (!response.ok) throw new Error(
+									if (!response.ok) throw Error_(
 										response.status === 403
 										?	locale_error_no_permission_logged_in
 										:	locale_error_connection
@@ -686,7 +690,7 @@ export default function MenuStart({
 						}`,
 						onclick: () => {
 							busy_set(true);
-							fetch(API + 'world', {
+							fetch_(API + 'world', {
 								method: 'POST',
 								headers: {'Content-Type': 'application/json'},
 								body: JSON_stringify({
@@ -696,7 +700,7 @@ export default function MenuStart({
 								}),
 							})
 							.then(response => {
-								if (!response.ok) throw new Error(
+								if (!response.ok) throw Error_(
 									response.status === 403
 									?	locale_error_no_permission_logged_in
 									:	locale_error_connection

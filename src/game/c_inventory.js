@@ -23,9 +23,6 @@ import {
 	game_menu_close,
 } from './m_game.js';
 import {
-	tiles_data,
-} from './m_renderer.js';
-import {
 	slot_create,
 	slot_transfer,
 } from './m_slot.js';
@@ -37,6 +34,7 @@ import Stack from './c_stack.js';
 
 function Palette({
 	slot_hand,
+	textures_id,
 }) {
 	hook_dom('div[className=grid]', {
 		onclick: ({
@@ -69,6 +67,7 @@ function Palette({
 					data: null,
 					gamemode: GAMEMODE_CREATIVE,
 					id,
+					textures_id,
 				}),
 			])
 		))
@@ -77,10 +76,11 @@ function Palette({
 
 export default function Inventory({
 	game,
+	textures_id,
 }) {
 	const slot_hand = hook_memo(() => slot_create(null));
 
-	const gamemode = game.player.gamemode;
+	const {gamemode} = game.player;
 
 	hook_dom('div[className=menu overlay inventory]', hook_memo(() => ({
 		onclick: ({
@@ -137,12 +137,13 @@ export default function Inventory({
 		},
 	})));
 
-	return tiles_data && [
+	return [
 		node_dom('div[className=window]', null, [
 			node_dom(`h2[innerText=${locale_inventory}]`),
 			gamemode === GAMEMODE_CREATIVE &&
 			node(Palette, {
 				slot_hand,
+				textures_id,
 			}),
 			node_dom('div[className=grid]', null,
 				game.player.inventory.map(({content}, index) =>
@@ -160,6 +161,7 @@ export default function Inventory({
 							data: content.data,
 							gamemode,
 							id: content.id,
+							textures_id,
 						}),
 					])
 				)
@@ -176,6 +178,7 @@ export default function Inventory({
 				data: slot_hand.content.data,
 				gamemode: GAMEMODE_SURVIVAL,
 				id: slot_hand.content.id,
+				textures_id,
 			}),
 		]),
 	];

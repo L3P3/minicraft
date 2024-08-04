@@ -263,11 +263,6 @@ var onmousedown;
 var onmouseup;
 
 /**
-	@type {string}
-*/
-var ASSETS;
-
-/**
 	@type {boolean}
 */
 var SSR;
@@ -326,6 +321,15 @@ var TYPE_WORLD_API;
 	}}
 */
 var TYPE_CHAT_API;
+
+/**
+	@typedef {{
+		id: number,
+		label: string,
+		owner: string,
+	}}
+*/
+var TYPE_TEXTURES_ITEM;
 
 /**
 	@typedef {{

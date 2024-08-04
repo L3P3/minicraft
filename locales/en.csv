@@ -1,6 +1,7 @@
 amount: Amount
 ask_world_delete_1: Really delete world "
 ask_world_delete_2: "?
+back: Back
 back_to_game: Back to game
 change_world_name: Change world name
 chunk_regenerated: Chunk regenerated.
@@ -78,7 +79,6 @@ settings: Settings
 show_world_settings: Show world settings
 spawn_updated: Spawn updated.
 surfaces_colored: Plain
-surfaces_textured: Textured
 surfaces: Surfaces
 teleported_to_spawn: Teleported to spawn.
 teleported_to: Teleported to

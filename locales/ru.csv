@@ -1,6 +1,7 @@
 amount: Число
 ask_world_delete_1: Мир "
 ask_world_delete_2: " точно удалить?
+back: Вернуться
 back_to_game: Вернуться в игру
 change_world_name: Изменит имя миру
 chunk_regenerated: Чанки перезагружается 
@@ -78,7 +79,6 @@ settings: Настройки
 show_world_settings: Акции/Показать настройки мира
 spawn_updated: Началная точка обновлена
 surfaces_colored: Одноцветный
-surfaces_textured: С текстурами
 surfaces: Поверхность
 teleported_to_spawn: Переместится к стартовой точки
 teleported_to: Переместится к

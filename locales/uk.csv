@@ -1,6 +1,7 @@
 amount: Номер
 ask_world_delete_1: Світ "
 ask_world_delete_2: " дійсно видалити?
+back: Повернуться
 back_to_game: Повернуться в гру
 change_world_name: Змінити ім\'я світу
 chunk_regenerated: Участки відновлені.
@@ -77,8 +78,7 @@ selection_secondary: Друга крапка вибору
 settings: Налаштування
 show_world_settings: Акції/Показати налаштування світу.
 spawn_updated: Початкова крапка оновлена.
-surfaces_colored: Однотонні 
-surfaces_textured: Текстурований
+surfaces_colored: Однотонні
 surfaces: Поверхности 
 teleported_to_spawn: Перемістився до початкової.
 teleported_to: Переміститися до

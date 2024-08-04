@@ -13,14 +13,11 @@ import {
 	Math_min,
 } from '../etc/helpers.js';
 
-import {
-	tiles_data,
-} from './m_renderer.js';
-
 import Stack from './c_stack.js';
 
 export default function Bar({
 	player,
+	textures_id,
 	time_now,
 }) {
 	hook_dom('div[className=bar]', {
@@ -44,7 +41,6 @@ export default function Bar({
 	const {gamemode} = player;
 
 	return (
-		tiles_data &&
 		player.inventory
 		.slice(0, PLAYER_SLOTS)
 		.map(({content}, index) => (
@@ -62,6 +58,7 @@ export default function Bar({
 					data: content.data,
 					gamemode,
 					id: content.id,
+					textures_id,
 				}),
 			])
 		))

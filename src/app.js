@@ -38,6 +38,9 @@ import {
 	game_key,
 	game_save,
 } from './game/m_game.js';
+import {
+	tiles_set,
+} from './game/m_renderer.js';
 
 import App from './game/c_app.js';
 
@@ -121,6 +124,7 @@ function Root() {
 			addEventListener_('touchstart', handler_touch, true);
 		}
 	}, [flag_touch]);
+	hook_effect(tiles_set, [state.config.textures]);
 
 	hook_dom('', {
 		onkeydown: handler_key,

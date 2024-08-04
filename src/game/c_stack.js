@@ -10,14 +10,17 @@ import {
 	ITEM_LABELS,
 } from '../etc/constants.js';
 import {
+	API_DATA,
 	LANG,
 } from '../etc/env.js';
 
 const Bitmap = ({
 	id,
+	textures_id,
 }) => (
-	hook_dom('#tile', {
+	hook_dom('div[className=bitmap]', {
 		S: {
+			backgroundImage: `url(${API_DATA}textures/${textures_id}.png)`,
 			backgroundPositionY: `-${(id - 1) * 2}rem`,
 		},
 	}),
@@ -29,6 +32,7 @@ export default function Stack({
 	data,
 	gamemode,
 	id,
+	textures_id,
 }) {
 	hook_dom('div[className=stack]', {
 		title: (
@@ -41,6 +45,7 @@ export default function Stack({
 	return [
 		node(Bitmap, {
 			id,
+			textures_id,
 		}),
 		amount !== 1 &&
 		node_dom('div[className=amount]', {

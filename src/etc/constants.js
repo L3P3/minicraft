@@ -5,8 +5,9 @@ import {
 	locale_item_labels,
 } from './locale.js';
 
-export const APP_VIEW_WORLDS = 0;
-export const APP_VIEW_GAME = 1;
+export const APP_VIEW_GAME = 0;
+export const APP_VIEW_SETTINGS = 1;
+export const APP_VIEW_WORLDS = 2;
 
 export const CHUNK_WIDTH_L2 = 4;
 export const CHUNK_WIDTH = 1 << CHUNK_WIDTH_L2;

@@ -187,6 +187,9 @@ export default function Game({
 
 	hook_rerender();
 
+	const textures_id_ref = hook_static({val: 1});
+	if (config.textures) textures_id_ref.val = config.textures;
+
 	return [
 		node_dom('canvas', {
 			R: hook_static(canvas_element => (
@@ -214,11 +217,13 @@ export default function Game({
 		model.player.gamemode !== GAMEMODE_SPECTATOR &&
 		node(Bar, {
 			player: model.player,
+			textures_id: textures_id_ref.val,
 			time_now,
 		}),
 		model.menu === MENU_INVENTORY &&
 		node(Inventory, {
 			game: model,
+			textures_id: textures_id_ref.val,
 			time_now,
 		}),
 		model.menu === MENU_SETTINGS &&

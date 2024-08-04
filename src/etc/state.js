@@ -6,6 +6,7 @@ import {
 	JSON_parse,
 	JSON_stringify,
 	Object_keys,
+	Set_,
 	localStorage_,
 	localStorage_getItem,
 	localStorage_removeItem,
@@ -25,7 +26,7 @@ if (
 	config_loaded['worlds'] &&
 	config_loaded['version'].startsWith('0.9.')
 ) {
-	const prefixes_keep = new Set(
+	const prefixes_keep = new Set_(
 		config_loaded['worlds']
 		.map(world => 'minicraft.world.' + world.id)
 	);
@@ -42,11 +43,11 @@ export const reducers = {
 	init: () => {
 		let needs_save = false;
 		const config = {
-			flag_textures: true,
 			flag_touch: false, // not saved
 			pixel_grouping: 1,
 			mouse_sensitivity: 3,
 			resolution_scaling: 4,
+			textures: 1,
 			view_angle: 120,
 			view_distance: 64,
 			world_last: 0,
@@ -54,13 +55,8 @@ export const reducers = {
 			worlds: [],
 		};
 		if (config_loaded) {
-			let tmp = config_loaded['flag_textures'];
+			let tmp = config_loaded['pixel_grouping'];
 			if (tmp != null) {
-				config.flag_textures = tmp;
-			}
-			if ((
-				tmp = config_loaded['pixel_grouping']
-			) != null) {
 				config.pixel_grouping = tmp;
 			}
 			if ((
@@ -69,6 +65,18 @@ export const reducers = {
 				config.mouse_sensitivity = tmp;
 			}
 			config.resolution_scaling = config_loaded['resolution_scaling'];
+			if ((
+				tmp = config_loaded['textures']
+			) != null) {
+				config.textures = tmp;
+			}
+			else {
+				config.textures = (
+					config_loaded['flag_textures']
+					?	1
+					:	0
+				);
+			}
 			config.view_angle = config_loaded['view_angle'];
 			config.view_distance = config_loaded['view_distance'];
 			if ((
@@ -117,10 +125,10 @@ export const reducers = {
 		if (config === state.config_saved) return state;
 		localStorage_setItem('minicraft.config', JSON_stringify({
 			'version': VERSION,
-			'flag_textures': config.flag_textures,
 			'pixel_grouping': config.pixel_grouping,
 			'mouse_sensitivity': config.mouse_sensitivity,
 			'resolution_scaling': config.resolution_scaling,
+			'textures': config.textures,
 			'view_angle': config.view_angle,
 			'view_distance': config.view_distance,
 			'world_last': config.world_last,
