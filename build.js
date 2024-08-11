@@ -122,7 +122,8 @@ async function build_js(lang) {
 		(await readFile(TMP_FILE, 'ascii'))
 		.split('actions').join('a')
 		.split('content').join('c')
-		.split('loaded').join('l'),
+		.split('loaded').join('l')
+		.split('downl').join('downloaded'),
 		'ascii'
 	);
 
@@ -156,8 +157,7 @@ if(
 	throw new Error('google closure compiler required!');
 }
 
-await exec('mkdir -p ./dist');
-await exec('rm ./dist/*');
+await exec('rm ./dist/app*');
 
 console.log(`build ${version} (${prod ? 'production' : 'dev'})...`);
 

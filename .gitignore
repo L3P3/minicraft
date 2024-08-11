@@ -1,0 +1,6 @@
+doc
+src/old
+dist/*
+!dist/.gitkeep
+node_modules
+package-lock.json

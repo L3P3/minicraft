@@ -541,73 +541,60 @@ export const renderer_render = (model, now) => {
 	}
 
 	model.diagnostics = (
-		game.flag_diagnostics
-		?	'Minicraft ' + VERSION + ' ' + (
-				number_padStart2(model.fps, '\xa0')
-			) + ' fps, T: ' + (
-				number_padStart2(world.time_f * 24, '0')
-			) + ':' + (
-				number_padStart2((((world.time_f * 24) % 1) * 60), '0')
-			) + '; ' + (
-				world.flag_paused &&
-				now % 1e3 < 500
-				?	''
-				:	world.time
-			) + '\n' +
+		game.flag_diagnostics ?
+`minicraft ${VERSION} ${
+	number_padStart2(model.fps, '\xa0')
+} fps, T: ${
+	number_padStart2(world.time_f * 24, '0')
+}:${
+	number_padStart2((((world.time_f * 24) % 1) * 60), '0')
+}; ${
+	world.flag_paused &&
+	now % 1e3 < 500
+	?	''
+	:	world.time
+}
+R: ${resolution_x}x${resolution_y} (x${config.resolution_scaling}), D: ${config.view_distance}, C: ${world.chunks_checklist_index}/${world.chunks_checklist.length}, M: ${
+	number_square(
+		1 << (CHUNK_WIDTH_L2 + world.size_l2)
+	)
+	* CHUNK_HEIGHT >> 10
+}k
+E: 0/0 M: ${player.gamemode}
 
-			'R: ' + resolution_x + 'x' + resolution_y +
-			' (x' + config.resolution_scaling + '), D: ' + config.view_distance + ', ' +
-			//'S: ' + check_count + ', ' +
-			'C: ' + world.chunks_checklist_index + '/' + world.chunks_checklist.length + ', ' +
-			'M: ' + (
-				number_square(
-					1 << (CHUNK_WIDTH_L2 + world.size_l2)
-				)
-				* CHUNK_HEIGHT >> 10
-			) + 'k\n' +
-			'E: 0/0 M: ' + player.gamemode + '\n\n' +
-
-			'Position: ' + (
-				number_toFixed2(player.position_x)
-			) + ' ' + (
-				number_toFixed2(player.position_y)
-			) + ' ' + (
-				number_toFixed2(player.position_z)
-			) + '\n' +
-
-			'Angle: ' + (
-				number_toFixed2(player.angle_h * Math_PI_180d)
-			) + ' ' + (
-				number_toFixed2(player.angle_v * Math_PI_180d)
-			) + '\n' +
-			'Block: ' + (
-				player.block_focus_y < 0
-				?	0
-				:	player.block_focus_x + ' ' +
-					player.block_focus_y + ' ' +
-					player.block_focus_z + ' ' +
-					BLOCK_TYPE_FACE_LABELS[player.block_focus_face] + ': ' +
-					world_block_get(
-						world,
-						player.block_focus_x,
-						player.block_focus_y,
-						player.block_focus_z
-					)
-			) + '\n' +
-			'Chunk abs: ' + (
-				Math_floor(player.position_x) >> CHUNK_WIDTH_L2
-			) + ' ' + (
-				Math_floor(player.position_z) >> CHUNK_WIDTH_L2
-			) + ' ' + (
-				Math_floor(player.position_y) >> CHUNK_WIDTH_L2
-			) + ' rel: ' + (
-				world.focus_x
-			) + ' ' + (
-				world.focus_z
-			) + ' ' + (
-				world.focus_y
-			)
-		:	''
+Position: ${
+	number_toFixed2(player.position_x)
+} ${
+	number_toFixed2(player.position_y)
+} ${
+	number_toFixed2(player.position_z)
+}
+Angle: ${
+	number_toFixed2(player.angle_h * Math_PI_180d)
+} ${
+	number_toFixed2(player.angle_v * Math_PI_180d)
+}
+Block: ${
+	player.block_focus_y < 0
+	?	0
+	:	player.block_focus_x + ' ' +
+		player.block_focus_y + ' ' +
+		player.block_focus_z + ' ' +
+		BLOCK_TYPE_FACE_LABELS[player.block_focus_face] + ': ' +
+		world_block_get(
+			world,
+			player.block_focus_x,
+			player.block_focus_y,
+			player.block_focus_z
+		)
+}
+Chunk abs: ${
+	Math_floor(player.position_x) >> CHUNK_WIDTH_L2
+} ${
+	Math_floor(player.position_z) >> CHUNK_WIDTH_L2
+} ${
+	Math_floor(player.position_y) >> CHUNK_WIDTH_L2
+} rel: ${world.focus_x} ${world.focus_z} ${world.focus_y}` : ''
 	);
 }
 

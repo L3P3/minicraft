@@ -1,6 +1,6 @@
 {
 	"name": "minicraft",
-	"version": "0.11.0",
+	"version": "0.11.1",
 	"description": "voxel-based 3d game, written in javascript",
 	"homepage": "https://l3p3.de/minicraft",
 	"repository": {
@@ -13,7 +13,8 @@
 	"main": "./src/app.js",
 	"type": "module",
 	"scripts": {
-		"build": "node build.js"
+		"build": "node build.js",
+		"start": "esbuild --servedir=."
 	},
 	"keywords": [
 		"minecraft",

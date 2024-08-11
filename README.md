@@ -61,13 +61,17 @@ Heavily inspired by and somewhat based on the work of [@xNotch](https://github.c
 - [ ] use gpu?
 - [ ] get a lawyer?
 
-## How to use while developing
+## How to run locally
 
 I highly recommend using Visual Studio Code and the extension "Live Server". Start it via "Go Live" and open "http://localhost:5500/app-dev.html" to see the result.
 
+If you use another IDE that does not have a similar feature, you may once do `sudo apt install esbuild`, then run `npm start` and click the link and open `app-dev.html`. But I do not recommend this approach.
+
 ## Build instructions
 
-After cloning, you need to run `npm install` once to install the build tools.
+Building is **not needed** unless my server is down and you want to mirror https://l3p3.de/minicraft!
+
+After cloning, you need to run `npm install` once to install the build tools. The build script is designed to run under Linux, see [the GitHub actions file](.github/workflows/build.yml) and [the build script itself](build.js) to learn more about the build environment.
 
 To bundle the app, run `npm run build`. The result will be put into the `/dist` directory and can be tested at "http://localhost:5500/app-prod.html".
 

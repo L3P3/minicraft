@@ -764,7 +764,7 @@ export const game_message_send = (model, value) => {
 			player.speed_z = 0;
 			break;
 		case 'version':
-			game_message_print(model, 'Minicraft ' + VERSION);
+			game_message_print(model, 'minicraft ' + VERSION);
 			break;
 		case '/exit':
 			player.mouse_mode = MOUSE_MODE_NORMAL;
