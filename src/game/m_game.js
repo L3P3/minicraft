@@ -10,6 +10,7 @@ import {
 	BLOCK_TYPE_DIRT,
 	BLOCK_TYPE_FACE_B,
 	BLOCK_TYPE_FACE_E,
+	BLOCK_TYPE_FACE_N,
 	BLOCK_TYPE_FACE_S,
 	BLOCK_TYPE_FACE_T,
 	BLOCK_TYPE_FACE_W,
@@ -455,7 +456,7 @@ export const game_key = (model, code, state) => {
 						case BLOCK_TYPE_FACE_B: --y; break;
 						case BLOCK_TYPE_FACE_T: ++y; break;
 						case BLOCK_TYPE_FACE_S: --z; break;
-						default: ++z;
+						case BLOCK_TYPE_FACE_N: ++z;
 					}
 					if (
 						y >= 0 &&

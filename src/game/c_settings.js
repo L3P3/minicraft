@@ -140,7 +140,7 @@ export default function Settings({
 				}),
 			]),
 			node_dom(`label[innerText=${locale_pixel_grouping}:]`, null, [
-				node_dom('input[type=range][min=1][max=6][step=1]', {
+				node_dom('input[type=range][min=1][max=8][step=1]', {
 					value: config.pixel_grouping,
 					onchange: event => (
 						config_set({

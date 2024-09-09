@@ -78,13 +78,14 @@ export const BLOCK_COLORS = [
 	0xe3eaed, // QUARTZ_BLOCK
 ];
 
-export const BLOCK_TYPE_FACE_LABELS = 'WEBTSN'.split('');
+export const BLOCK_TYPE_FACE_LABELS = 'WEBTSNI';
 export const BLOCK_TYPE_FACE_W = 0;
 export const BLOCK_TYPE_FACE_E = 1;
 export const BLOCK_TYPE_FACE_B = 2;
 export const BLOCK_TYPE_FACE_T = 3;
 export const BLOCK_TYPE_FACE_S = 4;
 export const BLOCK_TYPE_FACE_N = 5;
+export const BLOCK_TYPE_FACE_I = 6;
 
 export const SKY_COLOR = 0xffb184;
 
