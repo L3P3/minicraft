@@ -67,9 +67,13 @@ I highly recommend using Visual Studio Code and the extension "Live Server". Sta
 
 If you use another IDE that does not have a similar feature, you may once do `sudo apt install esbuild`, then run `npm start` and click the link and open `app-dev.html`. But I do not recommend this approach.
 
+> [!TIP]
+> An http server is only needed when using `app-dev.html`, since `import` statements are not supported in `file://` protocol.
+
 ## Build instructions
 
-Building is **not needed** unless my server is down and you want to mirror https://l3p3.de/minicraft!
+> [!IMPORTANT]
+> Building is **not needed** unless my server is down and you want to mirror https://l3p3.de/minicraft!
 
 After cloning, you need to run `npm install` once to install the build tools. The build script is designed to run under Linux, see [the GitHub actions file](.github/workflows/build.yml) and [the build script itself](build.js) to learn more about the build environment.
 
@@ -95,4 +99,4 @@ I am really happy to answer any questions or getting any kind of feedback. Feel 
 
 Just ZLib license, I do not care too much about it.
 
-This game includes slightly modified textures from Minecraft, which is of course owned by Microsoft. Since this is a purely educational project, I deem this fair use.
+This game uses slightly modified textures from Minecraft, which is of course owned by Microsoft. Since this is a purely educational project, I deem this fair use.
