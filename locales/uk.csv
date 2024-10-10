@@ -33,6 +33,7 @@ error_no_world_selected: Не вибраний світ!
 error_not_logged_in: Не зареєстрований!
 error_only_vert_supported: Підтримується тільки "vert"!
 error_opened: миникрафт вже запущений!
+error_parameter_missing: Відсутній параметр!
 error_pitch: Невдачя!
 error_selection_required: Необхідний вибір!
 error_storage: Недостатньо місця!
@@ -82,6 +83,7 @@ surfaces_colored: Однотонні
 surfaces: Поверхности 
 teleported_to_spawn: Перемістився до початкової.
 teleported_to: Переміститися до
+time_set_to: Новий час
 today: сегодня 
 transfer: Перемістити 
 unknown_command: Недійсна команда 

@@ -89,7 +89,7 @@ export default function Game({
 
 			if (
 				model.menu === MENU_NONE &&
-				!model.world.flag_paused &&
+				!model.flag_paused &&
 				Math.abs(event.deltaY) > 5
 			) {
 				const key =
@@ -144,7 +144,7 @@ export default function Game({
 		// esc pressed ingame or focus lost
 		if (
 			!ingame &&
-			!model.world.flag_paused &&
+			!model.flag_paused &&
 			model.menu === MENU_NONE
 		) {
 			model.menu = MENU_SETTINGS;
@@ -165,7 +165,7 @@ export default function Game({
 			}
 		}
 
-		model.world.flag_paused = !ingame;
+		model.flag_paused = !ingame;
 	}, [
 		config.flag_touch &&
 		model.menu === MENU_NONE ||
@@ -177,7 +177,7 @@ export default function Game({
 		shouldRelease &&
 			document_.exitPointerLock()
 	), [
-		model.world.flag_paused ||
+		model.flag_paused ||
 		model.menu !== MENU_NONE,
 	]);
 

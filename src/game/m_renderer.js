@@ -149,7 +149,7 @@ export const renderer_render = (model, now) => {
 	let block_inside = 0;
 
 	if (
-		!world.flag_paused ||
+		!game.flag_paused ||
 		model.flag_dirty
 	) {
 		model.flag_dirty = false;
@@ -594,7 +594,7 @@ export const renderer_render = (model, now) => {
 }:${
 	number_padStart2((((world.time_f * 24) % 1) * 60), '0')
 }; ${
-	world.flag_paused &&
+	game.flag_paused &&
 	now % 1e3 < 500
 	?	''
 	:	world.time

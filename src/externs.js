@@ -276,6 +276,7 @@ var SSR;
 			p: !Array<number>,
 		},
 		s: !Array<number>,
+		t: number,
 		v: number,
 	}}
 */

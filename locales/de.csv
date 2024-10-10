@@ -33,6 +33,7 @@ error_no_world_selected: Keine Welt ausgewählt!
 error_not_logged_in: Nicht angemeldet!
 error_only_vert_supported: Nur "vert" wird unterstützt!
 error_opened: minicraft läuft schon!
+error_parameter_missing: Parameter fehlt!
 error_pitch: Pech!
 error_selection_required: Auswahl erforderlich!
 error_storage: Der Speicherplatz reicht nicht!
@@ -82,6 +83,7 @@ surfaces_colored: Einfarbig
 surfaces: Oberflächen
 teleported_to_spawn: Zum Startpunkt teleportiert.
 teleported_to: Teleportiert zu
+time_set_to: Zeit gesetzt auf
 today: heute
 transfer: Übertragen
 unknown_command: Ungültiger Befehl

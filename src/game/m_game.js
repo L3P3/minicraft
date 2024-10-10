@@ -82,6 +82,7 @@ import {
 	locale_error_invalid_block_type,
 	locale_error_inventory_full,
 	locale_error_only_vert_supported,
+	locale_error_parameter_missing,
 	locale_error_pitch,
 	locale_error_selection_required,
 	locale_game_saved,
@@ -99,6 +100,7 @@ import {
 	locale_spawn_updated,
 	locale_teleported_to_spawn,
 	locale_teleported_to,
+	locale_time_set_to,
 	locale_unknown_command,
 } from '../etc/locale.js';
 
@@ -130,6 +132,7 @@ import {
 	world_load,
 	world_save,
 	world_tick,
+	world_time_set,
 } from './m_world.js';
 
 let message_id_counter = 0;
@@ -148,6 +151,7 @@ export const game_create = (actions, frame_element, config, account) => {
 		cursor_y: 0,
 		flag_diagnostics: DEBUG,
 		flag_hud: true,
+		flag_paused: true,
 		frame_element,
 		frame_last: 0,
 		keys_active: new Set_,
@@ -166,6 +170,7 @@ export const game_create = (actions, frame_element, config, account) => {
 		rotate_last_time: 0,
 		rotate_last_v: 0,
 		tick_interval: setInterval_(() => (
+			model.flag_paused ||
 			world_tick(world, player)
 		), 50),
 		world,
@@ -191,6 +196,8 @@ export const game_renderer_init = (model, canvas_element) => {
 }
 
 export const game_save = model => {
+	if (model.world.flag_frozen) return;
+
 	world_save(model.world, model.player);
 	model.actions.world_prop(model.world.id, {
 		mod_l: Date_now(),
@@ -236,7 +243,7 @@ export const game_view_distance_update = model => {
 
 export const game_menu_close = model => {
 	model.menu = MENU_NONE;
-	model.world.flag_paused = false;
+	model.flag_paused = false;
 	game_mouse_catch(model);
 }
 
@@ -500,7 +507,7 @@ export const game_key = (model, code, state) => {
 			break;
 		case 27: // ESC
 			if (model.menu === MENU_NONE) {
-				model.world.flag_paused = true;
+				model.flag_paused = true;
 				model.menu = MENU_SETTINGS;
 			}
 			break;
@@ -538,7 +545,7 @@ export const game_key = (model, code, state) => {
 			break;
 		case 80: // P
 			if (model.world)
-				model.world.flag_paused = true;
+				model.flag_paused = true;
 			break;
 		case 81: { // Q
 			const slot = player.inventory[player.slot_index];
@@ -615,7 +622,7 @@ export const game_key = (model, code, state) => {
 export const game_render = (model, now) => {
 	if (model.world) {
 		model.frame_last &&
-		!model.world.flag_paused &&
+		!model.flag_paused &&
 			player_tick(model.player, now - model.frame_last);
 		model.renderer &&
 			renderer_render(model.renderer, now);
@@ -716,7 +723,7 @@ export const game_message_send = (model, value) => {
 			}
 			break;
 		case 'help':
-			game_message_print(model, locale_commands + ': clear, clearinv, gamemode, give, help, load, me, save, spawn, teleport, version');
+			game_message_print(model, locale_commands + ': clear, clearinv, gamemode, give, help, load, me, save, spawn, teleport, time, version');
 			break;
 		case 'load':
 			world_chunk_load(world, true)
@@ -764,6 +771,29 @@ export const game_message_send = (model, value) => {
 			player.speed_y = 0;
 			player.speed_z = 0;
 			break;
+		case 'time': {
+			let amount = args[1];
+			if (!amount) {
+				game_message_print(model, locale_error_parameter_missing);
+				break;
+			}
+			if (amount === 'day') amount = 1e3;
+			else if (amount === 'night') amount = 13e3;
+			else if (isNaN(
+				amount = Math_floor(Number_(amount))
+			)) break;
+			switch (args[0]) {
+			case 'add':
+				amount += world.time;
+			case 'set':
+				world_time_set(world, amount);
+				game_message_print(model, locale_time_set_to + ': ' + world.time, true);
+				break;
+			default:
+				game_message_print(model, locale_unknown_command + ': time ' + args[0]);
+			}
+			break;
+		}
 		case 'version':
 			game_message_print(model, 'minicraft ' + VERSION);
 			break;

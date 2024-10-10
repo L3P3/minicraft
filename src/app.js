@@ -13,9 +13,6 @@ import {
 	DEBUG,
 } from './etc/env.js';
 import {
-	reducers,
-} from './etc/state.js';
-import {
 	addEventListener_,
 	BroadcastChannel_,
 	clearTimeout_,
@@ -33,6 +30,9 @@ import {
 import {
 	locale_error_opened,
 } from './etc/locale.js';
+import {
+	reducers,
+} from './etc/state.js';
 
 import {
 	game_key,

@@ -61,8 +61,8 @@ export const world_create = id => ({
 	chunks_checklist: null,
 	// next checklist item to check
 	chunks_checklist_index: 0,
-	// if world is paused
-	flag_paused: true,
+	// nothing must change
+	flag_frozen: false,//TODO set
 	// currently centered chunk (relative chunk position inside superchunk)
 	focus_x: 0,
 	focus_y: 0,
@@ -292,6 +292,8 @@ const world_chunk_load_setup = model => {
 }
 
 export const world_save = (model, player) => {
+	if (model.flag_frozen) return;
+
 	const i = player.inventory.map(({content}) =>
 		content && [
 			content.id,
@@ -324,6 +326,7 @@ export const world_save = (model, player) => {
 				model.spawn_y,
 				model.spawn_z,
 			],
+			t: model.time,
 			v: WORLD_FORMAT,
 		}))
 	);
@@ -341,6 +344,7 @@ export const world_load = (model, player) => {
 		const {
 			p,
 			s,
+			t,
 			v,
 		} = /** @type {TYPE_WORLD_META} */ (JSON_parse(meta));
 
@@ -368,7 +372,16 @@ export const world_load = (model, player) => {
 		model.spawn_x = s[0];
 		model.spawn_y = s[1];
 		model.spawn_z = s[2];
+
+		if (t == null) return;
+
+		world_time_set(model, t);
 	}
+}
+
+export const world_time_set = (model, time) => {
+	model.time = time % 24e3;
+	model.time_f = ((time + 6e3) / 24e3) % 1;
 }
 
 const world_chunk_key = (x_abs, z_abs, y) => (
@@ -554,10 +567,7 @@ export const world_chunk_load = async (model, all) => {
 }
 
 export const world_tick = (model, player) => {
-	if (model.flag_paused) return;
-
-	model.time = (model.time + 1) % 24e3;
-	model.time_f = ((model.time_f + 6e3) * (1 / 24e3)) % 1;
+	world_time_set(model, model.time + 1);
 
 	world_offset_update(model, player, false);
 }

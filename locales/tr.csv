@@ -33,6 +33,7 @@ error_no_world_selected: Hiçbir dünya seçilmedi!
 error_not_logged_in: Giriş yapılmamış!
 error_only_vert_supported: Sadece "vert" desteklenir!
 error_opened: minicraft zaten çalışıyor!
+error_parameter_missing: Parametre eksik!
 error_pitch: Kahretsin!
 error_selection_required: Seçim gerekli!
 error_storage: Yetersiz depolama alanı!
@@ -81,7 +82,8 @@ spawn_updated: Spawn güncellendi.
 surfaces_colored: Sade
 surfaces: Yüzeyler
 teleported_to_spawn: Spawn\'a ışınlandı.
-teleported_to: Şuraya ışınlandı: 
+teleported_to: Şuraya ışınlandı
+time_set_to: Şimdiki saat
 today: bugün
 transfer: Transfer
 unknown_command: Bilinmeyen komut

@@ -33,6 +33,7 @@ error_no_world_selected: Мир был не выбрань!
 error_not_logged_in: Не зарегестрирован!
 error_only_vert_supported: Толко "vert" поддерживается!
 error_opened: миникрафт уже запущен!
+error_parameter_missing: Параметр отсутствует!
 error_pitch: Неповезло!
 error_selection_required: Выберите сначяло!
 error_storage: Нехватает памяти!
@@ -80,8 +81,9 @@ show_world_settings: Акции/Показать настройки мира
 spawn_updated: Началная точка обновлена
 surfaces_colored: Одноцветный
 surfaces: Поверхность
-teleported_to_spawn: Переместится к стартовой точки
+teleported_to_spawn: Переместится к стартовой точки.
 teleported_to: Переместится к
+time_set_to: Новое время
 today: сегодня
 transfer: Перенести
 unknown_command: Неправилная команда
