@@ -213,12 +213,14 @@ export const renderer_render = (model, now) => {
 		let dim_next = 0;
 
 		player.block_focus_y = -1;
-		block_inside = world_block_get(
-			world,
-			position_x_shifted & world_width_m1,
-			position_y_shifted & (CHUNK_HEIGHT - 1),
-			position_z_shifted & world_width_m1
-		);
+		block_inside =
+			(position_y < 0 || position_y >= CHUNK_HEIGHT) ? 0 :
+			world_block_get(
+				world,
+				position_x_shifted & world_width_m1,
+				position_y_shifted & (CHUNK_HEIGHT - 1),
+				position_z_shifted & world_width_m1
+			);
 
 		// inside block?
 		if (
