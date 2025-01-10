@@ -21,7 +21,7 @@ export const Math_sqrt = Math_.sqrt;
 export const Math_log2 = Math_.log2;
 export const String_fromCharCode = String.fromCharCode;
 
-export const BroadcastChannel_ = BroadcastChannel;
+export const BroadcastChannel_ = window_.BroadcastChannel;
 const Date_ = Date;
 export const Date_now = () => Date_.now();
 const JSON_ = JSON;
