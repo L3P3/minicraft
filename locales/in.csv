@@ -1,0 +1,106 @@
+amount: राशि
+ask_world_delete_1: वास्तव में दुनिया हटाना चाहते हैं "
+ask_world_delete_2: "?
+back: वापस
+back_to_game: खेल पर वापस जाएं
+change_world_name: दुनिया का नाम बदलें
+chunk_regenerated: चंक पुनः उत्पन्न हुआ।
+chunks_loaded: चंक्स लोड हो गए।
+commands: कमांड्स
+delete_local: (स्थानीय) हटाएं
+delete_world: दुनिया हटाएं
+delete: हटाएं
+download_world_from_server: सर्वर से दुनिया डाउनलोड करें
+download: डाउनलोड
+error_amount_minimum_1: राशि कम से कम 1 होनी चाहिए!
+error_conflict_1: संघर्ष! दुनिया "
+error_conflict_2: " को यहाँ और कहीं और संशोधित किया गया था।\nठीक: सर्वर से वेरिएंट लें (
+error_conflict_3: ) | रद्द करें: स्थानीय वेरिएंट रखें (
+error_conflict_4: )
+error_connection: कनेक्शन त्रुटि।
+error_delete_world: दुनिया हटाते समय त्रुटि:
+error_download_world: दुनिया डाउनलोड करते समय त्रुटि:
+error_edit_world: दुनिया संपादित करते समय त्रुटि:
+error_gamemode_range: गेम मोड 0..2 के बीच होना चाहिए!
+error_invalid_block_type: अमान्य ब्लॉक प्रकार!
+error_inventory_full: इन्वेंटरी भरी हुई है!
+error_list_is_loading: सूची लोड हो रही है!
+error_loading_worldlist: दुनिया सूची लोड करते समय त्रुटि:
+error_name_too_long: नाम बहुत लंबा है!
+error_no_permission_logged_in: अनुमति नहीं है। लॉग इन किया गया है?
+error_no_permission: कोई अनुमति नहीं!
+error_no_world_selected: कोई दुनिया चयनित नहीं!
+error_not_logged_in: लॉग इन नहीं किया गया!
+error_only_vert_supported: केवल "vert" समर्थित है!
+error_opened: minicraft पहले से चल रहा है!
+error_parameter_missing: पैरामीटर गुम है!
+error_pitch: पिच!
+error_selection_required: चयन आवश्यक है!
+error_storage: अपर्याप्त संग्रहण!
+error_upload_world: दुनिया अपलोड करते समय त्रुटि:
+error_world_is_loading: दुनिया अभी भी लोड हो रही है!
+error_world_is_present_both_sides: दुनिया दोनों तरफ मौजूद है!
+error_world_not_downloaded: दुनिया अभी तक डाउनलोड नहीं हुई है!
+error_world_not_uploaded: दुनिया अपलोड नहीं हुई है!
+game_saved: खेल सहेजा गया।
+gamemode_set_to: गेम मोड सेट किया गया
+inventory_cleared: इन्वेंटरी साफ़ हो गई।
+inventory: इन्वेंटरी
+item_labels: !!!अंग्रेजी में उपयोग नहीं होता!!!
+items_given: आइटम दिए गए
+join_selected_world: चयनित दुनिया में शामिल हों
+login: लॉग इन
+modification: संशोधित
+mouse_mode_normal: सामान्य माउस मोड।
+mouse_mode_selection: माउस बटन का उपयोग करके चुनें।
+mouse_sensitivity: माउस संवेदनशीलता
+name_existing_world: दुनिया का नया नाम:\n(अधिकतम 16 वर्ण)
+name_new_world: नई दुनिया का नाम:\n(अधिकतम 16 वर्ण)
+new_world: नई दुनिया
+no: नहीं
+only_local: केवल एक स्थानीय दुनिया
+open: प्रवेश करें
+owner: मालिक
+pixel_grouping: पिक्सेल समूहीकरण
+player: खिलाड़ी
+project_page: प्रोजेक्ट पेज
+public: सार्वजनिक
+publish_world: दुनिया प्रकाशित करें
+refresh: ताज़ा करें
+reload_list: सूची पुनः लोड करें
+rename: नाम बदलें
+resolution: रिज़ॉल्यूशन
+selection_expanded: चयन विस्तारित।
+selection_none: कोई नहीं
+selection_primary_short: प्राथमिक
+selection_primary: प्राथमिक बिंदु
+selection_secondary_short: द्वितीयक
+selection_secondary: द्वितीयक बिंदु
+settings: सेटिंग्स
+show_world_settings: दुनिया सेटिंग्स दिखाएं
+spawn_updated: स्पॉन अपडेट किया गया।
+surfaces_colored: सादा
+surfaces: सतहें
+teleported_to_spawn: स्पॉन पर टेलीपोर्ट किया गया।
+teleported_to: पर टेलीपोर्ट किया गया
+time_set_to: समय सेट किया गया
+today: आज
+transfer: स्थानांतरण
+unknown_command: अज्ञात कमांड
+unknown_world_found: एक अनाम दुनिया मिली। इसे क्या कहा जाए?
+unknown_world: अज्ञात दुनिया
+unpublish_world: दुनिया अप्रकाशित करें
+upload_world_to_server: सर्वर पर दुनिया अपलोड करें
+upload: अपलोड
+version_1: संस्करण
+version_2: L3P3 द्वारा
+view_angle: दृश्य कोण
+view_distance: दृश्य दूरी
+warn_world_remote_missing_1: दुनिया "
+warn_world_remote_missing_2: " सर्वर पर नहीं मिली, इसलिए यह अब एक स्थानीय दुनिया है।
+world_etc: दुनिया...
+world_leave: दुनिया छोड़ें
+worlds: दुनियाएं
+yes: हाँ
+
+// aur kuch chahiye?
