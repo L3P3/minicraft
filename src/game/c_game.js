@@ -20,9 +20,13 @@ import {
 import {
 	document_,
 	flag_chromium,
+	Math_,
 	Math_max,
 	window_,
 } from '../etc/helpers.js';
+import {
+	actions,
+} from '../etc/state.js';
 
 import {
 	game_create,
@@ -48,18 +52,17 @@ import Terminal from './c_terminal.js';
 import Touch from './c_touch.js';
 
 export default function Game({
-	account,
-	actions,
-	config,
 	frame,
 	ref,
+	state,
 	view_set,
 }) {
+	const {config} = state;
 	const time_now = now();
 	const pointer_locked = document_.pointerLockElement === frame;
 
 	const model = hook_memo(() => (
-		ref.game = game_create(actions, frame, config, account)
+		ref.game = game_create(frame, state)
 	));
 
 	hook_effect(() => {
@@ -90,7 +93,7 @@ export default function Game({
 			if (
 				model.menu === MENU_NONE &&
 				!model.flag_paused &&
-				Math.abs(event.deltaY) > 5
+				Math_.abs(event.deltaY) > 5
 			) {
 				const key =
 					event.deltaY > 0
@@ -109,14 +112,14 @@ export default function Game({
 		frame.addEventListener('mousemove', handler_mousemove, passive_true);
 		frame.addEventListener('wheel', handler_mousewheel, passive_true);
 
-		return () => {
-			frame.removeEventListener('mousedown', handler_mousebutton);
-			frame.removeEventListener('mouseup', handler_mousebutton);
-			frame.removeEventListener('mousemove', handler_mousemove, passive_true);
-			frame.removeEventListener('wheel', handler_mousewheel, passive_true);
-			game_destroy(model);
-			ref.game = null;
-		};
+		return () => (
+			frame.removeEventListener('mousedown', handler_mousebutton),
+			frame.removeEventListener('mouseup', handler_mousebutton),
+			frame.removeEventListener('mousemove', handler_mousemove, passive_true),
+			frame.removeEventListener('wheel', handler_mousewheel, passive_true),
+			game_destroy(model),
+			ref.game = null
+		);
 	});
 
 	hook_effect(() => (
@@ -128,14 +131,14 @@ export default function Game({
 	), [config]);
 
 	hook_effect((width, height, ratio) => (
-		model.resolution_css_ratio = ratio,
+		model.resolution_css_ratio = ratio || 1,
 		model.resolution_raw_x = Math_max(1, width),
 		model.resolution_raw_y = Math_max(1, height),
 		game_resolution_update(model)
 	), [
 		frame.offsetWidth,
 		frame.offsetHeight,
-		window_.devicePixelRatio || 1,
+		window_.devicePixelRatio,
 		config.resolution_scaling,
 	]);
 
@@ -228,7 +231,6 @@ export default function Game({
 		}),
 		model.menu === MENU_SETTINGS &&
 		node(Settings, {
-			actions,
 			config,
 			game: model,
 			view_set,

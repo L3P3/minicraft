@@ -70,6 +70,7 @@ refresh: Refresh
 reload_list: Reload list
 rename: Rename
 resolution: Resolution
+retry: Retry
 selection_expanded: Expanded selection.
 selection_none: none
 selection_primary_short: Primary

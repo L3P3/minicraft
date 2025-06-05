@@ -2,7 +2,6 @@ import {
 	hook_assert,
 	hook_dom,
 	hook_effect,
-	hook_model,
 	hook_static,
 	init,
 	node,
@@ -25,13 +24,15 @@ import {
 	Number_,
 	Object_keys,
 	removeEventListener_,
+	setInterval_,
 	setTimeout_,
 } from './etc/helpers.js';
 import {
 	locale_error_opened,
 } from './etc/locale.js';
 import {
-	reducers,
+	actions,
+	hook_app_state,
 } from './etc/state.js';
 
 import {
@@ -41,11 +42,15 @@ import {
 import {
 	tiles_set,
 } from './game/m_renderer.js';
+import {
+	world_store_init,
+} from './game/m_world_store.js';
 
 import App from './game/c_app.js';
 
+
 function Root() {
-	const [state, actions] = hook_model(reducers);
+	const state = hook_app_state();
 
 	const ref = hook_static({
 		game: null,
@@ -64,6 +69,8 @@ function Root() {
 			hook_assert(false);
 		}
 
+		world_store_init();
+
 		let unloaded = false;
 
 		// shotgun method
@@ -76,7 +83,7 @@ function Root() {
 		onpageshow = onfocus = () => {
 			unloaded = false;
 		};
-		setInterval(() => (
+		setInterval_(() => (
 			actions.config_save(),
 			!BroadcastChannel_ && localStorage_setItem('minicraft.lock', Date_now())
 		), 500);
@@ -135,10 +142,8 @@ function Root() {
 
 	return [
 		node(App, {
-			account: state.account,
-			actions,
-			config: state.config,
 			ref,
+			state,
 		}),
 	];
 }
@@ -155,9 +160,7 @@ if (window.SSR) {
 }
 else if (BroadcastChannel_) {
 	const channel_lock = new BroadcastChannel_('minicraft.lock');
-	const timeout = setTimeout_(() => {
-		init(Root);
-	}, 100);
+	const timeout = setTimeout_(init, 100, Root);
 	channel_lock.addEventListener('message', event => {
 		if (event.data === 'yes') {
 			clearTimeout_(timeout);

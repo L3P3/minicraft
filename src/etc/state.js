@@ -1,4 +1,8 @@
 import {
+	hook_model,
+} from './lui.js';
+
+import {
 	VERSION,
 } from './env.js';
 import {
@@ -11,14 +15,20 @@ import {
 	localStorage_getItem,
 	localStorage_removeItem,
 	localStorage_setItem,
+	prompt_,
 } from './helpers.js';
 import {
 	locale_unknown_world,
 	locale_unknown_world_found,
 } from './locale.js';
 
-let config_loaded = localStorage_getItem('minicraft.config');
-config_loaded = config_loaded && JSON_parse(config_loaded);
+import {
+	world_store_lists_merge,
+} from '../game/m_world_store.js';
+
+let config_loaded = JSON_parse(
+	localStorage_getItem('minicraft.config') || null
+);
 
 // HACK remove deleted worlds' chunks (i am so sorry)
 if (
@@ -33,13 +43,13 @@ if (
 	for (const key of Object_keys(localStorage_))
 	if (
 		key.startsWith('minicraft.world.') &&
-		!prefixes_keep.has(key.split(':')[0])
+		!prefixes_keep.has(key.split(':', 1)[0])
 	) {
 		localStorage_removeItem(key);
 	}
 }
 
-export const reducers = {
+const reducers = {
 	init: () => {
 		let needs_save = false;
 		const config = {
@@ -84,9 +94,9 @@ export const reducers = {
 			) != null) {
 				config.world_last = tmp;
 			}
-			if ((
+			if (
 				tmp = config_loaded['worlds']
-			) != null) {
+			) {
 				config.worlds = tmp;
 			}
 			else if (
@@ -95,7 +105,7 @@ export const reducers = {
 				config.worlds[0] = {
 					id: 0,
 					label: (
-						prompt(locale_unknown_world_found, '') || locale_unknown_world
+						prompt_(locale_unknown_world_found, '') || locale_unknown_world
 					).substring(0, 16),
 					mod_l: Date_now(),
 					mod_r: 0,
@@ -111,6 +121,11 @@ export const reducers = {
 			},
 			config,
 			config_saved: config,
+			connection_error: null,
+			world_list_cooldown: true,
+			world_list_loading: true,
+			world_syncing: null,
+			worlds_merged: world_store_lists_merge(config),
 		};
 		if (needs_save) {
 			state.config_saved = null;
@@ -139,10 +154,6 @@ export const reducers = {
 			config_saved: config,
 		};
 	},
-	account_set: (state, account) => ({
-		...state,
-		account,
-	}),
 	config_reduce: (state, reducer) => (
 		reducers.config_set(
 			state,
@@ -163,26 +174,39 @@ export const reducers = {
 				flag_touch,
 			})
 	),
-	world_add: (state, world) => ({
+	state_patch: (state, patch) => ({
 		...state,
-		config: {
+		...patch,
+	}),
+	world_add: (state, world) => {
+		const config = {
 			...state.config,
 			worlds: [
 				...state.config.worlds,
 				world,
 			],
-		},
-	}),
-	world_remove: (state, id) => ({
-		...state,
-		config: {
+		};
+		return {
+			...state,
+			config,
+			worlds_merged: world_store_lists_merge(config),
+		};
+	},
+	world_remove: (state, id) => {
+		const config = {
 			...state.config,
-			worlds: state.config.worlds.filter(world => world.id !== id),
-		},
-	}),
-	world_prop: (state, id, patch) => ({
-		...state,
-		config: {
+			worlds: state.config.worlds.filter(
+				world => world.id !== id
+			),
+		};
+		return {
+			...state,
+			config,
+			worlds_merged: world_store_lists_merge(config),
+		};
+	},
+	world_prop: (state, id, patch) => {
+		const config = {
 			...state.config,
 			worlds: state.config.worlds.map(world => (
 				world.id === id
@@ -192,6 +216,19 @@ export const reducers = {
 					}
 				:	world
 			)),
-		},
-	}),
+		};
+		return {
+			...state,
+			config,
+			worlds_merged: world_store_lists_merge(config),
+		};
+	},
 };
+
+export let app_state;
+export let actions;
+
+export const hook_app_state = () => (
+	[app_state, actions] = hook_model(reducers),
+	app_state
+);

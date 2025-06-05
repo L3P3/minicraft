@@ -81,6 +81,7 @@ import {
 	locale_error_gamemode_range,
 	locale_error_invalid_block_type,
 	locale_error_inventory_full,
+	locale_error_no_permission,
 	locale_error_only_vert_supported,
 	locale_error_parameter_missing,
 	locale_error_pitch,
@@ -103,6 +104,9 @@ import {
 	locale_time_set_to,
 	locale_unknown_command,
 } from '../etc/locale.js';
+import {
+	actions,
+} from '../etc/state.js';
 
 import {
 	player_create,
@@ -137,7 +141,7 @@ import {
 
 let message_id_counter = 0;
 
-export const game_create = (actions, frame_element, config, account) => {
+export const game_create = (frame_element, {config, account}) => {
 	const world = world_create(config.world_last);
 
 	const player = player_create(world, account);
@@ -145,7 +149,6 @@ export const game_create = (actions, frame_element, config, account) => {
 	world_load(world, player);
 
 	const model = {
-		actions,
 		config,
 		cursor_x: 0,
 		cursor_y: 0,
@@ -191,15 +194,15 @@ export const game_destroy = model => {
 	renderer_destroy(model.renderer);
 }
 
-export const game_renderer_init = (model, canvas_element) => {
-	model.renderer = renderer_create(model, canvas_element);
-}
+export const game_renderer_init = (model, canvas_element) => (
+	model.renderer = renderer_create(model, canvas_element)
+)
 
 export const game_save = model => {
 	if (model.world.flag_frozen) return;
 
 	world_save(model.world, model.player);
-	model.actions.world_prop(model.world.id, {
+	actions.world_prop(model.world.id, {
 		mod_l: Date_now(),
 	});
 }
@@ -373,6 +376,7 @@ export const game_key = (model, code, state) => {
 			break;
 		case KEY_MOUSE_LEFT:
 			if (
+				!model.world.flag_frozen &&
 				player.gamemode !== GAMEMODE_SPECTATOR &&
 				block_focus_y >= 0
 			) {
@@ -448,6 +452,7 @@ export const game_key = (model, code, state) => {
 			break;
 		case KEY_MOUSE_RIGHT:
 			if (
+				!model.world.flag_frozen &&
 				player.gamemode !== GAMEMODE_SPECTATOR &&
 				block_focus_y >= 0
 			) {
@@ -736,10 +741,18 @@ export const game_message_send = (model, value) => {
 			game_message_print(model, player.name + ' ' + args.join(' '), true);
 			break;
 		case 'save':
+			if (model.world.flag_frozen) {
+				game_message_print(model, locale_error_no_permission);
+				return;
+			}
 			game_save(model);
 			game_message_print(model, locale_game_saved, true);
 			break;
 		case 'spawn':
+			if (model.world.flag_frozen) {
+				game_message_print(model, locale_error_no_permission);
+				return;
+			}
 			world.spawn_x = player.position_x;
 			world.spawn_y = player.position_y;
 			world.spawn_z = player.position_z;
@@ -826,6 +839,10 @@ export const game_message_send = (model, value) => {
 			);
 			break;
 		case '/regen':
+			if (model.world.flag_frozen) {
+				game_message_print(model, locale_error_no_permission);
+				return;
+			}
 			world_chunk_reset(world)
 			.then(() => {
 				model.renderer.flag_dirty = true;
@@ -947,9 +964,7 @@ const game_poll = (model, msg) => (
 	})
 	.catch(error => false)
 	.then(value => {
-		model.poll_timeout = setTimeout_(() => {
-			game_poll(model, null);
-		}, 5e3);
+		model.poll_timeout = setTimeout_(game_poll, 5e3, model, null);
 		return value;
 	})
 )

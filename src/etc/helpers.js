@@ -5,7 +5,7 @@ import {
 export const window_ = window;
 export const document_ = document;
 export const navigator_ = navigator;
-const Math_ = Math;
+export const Math_ = Math;
 export const Math_PI = Math_.PI;
 export const Math_PI_h = Math_PI * .5;
 export const Math_PI_180d = 180 / Math_PI;
@@ -49,6 +49,9 @@ export const clearTimeout_ = clearTimeout;
 export const clearInterval_ = clearInterval;
 export const addEventListener_ = addEventListener;
 export const removeEventListener_ = removeEventListener;
+export const alert_ = alert;
+export const confirm_ = confirm;
+export const prompt_ = prompt;
 export const flag_chromium = navigator_.userAgent.includes('WebKit');
 
 /**
@@ -89,6 +92,9 @@ export const touch_id_get = event => event.changedTouches[0].identifier;
 export const handler_noop = () => false;
 
 export const datify = (time, short) => {
+	if (time < 2) {
+		return '...';
+	}
 	const date_now = new Date_();
 	const date_then = new Date_(time);
 

@@ -122,7 +122,6 @@ export const MENU_NONE = 0;
 export const MENU_SETTINGS = 1;
 export const MENU_TERMINAL = 2;
 export const MENU_INVENTORY = 3;
-export const MENU_WORLDS = 4;
 
 export const MOUSE_MODE_NORMAL = 0;
 export const MOUSE_MODE_SELECT = 1;

@@ -33,6 +33,9 @@ import {
 	decompress,
 } from '../etc/lz.js';
 import {
+	app_state,
+} from '../etc/state.js';
+import {
 	chunk_delete,
 	chunk_get,
 	chunk_set,
@@ -62,7 +65,7 @@ export const world_create = id => ({
 	// next checklist item to check
 	chunks_checklist_index: 0,
 	// nothing must change
-	flag_frozen: false,//TODO set
+	flag_frozen: !app_state.worlds_merged.find(i => i.id === id).writable,
 	// currently centered chunk (relative chunk position inside superchunk)
 	focus_x: 0,
 	focus_y: 0,
