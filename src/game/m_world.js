@@ -33,6 +33,7 @@ import {
 	decompress,
 } from '../etc/lz.js';
 import {
+	actions,
 	app_state,
 } from '../etc/state.js';
 import {
@@ -45,46 +46,62 @@ import {
 	stack_create,
 } from './m_stack.js';
 
+export const worlds = new Map_();
+
 // used for loading/saving of chunks (prevent frequent reallocation)
 const chunk_data_tmp = new Uint32Array_(1 << (CHUNK_WIDTH_L2 * 3 - 2));
 const chunk_data_tmp_u8 = new Uint8Array_(chunk_data_tmp.buffer);
 
 const chunks_checklists = new Map_();
 
-export const world_create = id => ({
-	// blocks of superchunk
-	// uint8[]
-	blocks: null,
-	blocks_u32: null,
-	// currently saving a chunk
-	busy: false,
-	// all chunk metadata currently in superchunk
-	chunks: null,
-	// {chunk metadata index, offset x, offset z}, sorted by loading order
-	chunks_checklist: null,
-	// next checklist item to check
-	chunks_checklist_index: 0,
-	// nothing must change
-	flag_frozen: !app_state.worlds_merged.find(i => i.id === id).writable,
-	// currently centered chunk (relative chunk position inside superchunk)
-	focus_x: 0,
-	focus_y: 0,
-	focus_z: 0,
-	// world id for storage
-	id,
-	// superchunk offset in chunks
-	offset_x: 0,
-	offset_z: 0,
-	// log2 of superchunk width
-	size_l2: 0,
-	// block position of player spawn
-	spawn_x: 0.5,
-	spawn_y: FLATMAP_LAYERS_LENGTH + 1.5,
-	spawn_z: 0.5,
-	// ingame time
-	time: 0,
-	time_f: 0.0,
-});
+export const world_create = id => {
+	const world = {
+		// blocks of superchunk
+		// uint8[]
+		blocks: null,
+		blocks_u32: null,
+		// currently saving a chunk
+		busy: false,
+		// all chunk metadata currently in superchunk
+		chunks: null,
+		// {chunk metadata index, offset x, offset z}, sorted by loading order
+		chunks_checklist: null,
+		// next checklist item to check
+		chunks_checklist_index: 0,
+		// nothing must change
+		flag_frozen: !app_state.worlds_merged.find(i => i.id === id).writable,
+		// currently centered chunk (relative chunk position inside superchunk)
+		focus_x: 0,
+		focus_y: 0,
+		focus_z: 0,
+		// world id for storage
+		id,
+		// superchunk offset in chunks
+		offset_x: 0,
+		offset_z: 0,
+		// log2 of superchunk width
+		size_l2: 0,
+		// block position of player spawn
+		spawn_x: 0.5,
+		spawn_y: FLATMAP_LAYERS_LENGTH + 1.5,
+		spawn_z: 0.5,
+		// ingame time
+		time: 0,
+		time_f: 0.0,
+	};
+	worlds.set(id, world);
+	actions.state_patch({
+		worlds_opened: [...worlds.keys()],
+	});
+	return world;
+}
+
+export const world_destroy = model => {
+	worlds.delete(model.id);
+	actions.state_patch({
+		worlds_opened: [...worlds.keys()],
+	});
+}
 
 /*
 	blocks:

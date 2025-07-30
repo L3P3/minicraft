@@ -1,4 +1,5 @@
 import {
+	defer,
 	now,
 } from '../etc/lui.js';
 
@@ -49,6 +50,8 @@ import {
 	MOUSE_MODE_NORMAL,
 	MOUSE_MODE_SELECT,
 	PLAYER_SLOTS,
+	WINDOW_TYPE_EMPTY,
+	WINDOW_TYPE_GAME,
 } from '../etc/constants.js';
 import {
 	DEBUG,
@@ -133,6 +136,7 @@ import {
 	world_chunk_reset,
 	world_create,
 	world_data_init,
+	world_destroy,
 	world_load,
 	world_save,
 	world_tick,
@@ -141,7 +145,7 @@ import {
 
 let message_id_counter = 0;
 
-export const game_create = (frame_element, {config, account}) => {
+export const game_create = (frame_element, window_actions, {config, account}) => {
 	const world = world_create(config.world_last);
 
 	const player = player_create(world, account);
@@ -176,6 +180,7 @@ export const game_create = (frame_element, {config, account}) => {
 			model.flag_paused ||
 			world_tick(world, player)
 		), 50),
+		window_actions,
 		world,
 	};
 
@@ -190,6 +195,7 @@ export const game_destroy = model => {
 	clearInterval_(model.tick_interval);
 
 	world_save(model.world, model.player);
+	world_destroy(model.world);
 
 	renderer_destroy(model.renderer);
 }
@@ -277,8 +283,9 @@ export const game_mouse_move_player = (model, event) => {
 }
 
 export const game_mouse_move_menu = (model, event) => {
-	model.cursor_x = event.clientX;
-	model.cursor_y = event.clientY;
+	const rect = model.frame_element.getBoundingClientRect();
+	model.cursor_x = event.clientX - rect.left;
+	model.cursor_y = event.clientY - rect.top;
 }
 
 /**
@@ -548,6 +555,9 @@ export const game_key = (model, code, state) => {
 					game_key(model, code, false);
 			}
 			break;
+		case 70: // F
+			model.window_actions.fullscreen_toggle();
+			break;
 		case 80: // P
 			if (model.world)
 				model.flag_paused = true;
@@ -665,9 +675,6 @@ export const game_message_send = (model, value) => {
 			}
 			game_message_print(model, locale_inventory_cleared, true);
 			break;
-		//case 'exit':
-		//	game_message_print(model, 'use your pointer');
-		//	break;
 		case 'gamemode':
 		case 'gm': {
 				const value = Number_(args[0]);
@@ -809,6 +816,15 @@ export const game_message_send = (model, value) => {
 		}
 		case 'version':
 			game_message_print(model, 'minicraft ' + VERSION);
+			break;
+		case '_w':
+			actions.window_add({
+				type: (
+					args[0] === 'm'
+					?	WINDOW_TYPE_GAME
+					:	WINDOW_TYPE_EMPTY
+				),
+			});
 			break;
 		case '/exit':
 			player.mouse_mode = MOUSE_MODE_NORMAL;

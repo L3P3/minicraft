@@ -39,6 +39,7 @@ error_selection_required: Seçim gerekli!
 error_storage: Yetersiz depolama alanı!
 error_upload_world: Dünyayı yüklerken hata oluştu: 
 error_world_is_loading: Dünya hala yükleniyor!
+error_world_is_opened: Dünya zaten açık!
 error_world_is_present_both_sides: Dünya hem cihazınızda hem de sunucuda mevcut!
 error_world_not_downloaded: Dünya henüz indirilmedi!
 error_world_not_uploaded: Dünya henüz yüklenmedi!

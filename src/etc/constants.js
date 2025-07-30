@@ -127,3 +127,10 @@ export const MOUSE_MODE_NORMAL = 0;
 export const MOUSE_MODE_SELECT = 1;
 
 export const API_CHAT = (VERSION === 'dev' ? '//l3p3.de' : '') + '/api/chat';
+
+export const WINDOW_MODE_FULL = 0;
+export const WINDOW_MODE_FLOATING = 1;
+export const WINDOW_MODE_HIDDEN = 2;
+
+export const WINDOW_TYPE_EMPTY = 0;
+export const WINDOW_TYPE_GAME = 1;

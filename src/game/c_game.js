@@ -29,6 +29,11 @@ import {
 } from '../etc/state.js';
 
 import {
+	games,
+	in_event,
+} from '../app.js';
+
+import {
 	game_create,
 	game_destroy,
 	game_key,
@@ -53,19 +58,21 @@ import Touch from './c_touch.js';
 
 export default function Game({
 	frame,
-	ref,
+	key_event,
 	state,
 	view_set,
+	window_actions,
+	window_id,
 }) {
 	const {config} = state;
 	const time_now = now();
 	const pointer_locked = document_.pointerLockElement === frame;
 
-	const model = hook_memo(() => (
-		ref.game = game_create(frame, state)
-	));
+	const model = hook_memo(() => game_create(frame, window_actions, state));
 
 	hook_effect(() => {
+		games.add(model);
+
 		const handler_mousebutton = event => {
 			if (model.menu !== MENU_NONE) return true;
 
@@ -118,7 +125,7 @@ export default function Game({
 			frame.removeEventListener('mousemove', handler_mousemove, passive_true),
 			frame.removeEventListener('wheel', handler_mousewheel, passive_true),
 			game_destroy(model),
-			ref.game = null
+			games.delete(model)
 		);
 	});
 
@@ -141,6 +148,16 @@ export default function Game({
 		window_.devicePixelRatio,
 		config.resolution_scaling,
 	]);
+
+	hook_effect(() => {
+		if (key_event) {
+			game_key(
+				model,
+				key_event.code,
+				key_event.state
+			);
+		}
+	}, [key_event]);
 
 	// two-way binding for lock and pause
 	hook_effect(ingame => {
@@ -184,9 +201,12 @@ export default function Game({
 		model.menu !== MENU_NONE,
 	]);
 
-	hook_effect(() => (
+	if (
+		time_now !== model.frame_last &&
+		!in_event
+	) {
 		game_render(model, time_now)
-	), [time_now]);
+	}
 
 	hook_rerender();
 

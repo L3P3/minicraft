@@ -34,10 +34,22 @@ import Settings from './c_settings.js';
 let sync_check_timeout = 0;
 
 export default function App({
+	key_event,
 	state,
-	ref,
+	window_actions,
+	window_id,
 }) {
 	const [view, view_set] = hook_state(APP_VIEW_WORLDS);
+
+	hook_effect(() => {
+		window_actions.title_set(
+			view === APP_VIEW_GAME
+			?	(
+				state.worlds_merged.find(i => i.id === state.config.world_last).label
+			) + ' – minicraft'
+			:	'minicraft'
+		);
+	}, [view]);
 
 	hook_effect(() => {
 		clearTimeout_(sync_check_timeout);
@@ -69,9 +81,11 @@ export default function App({
 		view === APP_VIEW_GAME &&
 		node(Game, {
 			frame,
-			ref,
+			key_event,
 			state,
 			view_set,
+			window_actions,
+			window_id,
 		}),
 		view === APP_VIEW_WORLDS &&
 		state.connection_error &&

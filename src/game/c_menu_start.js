@@ -47,6 +47,7 @@ import {
 	locale_error_no_world_selected,
 	locale_error_not_logged_in,
 	locale_error_world_is_loading,
+	locale_error_world_is_opened,
 	locale_error_world_is_present_both_sides,
 	locale_error_world_not_downloaded,
 	locale_error_world_not_uploaded,
@@ -153,6 +154,7 @@ export default function MenuStart({
 		world_list_loading,
 		world_syncing,
 		worlds_merged,
+		worlds_opened,
 	},
 	view_set,
 }) {
@@ -178,6 +180,7 @@ export default function MenuStart({
 	const [menu_opened, menu_opened_set] = hook_state(false);
 	if (!world_selected) menu_opened_set(false);
 	const [busy, busy_set] = hook_state(false);
+	const world_selected_opened = !!world_selected && worlds_opened.includes(world_selected_id);
 
 	return [
 		node_dom(`h1[innerText=${locale_worlds}]`),
@@ -208,6 +211,7 @@ export default function MenuStart({
 			node_dom(`button[innerText=${locale_open}]`, {
 				disabled: (
 					!world_selected ||
+					world_selected_opened ||
 					world_selected.local < 2 ||
 					world_selected.remote > world_selected.local
 				),
@@ -222,6 +226,8 @@ export default function MenuStart({
 				title: (
 					!world_selected
 					?	locale_error_no_world_selected
+					: world_selected_opened
+					?	locale_error_world_is_opened
 					: world_selected.local < 2
 					?	locale_error_world_not_downloaded
 					: world_selected.local < world_selected.remote
@@ -238,9 +244,11 @@ export default function MenuStart({
 					menu_opened_set(true);
 				},
 				title: (
-					world_selected
-					?	locale_show_world_settings
-					:	locale_error_no_world_selected
+					!world_selected
+					?	locale_error_no_world_selected
+					: world_selected_opened
+					?	locale_error_world_is_opened
+					:	locale_show_world_settings
 				),
 			}),
 		]),
@@ -311,6 +319,7 @@ export default function MenuStart({
 					node_dom(`button[innerText=${locale_rename}]`, {
 						disabled: (
 							busy ||
+							world_selected_opened ||
 							!world_selected.writable
 						),
 						onclick: () => {
@@ -353,14 +362,17 @@ export default function MenuStart({
 							}
 						},
 						title: (
-							world_selected.writable
-							?	locale_change_world_name
-							:	locale_error_no_permission
+							!world_selected.writable
+							?	locale_error_no_permission
+							: world_selected_opened
+							?	locale_error_world_is_opened
+							:	locale_change_world_name
 						),
 					}),
 					node_dom('button', {
 						disabled: (
 							busy ||
+							world_selected_opened ||
 							!world_selected.local &&
 							!world_selected.writable
 						),
@@ -408,8 +420,10 @@ export default function MenuStart({
 							}
 						},
 						title: (
-							!world_selected.local &&
-							!world_selected.writable
+							world_selected_opened
+							?	locale_error_world_is_opened
+							: !world_selected.local &&
+							  !world_selected.writable
 							?	locale_error_no_permission
 							:	locale_delete_world
 						),
@@ -469,6 +483,7 @@ export default function MenuStart({
 						disabled: (
 							busy ||
 							!world_list_remote ||
+							world_selected_opened ||
 							world_selected.local > 0 && world_selected.remote > 0 ||
 							!world_selected.remote && !account.rank
 						),
@@ -501,6 +516,8 @@ export default function MenuStart({
 							?	locale_download_world_from_server
 							: world_selected.remote
 							?	locale_error_world_is_present_both_sides
+							: world_selected_opened
+							?	locale_error_world_is_opened
 							: account.rank
 							?	locale_upload_world_to_server
 							:	locale_error_not_logged_in

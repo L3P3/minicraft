@@ -3,19 +3,28 @@ import {
 } from './lui.js';
 
 import {
+	WINDOW_MODE_FLOATING,
+	WINDOW_MODE_FULL,
+	WINDOW_TYPE_EMPTY,
+	WINDOW_TYPE_GAME,
+} from './constants.js';
+import {
 	VERSION,
 } from './env.js';
 import {
 	Date_now,
 	JSON_parse,
 	JSON_stringify,
+	Math_max,
 	Object_keys,
 	Set_,
+	document_,
 	localStorage_,
 	localStorage_getItem,
 	localStorage_removeItem,
 	localStorage_setItem,
 	prompt_,
+	window_,
 } from './helpers.js';
 import {
 	locale_unknown_world,
@@ -122,10 +131,21 @@ const reducers = {
 			config,
 			config_saved: config,
 			connection_error: null,
+			cursor: null,
+			screen_height: window_.innerHeight,
+			screen_width: window_.innerWidth,
+			windows: [
+				{
+					id: 0,
+					mode_initial: WINDOW_MODE_FULL,
+					type: WINDOW_TYPE_GAME,
+				},
+			],
 			world_list_cooldown: true,
 			world_list_loading: true,
 			world_syncing: null,
 			worlds_merged: world_store_lists_merge(config),
+			worlds_opened: [],
 		};
 		if (needs_save) {
 			state.config_saved = null;
@@ -178,6 +198,42 @@ const reducers = {
 		...state,
 		...patch,
 	}),
+	window_add: (state, window) => (
+		document_.activeElement.blur(),
+		{
+			...state,
+			windows: [
+				...state.windows,
+				{
+					id: Math_max(-1, ...state.windows.map(w => w.id)) + 1,
+					mode_initial: WINDOW_MODE_FLOATING,
+					type: WINDOW_TYPE_EMPTY,
+					...window,
+				},
+			],
+		}
+	),
+	window_remove: (state, id) => ({
+		...state,
+		windows: state.windows.filter(
+			w => w.id !== id
+		),
+	}),
+	window_focus: (state, id) => (
+		state.windows[state.windows.length - 1].id === id
+		?	state
+		:	{
+			...state,
+			windows: [
+				...state.windows.filter(
+					w => w.id !== id
+				),
+				state.windows.find(
+					w => w.id === id
+				),
+			],
+		}
+	),
 	world_add: (state, world) => {
 		const config = {
 			...state.config,
@@ -228,7 +284,6 @@ const reducers = {
 export let app_state;
 export let actions;
 
-export const hook_app_state = () => (
-	[app_state, actions] = hook_model(reducers),
-	app_state
-);
+export const hook_app_state = () => {
+	[app_state, actions] = hook_model(reducers);
+}
