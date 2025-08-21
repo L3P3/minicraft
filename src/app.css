@@ -403,10 +403,10 @@ button {
 	width: 1rem;
 	height: 1rem;
 	border-radius: 50%;
-	opacity: 50%;
+	opacity: .5;
 	cursor: pointer;
 	transition: opacity .2s;
 }
 .window_button:hover {
-	opacity: 100%;
+	opacity: 1;
 }

@@ -38,6 +38,9 @@ import {
 	app_state,
 	hook_app_state,
 } from './etc/state.js';
+import {
+	chunks_db_promise,
+} from './etc/storage.js';
 
 import {
 	game_save,
@@ -187,7 +190,11 @@ if (window.SSR) {
 }
 else if (BroadcastChannel_) {
 	const channel_lock = new BroadcastChannel_('minicraft.lock');
-	const timeout = setTimeout_(init, 100, Root);
+	const timeout = setTimeout_(() => (
+		chunks_db_promise.then(() =>
+			init(Root)
+		)
+	), 100);
 	channel_lock.addEventListener('message', event => {
 		if (event.data === 'yes') {
 			clearTimeout_(timeout);
@@ -206,7 +213,11 @@ else {
 	const lock_found = Number_(localStorage_getItem('minicraft.lock'));
 	const lock_limit = Date_now() - 1000;
 	// if already expired
-	if (lock_found < lock_limit) init(Root);
+	if (lock_found < lock_limit) {
+		chunks_db_promise.then(() =>
+			init(Root)
+		)
+	}
 	// if not, wait and check again
 	else setTimeout_(() => {
 		init(

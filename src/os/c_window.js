@@ -49,7 +49,7 @@ const AREA_CENTER = 4;
 const AREA_RIGHT = 5;
 const AREA_BOTTOMLEFT = 6;
 const AREA_BOTTOM = 7;
-//const AREA_BOTTOMRIGHT = 8;
+const AREA_BOTTOMRIGHT = 8;
 
 const CURSORS = 'nwse-resize,ns-resize,nesw-resize,ew-resize,move,ew-resize,nesw-resize,ns-resize,nwse-resize'.split(',');
 
@@ -120,26 +120,28 @@ const drag_handler = (hook_model_state_actions, window_id, event) => {
 		return;
 	}
 	event.preventDefault();
-	element.style.willChange = 'transform';
 	document_.activeElement.blur();
 	const [window_state_start, window_actions] = hook_model_state_actions;
 	const mouse_x_start = event.clientX;
 	const mouse_y_start = event.clientY;
 	let mouse_x_start_relative = mouse_x_start - window_state_start.left;
 	const mouse_y_start_relative = mouse_y_start - window_state_start.top;
-	const area = ( // [0..7], [8..n-9], [n-8..n-1]
+	const area_h = ( // [0..7], [8..n-9], [n-8..n-1]
 		mouse_x_start_relative < 8
 		?	AREA_START
 		: mouse_x_start_relative < window_state_start.width - 8
 		?	AREA_MIDDLE
 		:	AREA_END
-	) + (
-		mouse_y_start_relative < 8
-		?	AREA_START * 3
-		: mouse_y_start_relative < window_state_start.height - 8
-		?	AREA_MIDDLE * 3
-		:	AREA_END * 3
 	);
+	const area_v = (
+		mouse_y_start_relative < 8
+		?	AREA_START
+		: mouse_y_start_relative < window_state_start.height - 8
+		?	AREA_MIDDLE
+		:	AREA_END
+	);
+	const area = area_h + area_v * 3;
+	element.style.willChange = area === AREA_CENTER ? 'transform' : 'contents';
 	actions.state_patch({
 		cursor: CURSORS[area],
 	});
@@ -150,48 +152,8 @@ const drag_handler = (hook_model_state_actions, window_id, event) => {
 		let mouse_x_now = event.clientX;
 		let mouse_y_now = event.clientY;
 
-		// lock x/y movement
-		switch (area) {
-		case AREA_TOP:
-		case AREA_BOTTOM:
-			mouse_x_now = mouse_x_start;
-			break;
-		case AREA_LEFT:
-		case AREA_RIGHT:
-			mouse_y_now = mouse_y_start;
-		}
-
-		// moving left edge, limit x
-		switch (area) {
-		case AREA_TOPLEFT:
-		case AREA_LEFT:
-		case AREA_BOTTOMLEFT:
-			mouse_x_now = Math_max(
-				mouse_x_start_relative,
-				Math_min(
-					mouse_x_now,
-					window_state_start.left + window_state_start.width - WIDTH_MIN + mouse_x_start_relative
-				)
-			);
-		}
-
-		// moving top edge, limit y
-		switch (area) {
-		case AREA_TOPLEFT:
-		case AREA_TOP:
-		case AREA_TOPRIGHT:
-			mouse_y_now = Math_max(
-				mouse_y_start_relative,
-				Math_min(
-					mouse_y_now,
-					window_state_start.top + window_state_start.height - HEIGHT_MIN + mouse_y_start_relative
-				)
-			);
-		}
-
-		// move/resize
-		switch (area) {
-		case AREA_CENTER:
+		// move only?
+		area_center: if (area === AREA_CENTER) {
 			// snap to edges
 			if (event.type === 'mouseup') {
 				if (mouse_y_now < 4) {
@@ -201,7 +163,7 @@ const drag_handler = (hook_model_state_actions, window_id, event) => {
 						width: app_state.screen_width,
 						height: app_state.screen_height,
 					});
-					break;
+					break area_center;
 				}
 				if (mouse_x_now < 4) {
 					window_actions.patch({
@@ -210,7 +172,7 @@ const drag_handler = (hook_model_state_actions, window_id, event) => {
 						width: Math_ceil(app_state.screen_width / 2),
 						height: app_state.screen_height,
 					});
-					break;
+					break area_center;
 				}
 				if (mouse_x_now > app_state.screen_width - 3) {
 					window_actions.patch({
@@ -219,7 +181,7 @@ const drag_handler = (hook_model_state_actions, window_id, event) => {
 						width: Math_floor(app_state.screen_width / 2),
 						height: app_state.screen_height,
 					});
-					break;
+					break area_center;
 				}
 			}
 			// unsnap from edges
@@ -244,47 +206,54 @@ const drag_handler = (hook_model_state_actions, window_id, event) => {
 				mouse_x_now - mouse_x_start_relative,
 				mouse_y_now - mouse_y_start_relative
 			);
-			break;
-		// those lack perfection, 5€ for who finds a better solution
-		case AREA_TOPLEFT:
-		case AREA_TOP:
-		case AREA_LEFT:
-			window_actions.move_to(
-				mouse_x_now - mouse_x_start_relative,
-				mouse_y_now - mouse_y_start_relative
-			);
+		}
+		// resize?
+		else {
+			// need to move?
+			if (area_h === AREA_START || area_v === AREA_START) {
+				window_actions.move_to(
+					// left
+					area_h === AREA_START
+					?	(
+							// limit mouse_x to left and right
+							mouse_x_now = Math_max(
+								mouse_x_start_relative,
+								Math_min(
+									mouse_x_now,
+									window_state_start.left + window_state_start.width - WIDTH_MIN + mouse_x_start_relative
+								)
+							)
+						) - mouse_x_start_relative
+					:	window_state_start.left,
+					// top
+					area_v === AREA_START
+					?	(
+							// limit mouse_y to top and bottom
+							mouse_y_now = Math_max(
+								mouse_y_start_relative,
+								Math_min(
+									mouse_y_now,
+									window_state_start.top + window_state_start.height - HEIGHT_MIN + mouse_y_start_relative
+								)
+							)
+						) - mouse_y_start_relative
+					:	window_state_start.top
+				);
+			}
+
 			window_actions.resize_to(
-				window_state_start.left + window_state_start.width + mouse_x_start_relative - mouse_x_now,
-				window_state_start.top + window_state_start.height + mouse_y_start_relative - mouse_y_now
-			);
-			break;
-		case AREA_TOPRIGHT:
-			window_actions.move_to(
-				window_state_start.left,
-				mouse_y_now - mouse_y_start_relative
-			);
-			window_actions.resize_to(
-				window_state_start.width - mouse_x_start + mouse_x_now,
-				window_state_start.top + window_state_start.height + mouse_y_start_relative - mouse_y_now
-			);
-			break;
-		case AREA_BOTTOMLEFT:
-			window_actions.move_to(
-				mouse_x_now - mouse_x_start_relative,
-				window_state_start.top
-			);
-			window_actions.resize_to(
-				window_state_start.left + window_state_start.width + mouse_x_start_relative - mouse_x_now,
-				window_state_start.height - mouse_y_start + mouse_y_now
-			);
-			break;
-		//case AREA_RIGHT:
-		//case AREA_BOTTOM:
-		//case AREA_BOTTOMRIGHT:
-		default:
-			window_actions.resize_to(
-				window_state_start.width - mouse_x_start + mouse_x_now,
-				window_state_start.height - mouse_y_start + mouse_y_now
+				// width
+				area_h === AREA_START
+				?	window_state_start.width + window_state_start.left + mouse_x_start_relative - mouse_x_now
+				: area_h === AREA_MIDDLE
+				?	window_state_start.width
+				:	window_state_start.width - mouse_x_start + mouse_x_now,
+				// height
+				area_v === AREA_START
+				?	window_state_start.height + window_state_start.top + mouse_y_start_relative - mouse_y_now
+				: area_v === AREA_MIDDLE
+				?	window_state_start.height
+				:	window_state_start.height - mouse_y_start + mouse_y_now
 			);
 		}
 		defer_end();
