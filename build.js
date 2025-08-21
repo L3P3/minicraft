@@ -122,7 +122,9 @@ async function build_js(lang) {
 		(await readFile(TMP_FILE, 'ascii'))
 		.split('content').join('c')
 		.split('loaded').join('l')
-		.split('downl').join('downloaded'),
+		.split('"transform":"cs"').join('"transform":"contents"')
+		.split('downl').join('downloaded')
+		.split('downloadedoading').join('downloading'),
 		'ascii'
 	);
 
