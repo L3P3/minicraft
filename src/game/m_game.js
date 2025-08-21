@@ -648,7 +648,7 @@ export const game_render = (model, now) => {
 const coord_part_parse = (base, value) => (
 	value = (
 		value.startsWith('~')
-		?	base + Number_(value.substr(1))
+		?	base + Number_(value.slice(1))
 		:	Number_(value)
 	),
 	isNaN(value)
@@ -663,7 +663,7 @@ export const game_message_send = (model, value) => {
 	} = model;
 	if (!value) {}
 	else if (value.charAt(0) === '/') {
-		const args = value.substr(1).split(' ');
+		const args = value.slice(1).split(' ');
 		const command = args.shift();
 		switch(command) {
 		case 'clear':

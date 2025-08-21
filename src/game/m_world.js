@@ -359,14 +359,16 @@ export const world_save = (model, player) => {
 }
 
 export const world_load = (model, player) => {
-	const meta = localStorage_getItem(`minicraft.world.${model.id}:meta`);
+	const meta = /** @type {TYPE_WORLD_META} */ (JSON_parse(
+		localStorage_getItem(`minicraft.world.${model.id}:meta`)
+	));
 	if (meta) {
 		const {
 			p,
 			s,
 			t,
 			v,
-		} = /** @type {TYPE_WORLD_META} */ (JSON_parse(meta));
+		} = meta;
 
 		if (v == null) return;
 
