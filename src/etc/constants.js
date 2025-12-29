@@ -19,6 +19,9 @@ export const COORDINATE_OFFSET = 1 << 16;
 
 export const WORLD_FORMAT = 1;
 
+export const WORLD_STORED_NOT = 0;
+export const WORLD_STORED_SHOULD = 1;
+
 export const BLOCK_TYPE_AIR = 0;
 export const BLOCK_TYPE_STONE = 1;
 export const BLOCK_TYPE_GRASS = 2;

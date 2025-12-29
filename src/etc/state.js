@@ -7,6 +7,7 @@ import {
 	WINDOW_MODE_FULL,
 	WINDOW_TYPE_EMPTY,
 	WINDOW_TYPE_GAME,
+	WORLD_STORED_NOT,
 } from './constants.js';
 import {
 	VERSION,
@@ -117,7 +118,7 @@ const reducers = {
 						prompt_(locale_unknown_world_found, '') || locale_unknown_world
 					).substring(0, 16),
 					mod_l: Date_now(),
-					mod_r: 0,
+					mod_r: WORLD_STORED_NOT,
 				};
 				needs_save = true;
 			}

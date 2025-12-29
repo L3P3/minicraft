@@ -173,7 +173,7 @@ function Root() {
 		node_dom('div[className=cursormask]', {
 			S: {
 				cursor: app_state.cursor,
-			}
+			},
 		}),
 	];
 }

@@ -11,6 +11,8 @@ import {
 import {
 	APP_VIEW_GAME,
 	APP_VIEW_SETTINGS,
+	WORLD_STORED_NOT,
+	WORLD_STORED_SHOULD,
 } from '../etc/constants.js';
 import {
 	API,
@@ -266,7 +268,7 @@ export default function MenuStart({
 						id: Math_min(0, ...config.worlds.map(world => world.id)) - 1,
 						label: name,
 						mod_l: Date_now(),
-						mod_r: 0,
+						mod_r: WORLD_STORED_NOT,
 					});
 				}
 			}),
@@ -499,13 +501,13 @@ export default function MenuStart({
 								actions.world_add({
 									id: world_selected.id,
 									label: world_selected.label,
-									mod_l: 1,
+									mod_l: WORLD_STORED_SHOULD,
 									mod_r: world_selected.remote,
 								});
 							}
 							else if (!world_selected.remote) {
 								actions.world_prop(world_selected.id, {
-									mod_r: 1,
+									mod_r: WORLD_STORED_SHOULD,
 								});
 							}
 						},
