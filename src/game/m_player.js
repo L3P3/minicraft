@@ -4,6 +4,7 @@ import {
 	PLAYER_INVENTORY,
 } from '../etc/constants.js';
 import {
+	Array_,
 	Math_cos,
 	Math_max,
 	Math_min,
@@ -33,7 +34,7 @@ export const player_create = (world, account) => ({
 	block_select_b: null,
 	gamemode: GAMEMODE_CREATIVE,
 	health: 20,
-	inventory: new Array(PLAYER_INVENTORY)
+	inventory: Array_(PLAYER_INVENTORY)
 		.fill(null)
 		.map(() => slot_create(null)),
 	mouse_mode: MOUSE_MODE_NORMAL,

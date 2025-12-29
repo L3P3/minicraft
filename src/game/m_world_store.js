@@ -3,6 +3,10 @@ import {
 } from '../etc/lui.js';
 
 import {
+	WORLD_STORED_NOT,
+	WORLD_STORED_SHOULD,
+} from '../etc/constants.js';
+import {
 	API,
 	API_DATA,
 	VERSION,
@@ -124,7 +128,7 @@ export const world_store_lists_merge = config => {
 				hash: world.hash,
 				id: world.id,
 				label: world.label,
-				local: 0,
+				local: WORLD_STORED_NOT,
 				public: world.public,
 				remote: world.modified,
 				writable: world.writable,
@@ -134,6 +138,7 @@ export const world_store_lists_merge = config => {
 
 	for (const world_local of /** @type {!Array<TYPE_WORLD_LISTING_LOCAL>} */ (config.worlds)) {
 		const world_list_item = world_list.find(world => world.id === world_local.id);
+		// present on remote?
 		if (world_list_item) {
 			const last_change_here = world_list_item.local = world_local.mod_l;
 			const last_change_there = world_list_item.remote;
@@ -162,9 +167,10 @@ export const world_store_lists_merge = config => {
 				}
 			}
 		}
+		// not present on remote?
 		else {
 			if (
-				world_local.mod_r > 1 &&
+				world_local.mod_r > WORLD_STORED_SHOULD &&
 				world_list_remote
 			) {
 				alert_(
@@ -174,7 +180,7 @@ export const world_store_lists_merge = config => {
 				);
 				defer();
 				actions.world_prop(world_local.id, {
-					mod_r: 0,
+					mod_r: WORLD_STORED_NOT,
 				});
 			}
 
@@ -185,7 +191,7 @@ export const world_store_lists_merge = config => {
 				label: world_local.label,
 				local: world_local.mod_l,
 				public: false,
-				remote: world_local.mod_r === 1 ? 1 : 0,
+				remote: world_local.mod_r === WORLD_STORED_SHOULD ? WORLD_STORED_SHOULD : WORLD_STORED_NOT,
 				writable: true,
 			});
 		}
@@ -241,7 +247,8 @@ const world_store_sync = async world => {
 		world_syncing: id,
 	});
 
-	if (world.local < world.remote) { // download
+	// download?
+	if (world.local < world.remote) {
 		try {
 			const response = await fetch_(`${API_DATA}worlds/${world.hash}.json`);
 			const json = await response.json();
@@ -264,13 +271,16 @@ const world_store_sync = async world => {
 			}
 		}
 	}
-	else if (!world.writable) { // upload not allowed
+	// upload not allowed?
+	else if (!world.writable) {
 		defer();
+		// set local modification time to remote to prevent further sync attempts
 		actions.world_prop(id, {
 			mod_l: app_state.config.worlds.find(world => world.id === id).mod_r,
 		});
 	}
-	else { // upload
+	// upload?
+	else {
 		try {
 			let id_new = id;
 			if (world.remote === 1) { // register new world
@@ -328,7 +338,7 @@ const world_store_sync = async world => {
 		catch (error) {
 			defer();
 			actions.world_prop(id, {
-				mod_r: 0,
+				mod_r: WORLD_STORED_NOT,
 			});
 			throw Error_(locale_error_upload_world + error.message);
 		}

@@ -36,6 +36,7 @@ export const localStorage_removeItem = localStorage_.removeItem.bind(localStorag
 export const indexedDB_ = window_.indexedDB || null;
 export const fetch_ = fetch;
 export const Error_ = msg => new Error(msg);
+export const Array_ = Array;
 export const Uint8Array_ = Uint8Array;
 export const Uint32Array_ = Uint32Array;
 export const Set_ = Set;
@@ -67,11 +68,11 @@ export const number_toFixed2 = num => num.toFixed(2);
 	@param {string=} pad
 	@return {string}
 	@noinline
+	@suppress {checkTypes}
 */
 export const number_padStart2 = (num, pad) => (
-	Math_floor(num)
-	.toString()
-	.padStart(2, pad)
+	num = Math_floor(num).toString(),
+	num.length < 2 ? pad + num : num
 );
 
 /**

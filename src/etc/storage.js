@@ -1,4 +1,5 @@
 import {
+	Array_,
 	Number_,
 	Object_entries,
 	Object_keys,
@@ -180,7 +181,7 @@ export const chunks_set = indexedDB_
 			localStorage_setItem(`minicraft.world.${world}:${coords}`, data);
 		}
 		// assert margin for metadata
-		localStorage_setItem('__margin', new Array(257).join('x'));
+		localStorage_setItem('__margin', Array_(257).join('x'));
 		localStorage_removeItem('__margin');
 	}
 
