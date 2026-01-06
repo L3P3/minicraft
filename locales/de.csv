@@ -39,6 +39,7 @@ error_selection_required: Auswahl erforderlich!
 error_storage: Der Speicherplatz reicht nicht!
 error_upload_world: Fehler beim Hochladen der Welt: 
 error_world_is_loading: Die Welt wird noch geladen!
+error_world_is_opened: Die Welt ist schon geöffnet!
 error_world_is_present_both_sides: Die Welt ist schon auf beiden Seiten vorhanden!
 error_world_not_downloaded: Die Welt ist noch nicht heruntergeladen!
 error_world_not_uploaded: Die Welt ist nicht hochgeladen!
@@ -70,6 +71,7 @@ refresh: Aktualisieren
 reload_list: Liste neu laden
 rename: Umbenennen
 resolution: Auflösung
+retry: Nochmal probieren
 selection_expanded: Auswahl erweitert.
 selection_none: nichts
 selection_primary_short: Erster

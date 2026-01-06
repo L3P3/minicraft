@@ -261,6 +261,10 @@ var onmousedown;
 	@type {function(MouseEvent)?}
 */
 var onmouseup;
+/**
+	@type {function()?}
+*/
+var onresize;
 
 /**
 	@type {boolean}
@@ -347,6 +351,8 @@ var TYPE_RESPONSE_INITIAL;
 /**
 	@typedef {{
 		busy: boolean,
+		window: boolean,
+		borders: boolean,
 	}}
 */
 var TYPE_CSS_CLASSES;

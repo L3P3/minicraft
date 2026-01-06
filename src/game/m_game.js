@@ -1,4 +1,5 @@
 import {
+	defer,
 	now,
 } from '../etc/lui.js';
 
@@ -49,6 +50,8 @@ import {
 	MOUSE_MODE_NORMAL,
 	MOUSE_MODE_SELECT,
 	PLAYER_SLOTS,
+	WINDOW_TYPE_EMPTY,
+	WINDOW_TYPE_GAME,
 } from '../etc/constants.js';
 import {
 	DEBUG,
@@ -81,6 +84,7 @@ import {
 	locale_error_gamemode_range,
 	locale_error_invalid_block_type,
 	locale_error_inventory_full,
+	locale_error_no_permission,
 	locale_error_only_vert_supported,
 	locale_error_parameter_missing,
 	locale_error_pitch,
@@ -103,6 +107,9 @@ import {
 	locale_time_set_to,
 	locale_unknown_command,
 } from '../etc/locale.js';
+import {
+	actions,
+} from '../etc/state.js';
 
 import {
 	player_create,
@@ -129,6 +136,7 @@ import {
 	world_chunk_reset,
 	world_create,
 	world_data_init,
+	world_destroy,
 	world_load,
 	world_save,
 	world_tick,
@@ -137,7 +145,7 @@ import {
 
 let message_id_counter = 0;
 
-export const game_create = (actions, frame_element, config, account) => {
+export const game_create = (frame_element, window_actions, {config, account}) => {
 	const world = world_create(config.world_last);
 
 	const player = player_create(world, account);
@@ -145,7 +153,6 @@ export const game_create = (actions, frame_element, config, account) => {
 	world_load(world, player);
 
 	const model = {
-		actions,
 		config,
 		cursor_x: 0,
 		cursor_y: 0,
@@ -173,6 +180,7 @@ export const game_create = (actions, frame_element, config, account) => {
 			model.flag_paused ||
 			world_tick(world, player)
 		), 50),
+		window_actions,
 		world,
 	};
 
@@ -187,19 +195,20 @@ export const game_destroy = model => {
 	clearInterval_(model.tick_interval);
 
 	world_save(model.world, model.player);
+	world_destroy(model.world);
 
 	renderer_destroy(model.renderer);
 }
 
-export const game_renderer_init = (model, canvas_element) => {
-	model.renderer = renderer_create(model, canvas_element);
-}
+export const game_renderer_init = (model, canvas_element) => (
+	model.renderer = renderer_create(model, canvas_element)
+)
 
 export const game_save = model => {
 	if (model.world.flag_frozen) return;
 
 	world_save(model.world, model.player);
-	model.actions.world_prop(model.world.id, {
+	actions.world_prop(model.world.id, {
 		mod_l: Date_now(),
 	});
 }
@@ -274,8 +283,9 @@ export const game_mouse_move_player = (model, event) => {
 }
 
 export const game_mouse_move_menu = (model, event) => {
-	model.cursor_x = event.clientX;
-	model.cursor_y = event.clientY;
+	const rect = model.frame_element.getBoundingClientRect();
+	model.cursor_x = event.clientX - rect.left;
+	model.cursor_y = event.clientY - rect.top;
 }
 
 /**
@@ -373,6 +383,7 @@ export const game_key = (model, code, state) => {
 			break;
 		case KEY_MOUSE_LEFT:
 			if (
+				!model.world.flag_frozen &&
 				player.gamemode !== GAMEMODE_SPECTATOR &&
 				block_focus_y >= 0
 			) {
@@ -448,6 +459,7 @@ export const game_key = (model, code, state) => {
 			break;
 		case KEY_MOUSE_RIGHT:
 			if (
+				!model.world.flag_frozen &&
 				player.gamemode !== GAMEMODE_SPECTATOR &&
 				block_focus_y >= 0
 			) {
@@ -542,6 +554,9 @@ export const game_key = (model, code, state) => {
 				for (const code of keys_active)
 					game_key(model, code, false);
 			}
+			break;
+		case 70: // F
+			model.window_actions.fullscreen_toggle();
 			break;
 		case 80: // P
 			if (model.world)
@@ -660,9 +675,6 @@ export const game_message_send = (model, value) => {
 			}
 			game_message_print(model, locale_inventory_cleared, true);
 			break;
-		//case 'exit':
-		//	game_message_print(model, 'use your pointer');
-		//	break;
 		case 'gamemode':
 		case 'gm': {
 				const value = Number_(args[0]);
@@ -736,10 +748,18 @@ export const game_message_send = (model, value) => {
 			game_message_print(model, player.name + ' ' + args.join(' '), true);
 			break;
 		case 'save':
+			if (model.world.flag_frozen) {
+				game_message_print(model, locale_error_no_permission);
+				return;
+			}
 			game_save(model);
 			game_message_print(model, locale_game_saved, true);
 			break;
 		case 'spawn':
+			if (model.world.flag_frozen) {
+				game_message_print(model, locale_error_no_permission);
+				return;
+			}
 			world.spawn_x = player.position_x;
 			world.spawn_y = player.position_y;
 			world.spawn_z = player.position_z;
@@ -797,6 +817,15 @@ export const game_message_send = (model, value) => {
 		case 'version':
 			game_message_print(model, 'minicraft ' + VERSION);
 			break;
+		case '_w':
+			actions.window_add({
+				type: (
+					args[0] === 'm'
+					?	WINDOW_TYPE_GAME
+					:	WINDOW_TYPE_EMPTY
+				),
+			});
+			break;
 		case '/exit':
 			player.mouse_mode = MOUSE_MODE_NORMAL;
 			game_message_print(model, locale_mouse_mode_normal, true);
@@ -826,6 +855,10 @@ export const game_message_send = (model, value) => {
 			);
 			break;
 		case '/regen':
+			if (model.world.flag_frozen) {
+				game_message_print(model, locale_error_no_permission);
+				return;
+			}
 			world_chunk_reset(world)
 			.then(() => {
 				model.renderer.flag_dirty = true;
@@ -947,9 +980,7 @@ const game_poll = (model, msg) => (
 	})
 	.catch(error => false)
 	.then(value => {
-		model.poll_timeout = setTimeout_(() => {
-			game_poll(model, null);
-		}, 5e3);
+		model.poll_timeout = setTimeout_(game_poll, 5e3, model, null);
 		return value;
 	})
 )

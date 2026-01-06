@@ -1,12 +1,9 @@
 import {
 	defer,
 	defer_end,
-	hook_async,
 	hook_dom,
-	hook_effect,
 	hook_memo,
 	hook_state,
-	hook_static,
 	node_dom,
 	node_map,
 } from '../etc/lui.js';
@@ -17,18 +14,19 @@ import {
 } from '../etc/constants.js';
 import {
 	API,
-	API_DATA,
 	VERSION,
 } from '../etc/env.js';
 import {
+	alert_,
 	Date_now,
 	Error_,
 	JSON_stringify,
 	Math_max,
 	Math_min,
-	Promise_,
+	confirm_,
 	datify,
 	fetch_,
+	prompt_,
 } from '../etc/helpers.js';
 import {
 	locale_ask_world_delete_1,
@@ -39,24 +37,17 @@ import {
 	locale_delete_world,
 	locale_download_world_from_server,
 	locale_download,
-	locale_error_conflict_1,
-	locale_error_conflict_2,
-	locale_error_conflict_3,
-	locale_error_conflict_4,
 	locale_error_connection,
 	locale_error_delete_world,
-	locale_error_download_world,
 	locale_error_edit_world,
 	locale_error_list_is_loading,
-	locale_error_loading_worldlist,
 	locale_error_name_too_long,
 	locale_error_no_permission,
 	locale_error_no_permission_logged_in,
 	locale_error_no_world_selected,
 	locale_error_not_logged_in,
-	locale_error_storage,
-	locale_error_upload_world,
 	locale_error_world_is_loading,
+	locale_error_world_is_opened,
 	locale_error_world_is_present_both_sides,
 	locale_error_world_not_downloaded,
 	locale_error_world_not_uploaded,
@@ -83,24 +74,29 @@ import {
 	locale_upload,
 	locale_version_1,
 	locale_version_2,
-	locale_warn_world_remote_missing_1,
-	locale_warn_world_remote_missing_2,
 	locale_world_etc,
 	locale_worlds,
 	locale_yes,
 } from '../etc/locale.js';
 import {
 	chunks_delete,
-	chunks_get,
-	chunks_rename,
-	chunks_set,
 } from '../etc/storage.js';
+import {
+	actions,
+} from '../etc/state.js';
+
+import {
+	world_list_remote,
+	world_renamed_id_new,
+	world_renamed_id_old,
+	world_store_remote_reload,
+} from './m_world_store.js';
 
 function WorldItem({
 	I,
-	world_busy_id,
 	world_selected,
 	world_selected_id_set,
+	world_syncing,
 }) {
 	hook_dom('div', {
 		F: {
@@ -130,7 +126,7 @@ function WorldItem({
 		?	'R'
 		:	'r'
 	}`;
-	if (world_busy_id === I.id) {
+	if (world_syncing === I.id) {
 		flags = `[${flags}]`;
 	}
 
@@ -149,306 +145,52 @@ function WorldItem({
 	];
 }
 
-const headers_json_post = {
-	method: 'POST',
-	headers: {'Content-Type': 'application/json'},
-};
-
 export default function MenuStart({
-	account,
-	actions,
-	config,
+	state: {
+		account,
+		config,
+		connection_error,
+		world_list_cooldown,
+		world_list_loading,
+		world_syncing,
+		worlds_merged,
+		worlds_opened,
+	},
 	view_set,
 }) {
 	hook_dom('div[className=menu]');
 
-	// counter to force list refresh
-	const [refreshes, refreshes_set, refreshes_get] = hook_state(0);
-	const refresh = hook_static(() => {
-		refreshes_set(refreshes_get() + 1);
-	});
-
-	/**
-		last fetched world list
-		@type {{
-			value: ?Array<TYPE_WORLD_LISTING_REMOTE>,
-		}}
-	*/
-	const world_list_remote_ref = hook_static({
-		value: null,
-	});
-	const world_list_remote = hook_async(
-		async () => {
-			try {
-				const initial = !world_list_remote_ref.value && !refreshes;
-				const response = await fetch_(`${API}world?what=${initial ? 'initial' : 'meta_all'}`);
-				if (!response.ok) throw Error_(locale_error_connection);
-				const json = await response.json();
-				if (!initial) return /** @type {!Array<TYPE_WORLD_LISTING_REMOTE>} */ (json);
-				const json_initial = /** @type {TYPE_RESPONSE_INITIAL} */ (json);
-				if (
-					VERSION !== 'dev' &&
-					json_initial.version_latest !== VERSION
-				) {
-					location.reload(true);
-					return null;
-				}
-				defer();
-				actions.account_set(json_initial.account);
-				return json_initial.worlds;
-			}
-			catch (error) {
-				alert(locale_error_loading_worldlist + error.message);
-				return [];
-			}
-		},
-		[refreshes],
-		null
+	const [world_selected_id_state, world_selected_id_set] = hook_state(config.world_last);
+	// if the world was renamed, update the selected id
+	const world_selected_id = (
+		world_selected_id_state !== world_renamed_id_old
+		?	world_selected_id_state
+		:	(
+			world_selected_id_set(world_renamed_id_new),
+			world_renamed_id_new
+		)
 	);
-	// merged local and remote world list
-	const world_list = hook_memo(() => {
-		if (world_list_remote) {
-			world_list_remote_ref.value = world_list_remote;
-		}
-
-		const world_list = [];
-
-		if (world_list_remote_ref.value) {
-			world_list.push(
-				...world_list_remote_ref.value
-				.map(world => ({
-					account_name: world.account_name,
-					hash: world.hash,
-					id: world.id,
-					label: world.label,
-					local: 0,
-					public: world.public,
-					remote: world.modified,
-					writable: world.writable,
-				}))
-			);
-		}
-
-		for (const world_local of /** @type {!Array<TYPE_WORLD_LISTING_LOCAL>} */ (config.worlds)) {
-			const world_list_item = world_list.find(world => world.id === world_local.id);
-			if (world_list_item) {
-				const last_change_here = world_list_item.local = world_local.mod_l;
-				const last_change_there = world_list_item.remote;
-				const last_sync = world_local.mod_r;
-
-				if (
-					last_change_here > last_sync &&
-					last_change_there > last_sync
-				) {
-					if (confirm(
-						locale_error_conflict_1 +
-						world_local.label +
-						locale_error_conflict_2 +
-						datify(last_change_there, false) + locale_error_conflict_3 +
-						datify(last_change_here, false) +
-						locale_error_conflict_4
-					)) {
-						actions.world_prop(world_local.id, {
-							mod_l: world_list_item.local = last_sync,
-						});
-					}
-					else {
-						actions.world_prop(world_local.id, {
-							mod_r: world_list_item.remote = last_sync,
-						});
-					}
-				}
-			}
-			else {
-				if (
-					world_local.mod_r > 1 &&
-					world_list_remote &&
-					world_list_remote.length
-				) {
-					alert(
-						locale_warn_world_remote_missing_1 +
-						world_local.label +
-						locale_warn_world_remote_missing_2
-					);
-					actions.world_prop(world_local.id, {
-						mod_r: 0,
-					});
-				}
-
-				world_list.push({
-					account_name: '',
-					hash: 0,
-					id: world_local.id,
-					label: world_local.label,
-					local: world_local.mod_l,
-					public: false,
-					remote: world_local.mod_r === 1 ? 1 : 0,
-					writable: true,
-				});
-			}
-		}
-
-		return world_list.sort((a, b) => Math_max(b.local, b.remote) - Math_max(a.local, a.remote));
-	}, [
-		world_list_remote,
-		config.worlds,
-	]);
-
-	const [world_selected_id, world_selected_id_set, world_selected_id_get] = hook_state(config.world_last);
 	const world_selected = hook_memo(() => (
-		world_list.find(world => world.id === world_selected_id) || null
+		worlds_merged.find(world => world.id === world_selected_id) || null
 	), [
 		world_selected_id,
-		world_list,
+		worlds_merged,
 	]);
-
-	const world_busy_id = hook_memo(() => (
-		world_list?.find(world =>
-			world.local > 0 &&
-			world.remote > 0 &&
-			world.local !== world.remote
-		)?.id ?? null
-	), [world_list]);
-	hook_effect(() => {
-		if (world_busy_id === null) return;
-
-		let cancelled = false;
-		const world_busy = world_list.find(world => world.id === world_busy_id);
-
-		if (world_busy.local < world_busy.remote) {
-			// download
-			fetch_(`${API_DATA}worlds/${world_busy.hash}.json`)
-			.then(response => response.json())
-			.then(json => {
-				if (cancelled) return;
-				return (
-					chunks_set(world_busy_id, json)
-					.then(() => {
-						actions.world_prop(world_busy_id, {
-							mod_l: world_busy.remote,
-							mod_r: world_busy.remote,
-						});
-					})
-				);
-			})
-			.catch(error => {
-				if (cancelled) return;
-				if (error.name === 'QuotaExceededError') {
-					alert(locale_error_storage);
-					actions.world_remove(world_busy_id);
-					chunks_delete(world_busy_id);
-				}
-				else alert(locale_error_download_world + error.message);
-			});
-		}
-		else {
-			// upload
-			if (!world_busy.writable) {
-				actions.world_prop(world_busy_id, {
-					mod_l: config.worlds.find(world => world.id === world_busy_id).mod_r,
-				});
-				return;
-			}
-			let id_new = world_busy_id;
-			(
-				// register new world?
-				world_busy.remote === 1
-				?	fetch_(API + 'world', {
-						...headers_json_post,
-						body: JSON_stringify({
-							what: 'meta',
-							label: world_busy.label,
-						}),
-					})
-					.then(response => {
-						if (!response.ok) throw Error_(
-							response.status === 403
-							?	locale_error_no_permission_logged_in
-							:	locale_error_connection
-						);
-						return response.json();
-					})
-					.then(json => {
-						id_new = json.id;
-					})
-				:	Promise_.resolve()
-			)
-			.then(() => {
-				if (cancelled) throw null;
-				return chunks_get(world_busy_id);
-			})
-			.then(json => {
-				if (cancelled) throw null;
-				return fetch_(API + 'world', {
-					...headers_json_post,
-					body: JSON_stringify({
-						what: 'data',
-						world: id_new,
-						data: json,
-					}),
-				});
-			})
-			.then(response => {
-				if (!response.ok) throw Error_(
-					response.status === 403
-					?	locale_error_no_permission_logged_in
-					:	locale_error_connection
-				);
-				return response.json();
-			})
-			.then(result => {
-				defer();
-				if (id_new === world_busy_id) {
-					actions.world_prop(world_busy_id, {
-						mod_l: result.modified,
-						mod_r: result.modified,
-					});
-				}
-				else {
-					// replace the id
-					chunks_rename(world_busy_id, id_new);
-					actions.world_remove(world_busy_id);
-					actions.world_add({
-						id: id_new,
-						label: world_busy.label,
-						mod_l: result.modified,
-						mod_r: result.modified,
-					});
-					if (
-						!cancelled &&
-						world_selected_id_get() === world_busy_id
-					) {
-						world_selected_id_set(id_new);
-					}
-				}
-				if (!cancelled) refresh();
-				defer_end();
-			})
-			.catch(error => {
-				if (cancelled) return;
-				alert(locale_error_upload_world + error.message);
-				defer();
-				actions.world_prop(world_busy_id, {
-					mod_r: 0,
-				});
-				defer_end();
-			});
-		}
-
-		return () => {
-			cancelled = true;
-		};
-	}, [world_busy_id]);
 
 	const [menu_opened, menu_opened_set] = hook_state(false);
 	if (!world_selected) menu_opened_set(false);
 	const [busy, busy_set] = hook_state(false);
+	const world_selected_opened = !!world_selected && worlds_opened.includes(world_selected_id);
 
 	return [
 		node_dom(`h1[innerText=${locale_worlds}]`),
 		node_dom(`button[innerText=${locale_refresh}][style=position:absolute;left:0;top:0;height:2rem][title=${locale_reload_list}]`, {
-			disabled: !world_list_remote,
-			onclick: refresh,
+			disabled: (
+				world_list_cooldown ||
+				world_list_loading ||
+				connection_error !== null
+			),
+			onclick: world_store_remote_reload,
 		}),
 		node_dom('button[style=position:absolute;right:0;top:0;height:2rem]', {
 			disabled: account.rank > 0,
@@ -458,18 +200,19 @@ export default function MenuStart({
 			},
 		}),
 		node_dom('div[className=worlds]', null, [
-			node_map(WorldItem, world_list, {
-				refreshes, // refresh dates as well
-				world_busy_id,
+			node_map(WorldItem, worlds_merged, {
+				_: Date_now(), // refresh dates as well
 				world_selected,
 				world_selected_id_set,
+				world_syncing,
 			}),
 		]),
 		node_dom('center', null, [
 			node_dom(`button[innerText=${locale_open}]`, {
 				disabled: (
 					!world_selected ||
-					!world_selected.local ||
+					world_selected_opened ||
+					world_selected.local < 2 ||
 					world_selected.remote > world_selected.local
 				),
 				onclick: () => {
@@ -483,9 +226,11 @@ export default function MenuStart({
 				title: (
 					!world_selected
 					?	locale_error_no_world_selected
-					: !world_selected.local
+					: world_selected_opened
+					?	locale_error_world_is_opened
+					: world_selected.local < 2
 					?	locale_error_world_not_downloaded
-					: world_selected.remote > world_selected.local
+					: world_selected.local < world_selected.remote
 					?	locale_error_world_is_loading
 					:	locale_join_selected_world
 				),
@@ -499,9 +244,11 @@ export default function MenuStart({
 					menu_opened_set(true);
 				},
 				title: (
-					world_selected
-					?	locale_show_world_settings
-					:	locale_error_no_world_selected
+					!world_selected
+					?	locale_error_no_world_selected
+					: world_selected_opened
+					?	locale_error_world_is_opened
+					:	locale_show_world_settings
 				),
 			}),
 		]),
@@ -509,10 +256,10 @@ export default function MenuStart({
 		node_dom('center', null, [
 			node_dom(`button[innerText=${locale_new_world}]`, {
 				onclick: () => {
-					const name = prompt(locale_name_new_world, locale_new_world);
+					const name = prompt_(locale_name_new_world, locale_new_world);
 					if (!name) return;
 					if (name.length > 16) {
-						alert(locale_error_name_too_long);
+						alert_(locale_error_name_too_long);
 						return;
 					}
 					actions.world_add({
@@ -572,10 +319,11 @@ export default function MenuStart({
 					node_dom(`button[innerText=${locale_rename}]`, {
 						disabled: (
 							busy ||
+							world_selected_opened ||
 							!world_selected.writable
 						),
 						onclick: () => {
-							const name = prompt(locale_name_existing_world, world_selected.label);
+							const name = prompt_(locale_name_existing_world, world_selected.label);
 							if (
 								!name ||
 								name === world_selected.label ||
@@ -606,7 +354,7 @@ export default function MenuStart({
 									return response.json();
 								})
 								.catch(error => {
-									alert(locale_error_edit_world + error.message);
+									alert_(locale_error_edit_world + error.message);
 								})
 								.then(() => {
 									busy_set(false);
@@ -614,14 +362,17 @@ export default function MenuStart({
 							}
 						},
 						title: (
-							world_selected.writable
-							?	locale_change_world_name
-							:	locale_error_no_permission
+							!world_selected.writable
+							?	locale_error_no_permission
+							: world_selected_opened
+							?	locale_error_world_is_opened
+							:	locale_change_world_name
 						),
 					}),
 					node_dom('button', {
 						disabled: (
 							busy ||
+							world_selected_opened ||
 							!world_selected.local &&
 							!world_selected.writable
 						),
@@ -631,7 +382,7 @@ export default function MenuStart({
 							:	locale_delete
 						),
 						onclick: () => {
-							if (!confirm(
+							if (!confirm_(
 								locale_ask_world_delete_1 + world_selected.label + locale_ask_world_delete_2
 							)) return;
 							if (world_selected.local) {
@@ -657,20 +408,22 @@ export default function MenuStart({
 									defer();
 									world_selected_id_set(null);
 									menu_opened_set(false);
-									refresh();
+									world_store_remote_reload();
 									busy_set(false);
 									defer_end();
 									return response.json();
 								})
 								.catch(error => {
-									alert(locale_error_delete_world + error.message);
+									alert_(locale_error_delete_world + error.message);
 									busy_set(false);
 								});
 							}
 						},
 						title: (
-							!world_selected.local &&
-							!world_selected.writable
+							world_selected_opened
+							?	locale_error_world_is_opened
+							: !world_selected.local &&
+							  !world_selected.writable
 							?	locale_error_no_permission
 							:	locale_delete_world
 						),
@@ -706,13 +459,13 @@ export default function MenuStart({
 									:	locale_error_connection
 								);
 								defer();
-								refresh();
+								world_store_remote_reload();
 								busy_set(false);
 								defer_end();
 								return response.json();
 							})
 							.catch(error => {
-								alert(locale_error_edit_world + error.message);
+								alert_(locale_error_edit_world + error.message);
 								busy_set(false);
 							});
 						},
@@ -730,6 +483,7 @@ export default function MenuStart({
 						disabled: (
 							busy ||
 							!world_list_remote ||
+							world_selected_opened ||
 							world_selected.local > 0 && world_selected.remote > 0 ||
 							!world_selected.remote && !account.rank
 						),
@@ -762,6 +516,8 @@ export default function MenuStart({
 							?	locale_download_world_from_server
 							: world_selected.remote
 							?	locale_error_world_is_present_both_sides
+							: world_selected_opened
+							?	locale_error_world_is_opened
 							: account.rank
 							?	locale_upload_world_to_server
 							:	locale_error_not_logged_in

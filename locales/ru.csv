@@ -39,6 +39,7 @@ error_selection_required: Выберите сначяло!
 error_storage: Нехватает памяти!
 error_upload_world: Ошибка при загруске мира: 
 error_world_is_loading: Мир еще загружаетса!
+error_world_is_opened: Мир уже открыт!
 error_world_is_present_both_sides: Мир уже есть на двух страницах!
 error_world_not_downloaded: Мир еще не скачен!
 error_world_not_uploaded: Мир не загружен!
@@ -70,6 +71,7 @@ refresh: Обновит
 reload_list: Обновит список
 rename: Переименовать
 resolution: Качество
+retry: Повторить
 selection_expanded: Выборь увеличен.
 selection_none: ничего
 selection_primary_short: Первый

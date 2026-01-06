@@ -234,7 +234,7 @@ export const chunks_delete = world => {
 	@param {number} world_old
 	@param {number} world_new
 */
-export const chunks_rename = (world_old, world_new) => {
+export const chunks_rename = async (world_old, world_new) => {
 	if (!chunks_db) {
 		const prefix_old = `minicraft.world.${world_old}:`;
 		const prefix_old_length = prefix_old.length;
@@ -263,14 +263,19 @@ export const chunks_rename = (world_old, world_new) => {
 		.objectStore('chunks');
 	const request = store.openCursor();
 
-	request.onsuccess = () => {
-		const cursor = request.result;
-		if (cursor) {
-			if (cursor.value.world === world_old) {
-				cursor.value.world = world_new;
-				store.put(cursor.value);
+	return new Promise_(resolve => {
+		request.onsuccess = () => {
+			const cursor = request.result;
+			if (cursor) {
+				if (cursor.value.world === world_old) {
+					cursor.value.world = world_new;
+					store.put(cursor.value);
+				}
+				cursor.continue();
 			}
-			cursor.continue();
-		}
-	};
+			else {
+				resolve();
+			}
+		};
+	});
 }

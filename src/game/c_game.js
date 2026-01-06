@@ -20,9 +20,18 @@ import {
 import {
 	document_,
 	flag_chromium,
+	Math_,
 	Math_max,
 	window_,
 } from '../etc/helpers.js';
+import {
+	actions,
+} from '../etc/state.js';
+
+import {
+	games,
+	in_event,
+} from '../app.js';
 
 import {
 	game_create,
@@ -48,21 +57,22 @@ import Terminal from './c_terminal.js';
 import Touch from './c_touch.js';
 
 export default function Game({
-	account,
-	actions,
-	config,
 	frame,
-	ref,
+	key_event,
+	state,
 	view_set,
+	window_actions,
+	window_id,
 }) {
+	const {config} = state;
 	const time_now = now();
 	const pointer_locked = document_.pointerLockElement === frame;
 
-	const model = hook_memo(() => (
-		ref.game = game_create(actions, frame, config, account)
-	));
+	const model = hook_memo(() => game_create(frame, window_actions, state));
 
 	hook_effect(() => {
+		games.add(model);
+
 		const handler_mousebutton = event => {
 			if (model.menu !== MENU_NONE) return true;
 
@@ -90,7 +100,7 @@ export default function Game({
 			if (
 				model.menu === MENU_NONE &&
 				!model.flag_paused &&
-				Math.abs(event.deltaY) > 5
+				Math_.abs(event.deltaY) > 5
 			) {
 				const key =
 					event.deltaY > 0
@@ -109,14 +119,14 @@ export default function Game({
 		frame.addEventListener('mousemove', handler_mousemove, passive_true);
 		frame.addEventListener('wheel', handler_mousewheel, passive_true);
 
-		return () => {
-			frame.removeEventListener('mousedown', handler_mousebutton);
-			frame.removeEventListener('mouseup', handler_mousebutton);
-			frame.removeEventListener('mousemove', handler_mousemove, passive_true);
-			frame.removeEventListener('wheel', handler_mousewheel, passive_true);
-			game_destroy(model);
-			ref.game = null;
-		};
+		return () => (
+			frame.removeEventListener('mousedown', handler_mousebutton),
+			frame.removeEventListener('mouseup', handler_mousebutton),
+			frame.removeEventListener('mousemove', handler_mousemove, passive_true),
+			frame.removeEventListener('wheel', handler_mousewheel, passive_true),
+			game_destroy(model),
+			games.delete(model)
+		);
 	});
 
 	hook_effect(() => (
@@ -128,16 +138,26 @@ export default function Game({
 	), [config]);
 
 	hook_effect((width, height, ratio) => (
-		model.resolution_css_ratio = ratio,
+		model.resolution_css_ratio = ratio || 1,
 		model.resolution_raw_x = Math_max(1, width),
 		model.resolution_raw_y = Math_max(1, height),
 		game_resolution_update(model)
 	), [
 		frame.offsetWidth,
 		frame.offsetHeight,
-		window_.devicePixelRatio || 1,
+		window_.devicePixelRatio,
 		config.resolution_scaling,
 	]);
+
+	hook_effect(() => {
+		if (key_event) {
+			game_key(
+				model,
+				key_event.code,
+				key_event.state
+			);
+		}
+	}, [key_event]);
 
 	// two-way binding for lock and pause
 	hook_effect(ingame => {
@@ -181,9 +201,12 @@ export default function Game({
 		model.menu !== MENU_NONE,
 	]);
 
-	hook_effect(() => (
+	if (
+		time_now !== model.frame_last &&
+		!in_event
+	) {
 		game_render(model, time_now)
-	), [time_now]);
+	}
 
 	hook_rerender();
 
@@ -228,7 +251,6 @@ export default function Game({
 		}),
 		model.menu === MENU_SETTINGS &&
 		node(Settings, {
-			actions,
 			config,
 			game: model,
 			view_set,

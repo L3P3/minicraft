@@ -21,7 +21,7 @@ const Bitmap = ({
 	hook_dom('div[className=bitmap]', {
 		S: {
 			backgroundImage: `url(${API_DATA}textures/${textures_id}.png)`,
-			backgroundPositionY: `-${(id - 1) * 2}rem`,
+			backgroundPositionY: 100 - id * 100 + '%',
 		},
 	}),
 	null

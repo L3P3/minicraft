@@ -122,9 +122,15 @@ export const MENU_NONE = 0;
 export const MENU_SETTINGS = 1;
 export const MENU_TERMINAL = 2;
 export const MENU_INVENTORY = 3;
-export const MENU_WORLDS = 4;
 
 export const MOUSE_MODE_NORMAL = 0;
 export const MOUSE_MODE_SELECT = 1;
 
 export const API_CHAT = (VERSION === 'dev' ? '//l3p3.de' : '') + '/api/chat';
+
+export const WINDOW_MODE_FULL = 0;
+export const WINDOW_MODE_FLOATING = 1;
+export const WINDOW_MODE_HIDDEN = 2;
+
+export const WINDOW_TYPE_EMPTY = 0;
+export const WINDOW_TYPE_GAME = 1;

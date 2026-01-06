@@ -39,6 +39,7 @@ error_selection_required: Необхідний вибір!
 error_storage: Недостатньо місця!
 error_upload_world: Помилка завантаження світу:
 error_world_is_loading: Світ ще завантажується!
+error_world_is_opened: Світ уже відкритий!
 error_world_is_present_both_sides: Світ уже існує на сайті!
 error_world_not_downloaded: Світ ще не завантажений!
 error_world_not_uploaded: Світ не завантажений!
@@ -70,6 +71,7 @@ refresh: Оновити
 reload_list: Оновити список
 rename: Перейменувати
 resolution: Дозвіл
+retry: Спробуйте ще раз
 selection_expanded: Вибір розширився.
 selection_none: нічого 
 selection_primary_short: Перший

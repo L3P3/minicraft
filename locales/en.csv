@@ -39,6 +39,7 @@ error_selection_required: Selection required!
 error_storage: Insufficient storage!
 error_upload_world: Error while uploading world: 
 error_world_is_loading: The world is still loading!
+error_world_is_opened: The world is already opened!
 error_world_is_present_both_sides: The world is present on both sides!
 error_world_not_downloaded: The world is not downloaded yet!
 error_world_not_uploaded: The world is not uploaded!
@@ -70,6 +71,7 @@ refresh: Refresh
 reload_list: Reload list
 rename: Rename
 resolution: Resolution
+retry: Retry
 selection_expanded: Expanded selection.
 selection_none: none
 selection_primary_short: Primary

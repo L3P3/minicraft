@@ -31,6 +31,9 @@ import {
 	locale_view_distance,
 	locale_world_leave,
 } from '../etc/locale.js';
+import {
+	actions,
+} from '../etc/state.js';
 
 import {
 	game_menu_close,
@@ -55,9 +58,6 @@ function TextureItem({
 }
 
 export default function Settings({
-	actions: {
-		config_set,
-	},
 	config,
 	game,
 	view_set,
@@ -65,7 +65,8 @@ export default function Settings({
 	game && hook_effect(() => (
 		game_save(game)
 	));
-	
+
+	const {config_set} = actions;
 	const [textures_opened, textures_opened_set] = hook_state(false);
 	const textures = hook_async(() => (
 		!textures_opened ? Promise_.resolve(null) :
