@@ -12,10 +12,6 @@ import {
 	APP_VIEW_WORLDS,
 } from '../etc/constants.js';
 import {
-	clearTimeout_,
-	setTimeout_,
-} from '../etc/helpers.js';
-import {
 	locale_error_connection,
 	locale_retry,
 } from '../etc/locale.js';
@@ -23,15 +19,9 @@ import {
 	actions,
 } from '../etc/state.js';
 
-import {
-	world_store_sync_check,
-} from './m_world_store.js';
-
 import Game from './c_game.js';
 import MenuStart from './c_menu_start.js';
 import Settings from './c_settings.js';
-
-let sync_check_timeout = 0;
 
 export default function App({
 	key_event,
@@ -50,16 +40,6 @@ export default function App({
 			:	'minicraft'
 		);
 	}, [view]);
-
-	hook_effect(() => {
-		clearTimeout_(sync_check_timeout);
-		if (!state.connection_error) {
-			sync_check_timeout = setTimeout_(world_store_sync_check);
-		}
-	}, [
-		state.connection_error,
-		state.worlds_merged,
-	]);
 
 	const frame = hook_dom('div[className=game]');
 

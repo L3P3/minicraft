@@ -18,8 +18,10 @@ import {
 	datify,
 	Error_,
 	fetch_,
+	headers_json_post,
 	JSON_stringify,
 	Math_max,
+	response_parse,
 	setTimeout_,
 } from '../etc/helpers.js';
 import {
@@ -27,10 +29,8 @@ import {
 	locale_error_conflict_2,
 	locale_error_conflict_3,
 	locale_error_conflict_4,
-	locale_error_connection,
 	locale_error_download_world,
 	locale_error_loading_worldlist,
-	locale_error_no_permission_logged_in,
 	locale_error_storage,
 	locale_error_upload_world,
 	locale_warn_world_remote_missing_1,
@@ -78,17 +78,16 @@ const world_list_remote_load = async initial => {
 
 	try {
 		const response = await fetch_(`${API}world?what=${initial ? 'initia' : 'meta_al'}l`);
-		if (!response.ok) throw Error_(locale_error_connection);
-		const json = await response.json();
+		const result = await response_parse(response);
 		if (!initial) {
-			world_list_remote = /** @type {!Array<TYPE_WORLD_LISTING_REMOTE>} */ (json);
+			world_list_remote = /** @type {!Array<TYPE_WORLD_LISTING_REMOTE>} */ (result);
 			actions.state_patch({
 				world_list_loading: false,
 				worlds_merged: world_store_lists_merge(app_state.config),
 			});
 		}
 		else {
-			const json_initial = /** @type {TYPE_RESPONSE_INITIAL} */ (json);
+			const json_initial = /** @type {TYPE_RESPONSE_INITIAL} */ (result);
 			if (
 				VERSION !== 'dev' &&
 				json_initial.version_latest !== VERSION
@@ -178,10 +177,11 @@ export const world_store_lists_merge = config => {
 					world_local.label +
 					locale_warn_world_remote_missing_2
 				);
-				defer();
+				debugger;
+				/*defer();
 				actions.world_prop(world_local.id, {
 					mod_r: WORLD_STORED_NOT,
-				});
+				});*/
 			}
 
 			world_list.push({
@@ -191,7 +191,11 @@ export const world_store_lists_merge = config => {
 				label: world_local.label,
 				local: world_local.mod_l,
 				public: false,
-				remote: world_local.mod_r === WORLD_STORED_SHOULD ? WORLD_STORED_SHOULD : WORLD_STORED_NOT,
+				remote: (
+					world_local.mod_r === WORLD_STORED_SHOULD
+					?	WORLD_STORED_SHOULD
+					:	WORLD_STORED_NOT
+				),
 				writable: true,
 			});
 		}
@@ -212,8 +216,8 @@ export const world_store_sync_check = async () => {
 	try {
 		while (
 			world_syncable = world_list_merged.find(world =>
-				world.local > 0 &&
-				world.remote > 0 &&
+				world.local > WORLD_STORED_NOT &&
+				world.remote > WORLD_STORED_NOT &&
 				world.local !== world.remote
 			)
 		) {
@@ -232,11 +236,6 @@ export const world_store_sync_check = async () => {
 	syncing = false;
 }
 
-const headers_json_post = {
-	method: 'POST',
-	headers: {'Content-Type': 'application/json'},
-};
-
 /**
 	download/upload world
 	only call this when the modification time actually differs
@@ -251,8 +250,8 @@ const world_store_sync = async world => {
 	if (world.local < world.remote) {
 		try {
 			const response = await fetch_(`${API_DATA}worlds/${world.hash}.json`);
-			const json = await response.json();
-			await chunks_set(id, /** @type {!Object<string, string>} */ (json));
+			const result = await response.json();
+			await chunks_set(id, /** @type {!Object<string, string>} */ (result));
 			defer();
 			actions.world_prop(id, {
 				mod_l: world.remote,
@@ -282,57 +281,49 @@ const world_store_sync = async world => {
 	// upload?
 	else {
 		try {
+			const data_promise = chunks_get(id);
 			let id_new = id;
-			if (world.remote === 1) { // register new world
-				const response = await fetch_(API + 'world', {
+
+			let rename_promise = null;
+			// world must be registered first?
+			if (world.remote === WORLD_STORED_SHOULD) {
+				const response_register = await fetch_(API + 'world', {
 					...headers_json_post,
 					body: JSON_stringify({
 						what: 'meta',
 						label: world.label,
 					}),
 				});
-				if (!response.ok) throw Error_(
-					response.status === 403
-					?	locale_error_no_permission_logged_in
-					:	locale_error_connection
+				const result_register = await response_parse(response_register);
+				rename_promise = chunks_rename(
+					world_renamed_id_old = id,
+					world_renamed_id_new = id_new = result_register.id
 				);
-				const json = await response.json();
-				id_new = json.id;
 			}
 
-			const json = await chunks_get(id);
-			const response = await fetch_(API + 'world', {
+			const response_upload = await fetch_(API + 'world', {
 				...headers_json_post,
 				body: JSON_stringify({
 					what: 'data',
 					world: id_new,
-					data: json,
+					data: await data_promise,
 				}),
 			});
-			if (!response.ok) throw Error_(
-				response.status === 403
-				?	locale_error_no_permission_logged_in
-				:	locale_error_connection
-			);
-			const result = await response.json();
+			const result_upload = await response_parse(response_upload);
 			defer();
-			if (id_new === id) {
+			if (world.remote === WORLD_STORED_SHOULD) {
 				actions.world_prop(id, {
-					mod_l: result.modified,
-					mod_r: result.modified,
-				});
-			}
-			else { // replace the id
-				await chunks_rename(id, id_new);
-				actions.world_remove(id);
-				actions.world_add({
 					id: id_new,
-					label: world.label,
-					mod_l: result.modified,
-					mod_r: result.modified,
+					mod_l: result_upload.modified,
+					mod_r: result_upload.modified,
 				});
-				world_renamed_id_old = id;
-				world_renamed_id_new = id_new;
+				await rename_promise;
+			}
+			else {
+				actions.world_prop(id, {
+					mod_l: result_upload.modified,
+					mod_r: result_upload.modified,
+				});
 			}
 		}
 		catch (error) {

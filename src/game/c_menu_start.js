@@ -21,7 +21,6 @@ import {
 import {
 	alert_,
 	Date_now,
-	Error_,
 	JSON_stringify,
 	Math_max,
 	Math_min,
@@ -29,6 +28,8 @@ import {
 	datify,
 	fetch_,
 	prompt_,
+	response_parse,
+	headers_json_post,
 } from '../etc/helpers.js';
 import {
 	locale_ask_world_delete_1,
@@ -39,13 +40,11 @@ import {
 	locale_delete_world,
 	locale_download_world_from_server,
 	locale_download,
-	locale_error_connection,
 	locale_error_delete_world,
 	locale_error_edit_world,
 	locale_error_list_is_loading,
 	locale_error_name_too_long,
 	locale_error_no_permission,
-	locale_error_no_permission_logged_in,
 	locale_error_no_world_selected,
 	locale_error_not_logged_in,
 	locale_error_world_is_loading,
@@ -339,22 +338,14 @@ export default function MenuStart({
 							if (world_selected.remote) {
 								busy_set(true);
 								fetch_(API + 'world', {
-									method: 'POST',
-									headers: {'Content-Type': 'application/json'},
+									...headers_json_post,
 									body: JSON_stringify({
 										what: 'meta',
 										world: world_selected.id,
 										label: name,
 									}),
 								})
-								.then(response => {
-									if (!response.ok) throw Error_(
-										response.status === 403
-										?	locale_error_no_permission_logged_in
-										:	locale_error_connection
-									);
-									return response.json();
-								})
+								.then(response_parse)
 								.catch(error => {
 									alert_(locale_error_edit_world + error.message);
 								})
@@ -401,20 +392,16 @@ export default function MenuStart({
 										world: world_selected.id,
 									}),
 								})
-								.then(response => {
-									if (!response.ok) throw Error_(
-										response.status === 403
-										?	locale_error_no_permission_logged_in
-										:	locale_error_connection
-									);
-									defer();
-									world_selected_id_set(null);
-									menu_opened_set(false);
-									world_store_remote_reload();
-									busy_set(false);
-									defer_end();
-									return response.json();
-								})
+								.then(response => (
+									response = response_parse(response),
+									defer(),
+									world_selected_id_set(null),
+									menu_opened_set(false),
+									world_store_remote_reload(),
+									busy_set(false),
+									defer_end(),
+									response
+								))
 								.catch(error => {
 									alert_(locale_error_delete_world + error.message);
 									busy_set(false);
@@ -446,26 +433,21 @@ export default function MenuStart({
 						onclick: () => {
 							busy_set(true);
 							fetch_(API + 'world', {
-								method: 'POST',
-								headers: {'Content-Type': 'application/json'},
+								...headers_json_post,
 								body: JSON_stringify({
 									what: 'meta',
 									world: world_selected.id,
 									public: !world_selected.public,
 								}),
 							})
-							.then(response => {
-								if (!response.ok) throw Error_(
-									response.status === 403
-									?	locale_error_no_permission_logged_in
-									:	locale_error_connection
-								);
-								defer();
-								world_store_remote_reload();
-								busy_set(false);
-								defer_end();
-								return response.json();
-							})
+							.then(response => (
+								response = response_parse(response),
+								defer(),
+								world_store_remote_reload(),
+								busy_set(false),
+								defer_end(),
+								response
+							))
 							.catch(error => {
 								alert_(locale_error_edit_world + error.message);
 								busy_set(false);

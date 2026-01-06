@@ -50,6 +50,7 @@ import {
 } from './game/m_renderer.js';
 import {
 	world_store_init,
+	world_store_sync_check,
 } from './game/m_world_store.js';
 
 import Window from './os/c_window.js';
@@ -62,6 +63,7 @@ export const in_event_set = value => {
 	in_event = value;
 }
 let last_touch_event = 0;
+let sync_check_timeout = 0;
 
 function Root() {
 	hook_app_state();
@@ -158,6 +160,16 @@ function Root() {
 	}, [flag_touch]);
 	hook_effect(tiles_set, [app_state.config.textures]);
 
+	hook_effect(() => {
+		clearTimeout_(sync_check_timeout);
+		if (!app_state.connection_error) {
+			sync_check_timeout = setTimeout_(world_store_sync_check);
+		}
+	}, [
+		app_state.connection_error,
+		app_state.worlds_merged,
+	]);
+
 	hook_dom('', {
 		onkeydown: handler_key,
 		onkeyup: handler_key,
@@ -209,21 +221,23 @@ else if (BroadcastChannel_) {
 	channel_lock.postMessage('anyone there?');
 }
 else {
-	// first make sure lock has expired
 	const lock_found = Number_(localStorage_getItem('minicraft.lock'));
-	const lock_limit = Date_now() - 1000;
-	// if already expired
-	if (lock_found < lock_limit) {
+	const lock_limit = Date_now() - 1500;
+	// if lock still valid, wait and check again
+	if (lock_found > lock_limit) {
+		setTimeout_(() => {
+			// chunks_db_promise will already be resolved by then
+			init(
+				Number_(localStorage_getItem('minicraft.lock')) === lock_found
+				?	Root
+				:	ErrorOpened
+			);
+		}, lock_found - lock_limit);
+	}
+	// if not, init right away
+	else {
 		chunks_db_promise.then(() =>
 			init(Root)
 		)
 	}
-	// if not, wait and check again
-	else setTimeout_(() => {
-		init(
-			Number_(localStorage_getItem('minicraft.lock')) === lock_found
-			?	Root
-			:	ErrorOpened
-		);
-	}, lock_found - lock_limit);
 }

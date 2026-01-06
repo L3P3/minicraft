@@ -15,6 +15,7 @@ import {
 	WORLD_FORMAT,
 } from '../etc/constants.js';
 import {
+	Date_now,
 	JSON_parse,
 	JSON_stringify,
 	localStorage_getItem,
@@ -68,6 +69,8 @@ export const world_create = id => {
 		chunks_checklist: null,
 		// next checklist item to check
 		chunks_checklist_index: 0,
+		// could have been modified since last save
+		flag_dirty: false,
 		// nothing must change
 		flag_frozen: !app_state.worlds_merged.find(i => i.id === id).writable,
 		// currently centered chunk (relative chunk position inside superchunk)
@@ -174,8 +177,8 @@ export const world_block_set_try = (model, x, y, z, value) => {
 	return true;
 }
 
-export const world_data_init = (model, player, size_l2) => {
-	if (model.chunks) world_save(model, player);
+export const world_data_init = async (model, player, size_l2) => {
+	if (model.chunks) await world_save(model, player);
 
 	const size = 1 << (
 		model.size_l2 = size_l2
@@ -311,8 +314,14 @@ const world_chunk_load_setup = model => {
 	model.chunks_checklist_index = 0;
 }
 
-export const world_save = (model, player) => {
-	if (model.flag_frozen) return;
+export const world_save = async (model, player) => {
+	if (
+		model.flag_frozen ||
+		!model.flag_dirty
+	) return;
+
+	model.flag_dirty = false;
+	const mod_l = Date_now();
 
 	const i = player.inventory.map(({content}) =>
 		content && [
@@ -351,11 +360,15 @@ export const world_save = (model, player) => {
 		}))
 	);
 
-	return Promise_.all(
+	await Promise_.all(
 		model.chunks
 		.filter(chunk => chunk.dirty)
 		.map(chunk => world_chunk_save(model, chunk))
 	);
+
+	actions.world_prop(model.id, {
+		mod_l,
+	});
 }
 
 export const world_load = (model, player) => {
@@ -589,6 +602,7 @@ export const world_chunk_load = async (model, all) => {
 }
 
 export const world_tick = (model, player) => {
+	model.flag_dirty = true;
 	world_time_set(model, model.time + 1);
 
 	world_offset_update(model, player, false);
