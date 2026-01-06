@@ -223,12 +223,8 @@ export const world_store_sync_check = async () => {
 			await world_store_sync(world_syncable);
 			// Mark as synced in the current list to prevent re-syncing
 			// before state updates propagate
-			if (world_syncable.local < world_syncable.remote) {
-				world_syncable.local = world_syncable.remote;
-			}
-			else {
-				world_syncable.remote = world_syncable.local;
-			}
+			const synced_time = Math_max(world_syncable.local, world_syncable.remote);
+			world_syncable.local = world_syncable.remote = synced_time;
 			actions.state_patch({
 				world_syncing: null,
 			});
@@ -301,11 +297,11 @@ const world_store_sync = async world => {
 					}),
 				});
 				const result_register = await response_parse(response_register);
+				id_new = result_register.id;
 				// Await rename before upload to avoid inconsistent state if upload fails
-				await chunks_rename(
-					world_renamed_id_old = id,
-					world_renamed_id_new = id_new = result_register.id
-				);
+				world_renamed_id_old = id;
+				world_renamed_id_new = id_new;
+				await chunks_rename(id, id_new);
 			}
 
 			const response_upload = await fetch_(API + 'world', {
