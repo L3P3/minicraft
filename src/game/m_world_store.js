@@ -177,11 +177,10 @@ export const world_store_lists_merge = config => {
 					world_local.label +
 					locale_warn_world_remote_missing_2
 				);
-				debugger;
-				/*defer();
+				defer();
 				actions.world_prop(world_local.id, {
 					mod_r: WORLD_STORED_NOT,
-				});*/
+				});
 			}
 
 			world_list.push({
@@ -222,6 +221,14 @@ export const world_store_sync_check = async () => {
 			)
 		) {
 			await world_store_sync(world_syncable);
+			// Mark as synced in the current list to prevent re-syncing
+			// before state updates propagate
+			if (world_syncable.local < world_syncable.remote) {
+				world_syncable.local = world_syncable.remote;
+			}
+			else {
+				world_syncable.remote = world_syncable.local;
+			}
 			actions.state_patch({
 				world_syncing: null,
 			});
@@ -284,7 +291,6 @@ const world_store_sync = async world => {
 			const data_promise = chunks_get(id);
 			let id_new = id;
 
-			let rename_promise = null;
 			// world must be registered first?
 			if (world.remote === WORLD_STORED_SHOULD) {
 				const response_register = await fetch_(API + 'world', {
@@ -295,7 +301,8 @@ const world_store_sync = async world => {
 					}),
 				});
 				const result_register = await response_parse(response_register);
-				rename_promise = chunks_rename(
+				// Await rename before upload to avoid inconsistent state if upload fails
+				await chunks_rename(
 					world_renamed_id_old = id,
 					world_renamed_id_new = id_new = result_register.id
 				);
@@ -317,7 +324,6 @@ const world_store_sync = async world => {
 					mod_l: result_upload.modified,
 					mod_r: result_upload.modified,
 				});
-				await rename_promise;
 			}
 			else {
 				actions.world_prop(id, {
