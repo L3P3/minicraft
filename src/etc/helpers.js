@@ -1,4 +1,6 @@
 import {
+	locale_error_connection,
+	locale_error_no_permission_logged_in,
 	locale_today,
 } from '../etc/locale.js';
 
@@ -55,6 +57,16 @@ export const alert_ = alert;
 export const confirm_ = confirm;
 export const prompt_ = prompt;
 export const flag_chromium = navigator_.userAgent.includes('WebKit');
+
+// old safari does not support fill for typed arrays
+/*if (!Uint32Array_.prototype.fill) {
+	Uint32Array_.prototype.fill = Array_.prototype.fill;
+}*/
+
+export const headers_json_post = {
+	method: 'POST',
+	headers: {'Content-Type': 'application/json'},
+};
 
 /**
 	@param {number} num
@@ -131,4 +143,15 @@ export const datify = (time, short) => {
 	if (result) result += '/';
 
 	return result + date_then.getHours() + ':' + number_padStart2(date_then.getMinutes(), '0');
+}
+
+export const response_parse = response => {
+	if (!response.ok) {
+		throw Error_(
+			response.status === 403
+			?	locale_error_no_permission_logged_in
+			:	locale_error_connection
+		);
+	}
+	return response.json();
 }

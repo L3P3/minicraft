@@ -1,5 +1,4 @@
 import {
-	defer,
 	now,
 } from '../etc/lui.js';
 
@@ -61,9 +60,9 @@ import {
 import {
 	clearInterval_,
 	clearTimeout_,
-	Date_now,
 	fetch_,
 	flag_chromium,
+	headers_json_post,
 	JSON_stringify,
 	Math_ceil,
 	Math_floor,
@@ -205,12 +204,7 @@ export const game_renderer_init = (model, canvas_element) => (
 )
 
 export const game_save = model => {
-	if (model.world.flag_frozen) return;
-
 	world_save(model.world, model.player);
-	actions.world_prop(model.world.id, {
-		mod_l: Date_now(),
-	});
 }
 
 export const game_resolution_update = model => {
@@ -952,10 +946,7 @@ const game_poll = (model, msg) => (
 	(
 		msg
 		?	fetch_(API_CHAT, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
+				...headers_json_post,
 				body: JSON_stringify(/** @type {TYPE_CHAT_API} */ ({
 					msg,
 				})),
