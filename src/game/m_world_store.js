@@ -330,7 +330,7 @@ const world_store_sync = async world => {
 			if (id < 0) world_list_remote.push(result_upload);
 			else {
 				Object.assign(
-					world_list_remote.find(world => world.id === id),
+					/** @type {Object} */ (world_list_remote.find(world => world.id === id)),
 					result_upload
 				);
 			}

@@ -940,6 +940,7 @@ export const game_block_select = (model, block, secondary) => {
 
 const game_poll = (model, msg) => (
 	clearTimeout_(model.poll_timeout),
+	model.poll_timeout = setTimeout_(game_poll, 5e3, model, null),
 	(
 		msg
 		?	fetch_(API_CHAT, {
@@ -950,10 +951,7 @@ const game_poll = (model, msg) => (
 			})
 		:	fetch_(API_CHAT)
 	)
-	.then(res => {
-		if (!res.ok) return;
-		return res.text()
-	})
+	.then(res => res.ok && res.text())
 	.then(text => {
 		if (text) {
 			const lines = text.split('\n').filter(Boolean);
@@ -967,8 +965,4 @@ const game_poll = (model, msg) => (
 		return false;
 	})
 	.catch(_error => false)
-	.then(value => {
-		model.poll_timeout = setTimeout_(game_poll, 5e3, model, null);
-		return value;
-	})
 )
