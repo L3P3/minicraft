@@ -255,10 +255,7 @@ export const game_menu_close = model => {
 */
 export const game_mouse_catch = async model => {
 	if (model.config.flag_touch) return;
-	try {
-		await model.frame_element.requestPointerLock();
-	}
-	catch (error) {}
+	return model.frame_element.requestPointerLock().catch(_error => {});
 }
 
 export const game_mouse_move_player = (model, event) => {
@@ -969,7 +966,7 @@ const game_poll = (model, msg) => (
 		}
 		return false;
 	})
-	.catch(error => false)
+	.catch(_error => false)
 	.then(value => {
 		model.poll_timeout = setTimeout_(game_poll, 5e3, model, null);
 		return value;

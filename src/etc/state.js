@@ -145,8 +145,8 @@ const reducers = {
 			world_list_cooldown: true,
 			world_list_loading: true,
 			world_syncing: null,
-			worlds_merged: world_store_lists_merge(config),
 			worlds_opened: [],
+			...world_store_lists_merge(config),
 		};
 		if (needs_save) {
 			state.config_saved = null;
@@ -235,35 +235,28 @@ const reducers = {
 			],
 		}
 	),
-	world_add: (state, world) => {
-		const config = {
+	world_add: (state, world) => ({
+		...state,
+		...world_store_lists_merge({
 			...state.config,
 			worlds: [
 				...state.config.worlds,
 				world,
 			],
-		};
-		return {
-			...state,
-			config,
-			worlds_merged: world_store_lists_merge(config),
-		};
-	},
-	world_remove: (state, id) => {
-		const config = {
+		}),
+	}),
+	world_remove: (state, id) => ({
+		...state,
+		...world_store_lists_merge({
 			...state.config,
 			worlds: state.config.worlds.filter(
 				world => world.id !== id
 			),
-		};
-		return {
-			...state,
-			config,
-			worlds_merged: world_store_lists_merge(config),
-		};
-	},
-	world_prop: (state, id, patch) => {
-		const config = {
+		}),
+	}),
+	world_prop: (state, id, patch) => ({
+		...state,
+		...world_store_lists_merge({
 			...state.config,
 			worlds: state.config.worlds.map(world => (
 				world.id === id
@@ -273,13 +266,8 @@ const reducers = {
 					}
 				:	world
 			)),
-		};
-		return {
-			...state,
-			config,
-			worlds_merged: world_store_lists_merge(config),
-		};
-	},
+		}),
+	}),
 };
 
 export let app_state;

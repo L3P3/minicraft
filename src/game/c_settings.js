@@ -13,6 +13,7 @@ import {
 import {
 	Promise_,
 	fetch_,
+	response_parse,
 } from '../etc/helpers.js';
 import {
 	API_DATA,
@@ -71,12 +72,8 @@ export default function Settings({
 	const textures = hook_async(() => (
 		!textures_opened ? Promise_.resolve(null) :
 		fetch_(`${API_DATA}textures.json`)
-		.then(response => (
-			response.ok
-			?	response.json()
-			:	null
-		))
-		.catch(e => null)
+		.then(response_parse)
+		.catch(_error => null)
 	), [textures_opened], null);
 
 	hook_dom('div[className=menu overlay]');
