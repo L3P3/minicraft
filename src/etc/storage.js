@@ -229,6 +229,7 @@ export const chunks_rename = indexedDB_
 			const cursor = request.result;
 			if (cursor) {
 				if (cursor.value.world === world_old) {
+					cursor.delete();
 					cursor.value.world = world_new;
 					store.put(cursor.value);
 				}
