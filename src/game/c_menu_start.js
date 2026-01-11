@@ -379,8 +379,8 @@ export default function MenuStart({
 								locale_ask_world_delete_1 + world_selected.label + locale_ask_world_delete_2
 							)) return;
 							if (world_selected.local) {
-								actions.world_remove(world_selected.id);
 								chunks_delete(world_selected.id);
+								actions.world_remove(world_selected.id);
 							}
 							else {
 								busy_set(true);
@@ -393,14 +393,13 @@ export default function MenuStart({
 									}),
 								})
 								.then(response => (
-									response = response_parse(response),
+									response_parse(response),
 									defer(),
 									world_selected_id_set(null),
 									menu_opened_set(false),
 									world_store_remote_reload(),
 									busy_set(false),
-									defer_end(),
-									response
+									defer_end()
 								))
 								.catch(error => {
 									alert_(locale_error_delete_world + error.message);
