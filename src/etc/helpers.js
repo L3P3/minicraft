@@ -28,7 +28,7 @@ const Date_ = Date;
 export const Date_now = () => Date_.now();
 const JSON_ = JSON;
 export const Promise_ = Promise;
-export const Promise_resolve = Promise_.resolve;
+export const Promise_resolve = v => Promise_.resolve(v);
 export const JSON_stringify = JSON_.stringify;
 export const JSON_parse = JSON_.parse;
 export const localStorage_ = localStorage;
