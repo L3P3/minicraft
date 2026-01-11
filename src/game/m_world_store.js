@@ -298,7 +298,7 @@ const world_store_sync = async world => {
 			const data_promise = chunks_get(id);
 
 			// world must be registered first?
-			if (id < 0) {
+			if (world.remote === WORLD_STORED_SHOULD) {
 				const result_register = await response_parse(
 					await fetch_(API + 'world', {
 						...headers_json_post,
@@ -327,7 +327,9 @@ const world_store_sync = async world => {
 					}),
 				})
 			);
-			if (id < 0) world_list_remote.push(result_upload);
+			if (world.remote === WORLD_STORED_SHOULD) {
+				world_list_remote.push(result_upload);
+			}
 			else {
 				Object.assign(
 					/** @type {!Object} */ (world_list_remote.find(world => world.id === id)),
