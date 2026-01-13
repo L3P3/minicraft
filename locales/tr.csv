@@ -81,7 +81,8 @@ selection_secondary: İkince seçim noktası
 settings: Ayarlar
 show_world_settings: Dünya ayarlarını göster
 spawn_updated: Spawn güncellendi.
-surfaces_colored: Sade
+surface_add: Yüzey ekle
+surface_plain: Sade
 surfaces: Yüzeyler
 teleported_to_spawn: Spawn\'a ışınlandı.
 teleported_to: Şuraya ışınlandı

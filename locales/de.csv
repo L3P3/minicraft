@@ -1,8 +1,8 @@
 amount: Anzahl
 ask_world_delete_1: Welt "
 ask_world_delete_2: " wirklich löschen?
-back: Zurück
 back_to_game: Zurück zum Spiel
+back: Zurück
 change_world_name: Welt-Namen ändern
 chunk_regenerated: Chunk neu generiert.
 chunks_loaded: Chunks geladen.
@@ -81,7 +81,8 @@ selection_secondary: Zweiter Auswahlpunkt
 settings: Einstellungen
 show_world_settings: Aktionen/Einstellungen zur Welt anzeigen
 spawn_updated: Startpunkt aktualisiert.
-surfaces_colored: Einfarbig
+surface_add: Oberfläche hinzufügen
+surface_plain: Einfarbig
 surfaces: Oberflächen
 teleported_to_spawn: Zum Startpunkt teleportiert.
 teleported_to: Teleportiert zu

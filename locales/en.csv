@@ -81,7 +81,8 @@ selection_secondary: Secondary point
 settings: Settings
 show_world_settings: Show world settings
 spawn_updated: Spawn updated.
-surfaces_colored: Plain
+surface_add: Add surface
+surface_plain: Plain
 surfaces: Surfaces
 teleported_to_spawn: Teleported to spawn.
 teleported_to: Teleported to

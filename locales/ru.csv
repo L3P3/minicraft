@@ -81,8 +81,9 @@ selection_secondary: Вторая выбраная точка
 settings: Настройки
 show_world_settings: Акции/Показать настройки мира
 spawn_updated: Началная точка обновлена
-surfaces_colored: Одноцветный
-surfaces: Поверхность
+surface_add: Добавить поверхность
+surface_plain: Одноцветный
+surfaces: Поверхности
 teleported_to_spawn: Переместится к стартовой точки.
 teleported_to: Переместится к
 time_set_to: Новое время

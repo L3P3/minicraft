@@ -26,7 +26,8 @@ import {
 	locale_project_page,
 	locale_resolution,
 	locale_settings,
-	locale_surfaces_colored,
+	locale_surface_add,
+	locale_surface_plain,
 	locale_surfaces,
 	locale_view_angle,
 	locale_view_distance,
@@ -175,7 +176,7 @@ export default function Settings({
 
 		textures_opened &&
 		node_dom('div[className=settings]', null, [
-			node_dom(`button[innerText=${locale_surfaces_colored}]`, {
+			node_dom(`button[innerText=${locale_surface_plain}]`, {
 				disabled: config.textures === 0,
 				onclick: () => {
 					config_set({
@@ -187,6 +188,14 @@ export default function Settings({
 			node_map(TextureItem, textures, {
 				config_set,
 				current: config.textures,
+			}),
+		]),
+		textures_opened &&
+		node_dom('center', null, [
+			node_dom(`button[innerText=${locale_surface_add}]`, {
+				onclick: () => {
+					open('//l3p3.de/svr/minicraft/textures.html');
+				},
 			}),
 		]),
 	];
