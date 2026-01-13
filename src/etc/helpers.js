@@ -28,6 +28,9 @@ const Date_ = Date;
 export const Date_now = () => Date_.now();
 const JSON_ = JSON;
 export const Promise_ = Promise;
+/**
+	@param {*=} v
+*/
 export const Promise_resolve = v => Promise_.resolve(v);
 export const JSON_stringify = JSON_.stringify;
 export const JSON_parse = JSON_.parse;
