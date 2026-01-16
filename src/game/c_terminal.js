@@ -69,7 +69,7 @@ export default function Terminal({
 		}, [
 			node_map(Message, messages),
 		]),
-		hook_static(node_dom('input[enterkeyhint=send][mozactionhint=send][name=message][required]', {
+		hook_static(node_dom('input[autocomplete=off][enterkeyhint=send][mozactionhint=send][name=message][required]', {
 			onkeydown: event => {
 				const {
 					keyCode,
