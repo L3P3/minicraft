@@ -388,9 +388,9 @@ export const world_load = (model, player) => {
 		p.i.forEach((stack, i) => {
 			if (stack) {
 				player.inventory[i].content = stack_create(
-					stack[0],
-					stack[1],
-					stack[2]
+					/** @type {number} */ (stack[0]),
+					/** @type {number} */ (stack[1]),
+					/** @type {Object} */ (stack[2])
 				);
 			}
 		});
