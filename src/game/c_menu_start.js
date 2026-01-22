@@ -166,10 +166,7 @@ export default function MenuStart({
 	const world_selected_id = (
 		world_selected_id_state !== world_renamed_id_old
 		?	world_selected_id_state
-		:	(
-			world_selected_id_set(world_renamed_id_new),
-			world_renamed_id_new
-		)
+		:	world_selected_id_set(world_renamed_id_new)
 	);
 	const world_selected = hook_memo(() => (
 		worlds_merged.find(world => world.id === world_selected_id) || null
