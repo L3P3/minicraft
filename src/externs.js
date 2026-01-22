@@ -126,8 +126,9 @@ lui.hook_map = function(getter, data, deps){}
 lui.hook_memo = function(getter, deps){}
 
 /**
+	@template T
 	@param {!Object<string, Function>} reducer
-	@return {!Array}
+	@return {!Array<T|!Object<string, function(...*):T>>}
 */
 lui.hook_model = function(reducer){}
 
@@ -151,8 +152,9 @@ lui.hook_prev = function(value, initial){}
 lui.hook_rerender = function(){}
 
 /**
-	@param {*} initial
-	@return {!Array}
+	@template T
+	@param {T} initial
+	@return {!Array<T|function(T):T>}
 */
 lui.hook_state = function(initial){}
 
