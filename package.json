@@ -29,10 +29,10 @@
 	"dependencies": {
 		"cssnano": "latest",
 		"google-closure-compiler": "latest",
+		"lui-ssr": "latest",
 		"postcss": "latest"
 	},
 	"devDependencies": {
-		"lui": "github:L3P3/lui",
-		"lui-ssr": "latest"
+		"lui": "github:L3P3/lui"
 	}
 }

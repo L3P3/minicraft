@@ -6,6 +6,7 @@ import {
 	writeFile,
 } from 'fs/promises';
 import {exec as child_process_exec} from 'child_process';
+
 import cssnano from 'cssnano';
 import lui_ssr from 'lui-ssr';
 
@@ -118,53 +119,52 @@ async function build_js(lang) {
 	))[2]);
 
 	console.log('custom transformation...');
-	await writeFile(
-		TMP_FILE,
+	const code_app = (
 		(await readFile(TMP_FILE, 'ascii'))
 		.split('content').join('c')
 		.split('loaded').join('l')
 		.split('"transform":"cs"').join('"transform":"contents"')
 		.split('downl').join('downloaded')
-		.split('downloadedoading').join('downloading'),
+		.split('downloadedoading').join('downloading')
+	);
+	await writeFile(
+		TMP_FILE,
+		code_app,
 		'ascii'
 	);
 
-	console.log('js pass 2...');
-	console.log((await exec(
-		GCC_COMMAND +
-		[
-			'assume_function_wrapper',
-			'compilation_level SIMPLE',
-			'externs ./src/externs.js',
-			'js ' + TMP_FILE,
-			`js_output_file ./dist/app-${lang}.js`,
-			'language_in ECMASCRIPT6_STRICT',
-			'language_out ECMASCRIPT6_STRICT',
-			'rewrite_polyfills false',
-			'strict_mode_input',
-			'warning_level VERBOSE',
-		]
-		.join(' --')
-	))[2]);
-	console.log(`js ${lang} done.`);
+	await Promise.all([
+		(async () => {
+			console.log('js pass 2...');
+			console.log((await exec(
+				GCC_COMMAND +
+				[
+					'assume_function_wrapper',
+					'compilation_level SIMPLE',
+					'externs ./src/externs.js',
+					'js ' + TMP_FILE,
+					`js_output_file ./dist/app-${lang}.js`,
+					'language_in ECMASCRIPT6_STRICT',
+					'language_out ECMASCRIPT6_STRICT',
+					'rewrite_polyfills false',
+					'strict_mode_input',
+					'warning_level VERBOSE',
+				]
+				.join(' --')
+			))[2]);
+			console.log(`js ${lang} done.`);
 
-	await exec('rm ' + TMP_FILE);
-
-	// Generate SSR preview
-	console.log(`generating SSR for ${lang}...`);
-	try {
-		const app_js_content = await readFile(`./dist/app-${lang}.js`, 'utf8');
-		const ssr_html = lui_ssr(app_js_content)();
-		await writeFile(
-			`./dist/app-${lang}-ssr.html`,
-			ssr_html,
-			'utf8'
-		);
-		console.log(`SSR ${lang} done.`);
-	} catch (error) {
-		console.error(`Failed to generate SSR for ${lang}:`, error.message);
-		throw error;
-	}
+			await exec('rm ' + TMP_FILE);
+		})(),
+		(async () => {
+			await writeFile(
+				`./dist/app-${lang}-ssr.html`,
+				lui_ssr(code_app)(),
+				'utf8'
+			);
+			console.log(`ssr html done.`);
+		})(),
+	]);
 }
 
 if(
