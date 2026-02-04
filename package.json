@@ -29,6 +29,7 @@
 	"dependencies": {
 		"cssnano": "latest",
 		"google-closure-compiler": "latest",
+		"lui-ssr": "latest",
 		"postcss": "latest"
 	},
 	"devDependencies": {
