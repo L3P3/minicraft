@@ -152,14 +152,19 @@ async function build_js(lang) {
 
 	// Generate SSR preview
 	console.log(`generating SSR for ${lang}...`);
-	const app_js_content = await readFile(`./dist/app-${lang}.js`, 'utf8');
-	const ssr_html = lui_ssr(app_js_content)();
-	await writeFile(
-		`./dist/app-${lang}-ssr.html`,
-		ssr_html,
-		'utf8'
-	);
-	console.log(`SSR ${lang} done.`);
+	try {
+		const app_js_content = await readFile(`./dist/app-${lang}.js`, 'utf8');
+		const ssr_html = lui_ssr(app_js_content)();
+		await writeFile(
+			`./dist/app-${lang}-ssr.html`,
+			ssr_html,
+			'utf8'
+		);
+		console.log(`SSR ${lang} done.`);
+	} catch (error) {
+		console.error(`Failed to generate SSR for ${lang}:`, error.message);
+		throw error;
+	}
 }
 
 if(
