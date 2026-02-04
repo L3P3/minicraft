@@ -32,6 +32,7 @@
 		"postcss": "latest"
 	},
 	"devDependencies": {
-		"lui": "github:L3P3/lui"
+		"lui": "github:L3P3/lui",
+		"lui-ssr": "latest"
 	}
 }

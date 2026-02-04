@@ -7,6 +7,7 @@ import {
 } from 'fs/promises';
 import {exec as child_process_exec} from 'child_process';
 import cssnano from 'cssnano';
+import lui_ssr from 'lui-ssr';
 
 const GCC_COMMAND = './node_modules/.bin/google-closure-compiler --';
 const TMP_FILE = '/tmp/app.js';
@@ -148,6 +149,17 @@ async function build_js(lang) {
 	console.log(`js ${lang} done.`);
 
 	await exec('rm ' + TMP_FILE);
+
+	// Generate SSR preview
+	console.log(`generating SSR for ${lang}...`);
+	const app_js_content = await readFile(`./dist/app-${lang}.js`, 'utf8');
+	const ssr_html = lui_ssr(app_js_content)();
+	await writeFile(
+		`./dist/app-${lang}-ssr.html`,
+		ssr_html,
+		'utf8'
+	);
+	console.log(`SSR ${lang} done.`);
 }
 
 if(
