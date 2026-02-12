@@ -251,8 +251,8 @@ export default function Game({
 		}),
 		model.menu === MENU_SETTINGS &&
 		node(Settings, {
-			config,
 			game: model,
+			state,
 			view_set,
 		}),
 		model.menu === MENU_TERMINAL &&

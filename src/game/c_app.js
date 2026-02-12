@@ -54,8 +54,8 @@ export default function App({
 		}),
 		view === APP_VIEW_SETTINGS &&
 		node(Settings, {
-			config: state.config,
 			game: null,
+			state,
 			view_set,
 		}),
 		view === APP_VIEW_GAME &&

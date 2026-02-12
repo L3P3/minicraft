@@ -25,6 +25,7 @@ error_gamemode_range: Игровой режим должен быт 0..2!
 error_invalid_block_type: Неверный тип блока!
 error_inventory_full: Инвентар полный!
 error_list_is_loading: Список еще загружается!
+error_loading_surface: Ошибка при загрузке поверхности!
 error_loading_worldlist: Ошибка при загрузки списка миров: 
 error_name_too_long: Имя слишком долгое!
 error_no_permission_logged_in: Нету разрешения. Зарегестрирован?

@@ -135,6 +135,7 @@ const reducers = {
 			cursor: null,
 			screen_height: window_.innerHeight,
 			screen_width: window_.innerWidth,
+			surface_loading: config.textures,
 			windows: [
 				{
 					id: 0,

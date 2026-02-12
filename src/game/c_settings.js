@@ -1,4 +1,6 @@
 import {
+	defer,
+	defer_end,
 	hook_async,
 	hook_dom,
 	hook_effect,
@@ -44,31 +46,41 @@ import {
 
 function TextureItem({
 	/** TYPE_TEXTURES_ITEM */ I,
-	config_set,
 	current,
+	surface_loading,
 }) {
 	hook_dom('button', {
-		disabled: I.id === current,
+		disabled: (
+			I.id === current ||
+			surface_loading > 0
+		),
 		innerText: `${I.label} (${I.owner})`,
 		onclick: () => {
-			config_set({
+			defer();
+			actions.config_set({
 				textures: I.id,
 			});
+			actions.state_patch({
+				surface_loading: I.id,
+			});
+			defer_end();
 		},
 	});
 	return null;
 }
 
 export default function Settings({
-	config,
 	game,
+	state: {
+		config,
+		surface_loading,
+	},
 	view_set,
 }) {
 	game && hook_effect(() => (
 		game_save(game)
 	));
 
-	const {config_set} = actions;
 	const [textures_opened, textures_opened_set] = hook_state(false);
 	const textures = hook_async(() => (
 		!textures_opened ? Promise_.resolve(null) :
@@ -112,7 +124,7 @@ export default function Settings({
 				node_dom('input[type=range][min=1][max=100][step=1]', {
 					value: 101 - config.resolution_scaling,
 					onchange: event => (
-						config_set({
+						actions.config_set({
 							resolution_scaling: 101 - Number(event.target.value),
 						})
 					),
@@ -122,7 +134,7 @@ export default function Settings({
 				node_dom('input[type=range][min=1][max=180][step=1]', {
 					value: config.view_angle,
 					onchange: event => (
-						config_set({
+						actions.config_set({
 							view_angle: Number(event.target.value),
 						})
 					),
@@ -132,7 +144,7 @@ export default function Settings({
 				node_dom('input[type=range][min=1][max=128][step=1]', {
 					value: config.view_distance,
 					onchange: event => (
-						config_set({
+						actions.config_set({
 							view_distance: Number(event.target.value),
 						})
 					),
@@ -142,7 +154,7 @@ export default function Settings({
 				node_dom('input[type=range][min=1][max=8][step=1]', {
 					value: config.pixel_grouping,
 					onchange: event => (
-						config_set({
+						actions.config_set({
 							pixel_grouping: Number(event.target.value),
 						})
 					),
@@ -152,7 +164,7 @@ export default function Settings({
 				node_dom('input[type=range][min=1][max=15][step=1]', {
 					value: config.mouse_sensitivity,
 					onchange: event => (
-						config_set({
+						actions.config_set({
 							mouse_sensitivity: Number(event.target.value),
 						})
 					),
@@ -179,15 +191,20 @@ export default function Settings({
 			node_dom(`button[innerText=${locale_surface_plain}]`, {
 				disabled: config.textures === 0,
 				onclick: () => {
-					config_set({
+					defer();
+					actions.config_set({
 						textures: 0,
 					});
+					actions.state_patch({
+						surface_loading: 0,
+					});
+					defer_end();
 				},
 			}),
 			textures &&
 			node_map(TextureItem, textures, {
-				config_set,
 				current: config.textures,
+				surface_loading,
 			}),
 		]),
 		textures_opened &&

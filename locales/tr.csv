@@ -25,6 +25,7 @@ error_gamemode_range: Oyun modu 0..2 arasında olmalıdır!
 error_invalid_block_type: Geçersiz blok tipi!
 error_inventory_full: Envanter dolu!
 error_list_is_loading: Liste yükleniyor!
+error_loading_surface: Yüzey yüklenirken hata oluştu!
 error_loading_worldlist: Dünya listesini yüklemede hata oluştu: 
 error_name_too_long: İsim çok uzun!
 error_no_permission_logged_in: İzniniz yok. Giriş yaptınız mı?

@@ -27,6 +27,7 @@ export const locale_error_gamemode_range = 'Game mode must be in 0..2!';
 export const locale_error_invalid_block_type = 'Invalid block type!';
 export const locale_error_inventory_full = 'Inventory is full!';
 export const locale_error_list_is_loading = 'List is loading!';
+export const locale_error_loading_surface = 'Error while loading surface!';
 export const locale_error_loading_worldlist = 'Error while loading world list: ';
 export const locale_error_name_too_long = 'Name is too long!';
 export const locale_error_no_permission_logged_in = 'Missing permission. Logged in?';

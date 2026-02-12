@@ -1,4 +1,9 @@
 import {
+	defer,
+	defer_end,
+} from '../etc/lui.js';
+
+import {
 	BLOCK_COLORS,
 	BLOCK_TYPE_AIR,
 	BLOCK_TYPE_FACE_I,
@@ -38,8 +43,12 @@ import {
 	Uint32Array_,
 } from '../etc/helpers.js';
 import {
-	world_block_get,
-} from './m_world.js';
+	locale_error_loading_surface,
+} from '../etc/locale.js';
+import {
+	actions,
+	app_state,
+} from '../etc/state.js';
 import {
 	TILES_COUNT,
 	TILES_RESOLUTION,
@@ -53,9 +62,13 @@ import {
 	TILE_PLANKS,
 } from '../etc/textures.js';
 
+import {
+	world_block_get,
+} from './m_world.js';
+
 // parse png
 let tiles_data = null;
-let tiles_image_loading = null;
+let tiles_latest_working = 0;
 const renderer_instances = new Set_;
 
 export const tiles_set = id => {
@@ -63,12 +76,12 @@ export const tiles_set = id => {
 		tiles_data = null;
 	}
 	else {
-		const tiles_image = tiles_image_loading = new Image();
+		const tiles_image = new Image();
 		if (VERSION === 'dev') {
 			tiles_image.crossOrigin = 'anonymous';
 		}
 		tiles_image.onload = () => {
-			if (tiles_image_loading !== tiles_image) return;
+			if (app_state.surface_loading !== id) return;
 			const canvas_temp = document_.createElement('canvas');
 			canvas_temp.width = TILES_RESOLUTION;
 			canvas_temp.height = TILES_COUNT << TILES_RESOLUTION_LOG2;
@@ -92,7 +105,22 @@ export const tiles_set = id => {
 				).data.buffer
 			);
 			for (const model of renderer_instances) model.flag_dirty = true;
-			tiles_image_loading = null;
+			tiles_latest_working = id;
+			actions.state_patch({
+				surface_loading: 0,
+			});
+		}
+		tiles_image.onerror = () => {
+			if (app_state.surface_loading !== id) return;
+			alert(locale_error_loading_surface);
+			defer();
+			actions.config_set({
+				textures: tiles_latest_working,
+			});
+			actions.state_patch({
+				surface_loading: 0,
+			});
+			defer_end();
 		}
 		tiles_image.src = `${API_DATA}textures/${id}.png`;
 	}

@@ -25,6 +25,7 @@ error_gamemode_range: गेम मोड 0..2 के बीच होना च
 error_invalid_block_type: अमान्य ब्लॉक प्रकार!
 error_inventory_full: इन्वेंटरी भरी हुई है!
 error_list_is_loading: सूची लोड हो रही है!
+error_loading_surface: सतह लोड करते समय त्रुटि!
 error_loading_worldlist: दुनिया सूची लोड करते समय त्रुटि:
 error_name_too_long: नाम बहुत लंबा है!
 error_no_permission_logged_in: अनुमति नहीं है। लॉग इन किया गया है?

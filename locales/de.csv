@@ -25,6 +25,7 @@ error_gamemode_range: Spielmodus muss in 0..2 sein!
 error_invalid_block_type: Ungültiger Blocktyp!
 error_inventory_full: Inventar ist voll!
 error_list_is_loading: Liste wird noch geladen!
+error_loading_surface: Fehler beim Laden der Oberfläche!
 error_loading_worldlist: Fehler beim Laden der Weltenliste: 
 error_name_too_long: Der Name ist zu lang!
 error_no_permission_logged_in: Keine Berechtigung. Angemeldet?

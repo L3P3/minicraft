@@ -25,6 +25,7 @@ error_gamemode_range: Ігровий режим повинен бути 0..2!
 error_invalid_block_type: Недійсний тип блоку!
 error_inventory_full: Інвентар повний!
 error_list_is_loading: Список ще завантажується!
+error_loading_surface: Помилка завантаження поверхні!
 error_loading_worldlist: Помилка завантаження списку світ: 
 error_name_too_long: Назва занадто довга!
 error_no_permission_logged_in: Нема авторизації. Зареєстрований?
