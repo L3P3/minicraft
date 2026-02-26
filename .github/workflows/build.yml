@@ -25,7 +25,7 @@ jobs:
         uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: bun install
+        run: bun install --no-save
 
       - name: Build
         run: bun run ./build.js
@@ -38,10 +38,9 @@ jobs:
           git tag -f "v$APPVERSION"
           git push -f --tags
           git fetch origin dist
-          git checkout dist
+          git checkout -f dist
           mv /tmp/app-dist/* ./
           git add app*
-          git clean -fd
           git config user.name github-actions
           git config user.email github-actions@github.com
           git diff-index --quiet HEAD || git commit -m "v$APPVERSION"
