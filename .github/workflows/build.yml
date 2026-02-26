@@ -19,33 +19,35 @@ jobs:
     name: Build
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup NodeJS
-        uses: actions/setup-node@v3
-        with:
-          node-version: 17
+        uses: actions/checkout@v4
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
+
       - name: Install dependencies
-        run: npm install --production
+        run: bun install
+
       - name: Build
-        run: npm run-script build
+        run: bun run ./build.js
+
       - name: Commit artifacts
         if: github.ref == 'refs/heads/master'
         run: |
-          export APPVERSION=$(echo "console.log(require('./package.json').version)" | node)
+          export APPVERSION=$(bun -e "console.log(require('./package.json').version)")
           mv dist /tmp/app-dist
           git tag -f "v$APPVERSION"
           git push -f --tags
-          git clean -f
-          rm -rf ./node_modules
-          git fetch
+          git fetch origin dist
           git checkout dist
           mv /tmp/app-dist/* ./
+          git add app*
+          git clean -fd
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add .
           git diff-index --quiet HEAD || git commit -m "v$APPVERSION"
           git push
-      - name: Update commit reference
+
+      - name: Notify server
         if: github.ref == 'refs/heads/master'
         run: |
           echo "::add-mask::${{ secrets.UPDATE_KEY }}"
