@@ -26,6 +26,8 @@ import Settings from './c_settings.js';
 export default function App({
 	key_event,
 	state,
+	viewport_height,
+	viewport_width,
 	window_actions,
 	window_id,
 }) {
@@ -51,6 +53,8 @@ export default function App({
 		node(MenuStart, {
 			state,
 			view_set,
+			viewport_height,
+			viewport_width,
 		}),
 		view === APP_VIEW_SETTINGS &&
 		node_dom('div[className=backdrop]'),

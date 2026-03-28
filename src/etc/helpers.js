@@ -71,6 +71,12 @@ export const headers_json_post = {
 	headers: {'Content-Type': 'application/json'},
 };
 
+export const scrollIntoView_settings = {
+	behavior: 'smooth',
+	block: 'center',
+	container: 'nearest',
+};
+
 /**
 	@param {number} num
 	@return {string}

@@ -355,11 +355,16 @@ export default function Window({
 		}
 	}, [state.screen_width, state.screen_height]);
 
+	const viewport_width = window_state.mode === WINDOW_MODE_FULL ? state.screen_width : window_state.width - 16;
+	const viewport_height = window_state.mode === WINDOW_MODE_FULL ? state.screen_height : window_state.height - 40;
+
 	return [
 		type === WINDOW_TYPE_GAME &&
 		node(App, {
 			key_event: window_state.key_event,
 			state,
+			viewport_height,
+			viewport_width,
 			window_actions,
 			window_id,
 		}),

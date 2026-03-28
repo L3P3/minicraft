@@ -19,6 +19,7 @@ import {
 } from '../etc/helpers.js';
 import {
 	API_DATA,
+	VERSION,
 } from '../etc/env.js';
 import {
 	locale_back,
@@ -31,6 +32,8 @@ import {
 	locale_surface_add,
 	locale_surface_plain,
 	locale_surfaces,
+	locale_version_1,
+	locale_version_2,
 	locale_view_angle,
 	locale_view_distance,
 	locale_world_leave,
@@ -170,7 +173,7 @@ export default function Settings({
 					),
 				}),
 			]),
-			node_dom(`button[innerText=${locale_project_page}]`, {
+			node_dom(`button[innerText=${locale_version_1 + VERSION + locale_version_2}][title=${locale_project_page}]`, {
 				onclick: () => {
 					open('//github.com/L3P3/minicraft');
 				},
