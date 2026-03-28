@@ -21,6 +21,9 @@ import {
 	WINDOW_TYPE_GAME,
 } from '../etc/constants.js';
 import {
+	SSR,
+} from '../etc/env.js';
+import {
 	addEventListener_,
 	document_,
 	Math_ceil,
@@ -326,6 +329,18 @@ export default function Window({
 	},
 	state,
 }) {
+	// skip window stuff for ssr
+	if (SSR) {
+		return [
+			node(App, {
+				state,
+				viewport_height: 600,
+				viewport_width: 800,
+				window_id: 0,
+			}),
+		];
+	}
+
 	// HACK: lui does not support model parameters (yet), so we use a global variable
 	mode_initial_last = mode_initial;
 	const hook_model_state_actions = hook_model(model);

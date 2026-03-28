@@ -10,6 +10,7 @@ import {
 
 import {
 	DEBUG,
+	SSR,
 } from './etc/env.js';
 import {
 	addEventListener_,
@@ -197,7 +198,7 @@ function ErrorOpened() {
 	];
 }
 
-if (window.SSR) {
+if (SSR) {
 	init(Root);
 }
 else if (BroadcastChannel_) {

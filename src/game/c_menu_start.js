@@ -19,6 +19,7 @@ import {
 import {
 	API,
 	LEGACY,
+	SSR,
 } from '../etc/env.js';
 import {
 	alert_,
@@ -451,7 +452,7 @@ export default function MenuStart({
 	]);
 	const [busy, busy_set] = hook_state(false);
 
-	hook_dom('div[className=menu][style=overflow-y:hidden]');
+	hook_dom(`div[className=menu]${SSR ? '' : '[style=overflow-y:hidden]'}`);
 
 	return [
 		node_dom(`button[innerText=${locale_settings}][style=position:absolute]`, {
@@ -495,10 +496,15 @@ export default function MenuStart({
 		]),
 		node_dom('div[className=worlds]', {
 			S: {
-				height: `${Math_max(100, viewport_height - 140)}px`,
+				height: (
+					SSR
+					?	'300px;height:calc(100%-140px)'
+					:	`${Math_max(100, viewport_height - 140)}px`
+				),
 				width: `${Math_min(480, viewport_width - 16)}px`,
 			},
 		}, [
+			!SSR &&
 			node_dom('table[cellSpacing=0]', null, [
 				node_map(WorldItem, worlds_merged, {
 					_: Date_now(), // refresh dates as well

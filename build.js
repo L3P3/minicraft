@@ -60,15 +60,16 @@ async function lang_generate(lang) {
 	);
 }
 
-const env_set = async (version, debug, lang, legacy, api, api_data) => Promise.all([
+const env_set = async (version, debug, lang, legacy, api, api_data, ssr) => Promise.all([
 	writeFile(
 		'./src/etc/env.js',
-`export const VERSION = '${version}';
+`export const API = '${api}';
+export const API_DATA = '${api_data}';
 export const DEBUG = ${debug};
 export const LANG = '${lang}';
 export const LEGACY = ${legacy};
-export const API = '${api}';
-export const API_DATA = '${api_data}';
+export const SSR = ${ssr};
+export const VERSION = '${version}';
 `,
 		'utf8'
 	),
@@ -88,18 +89,20 @@ async function build_css() {
 
 const promises = [];
 
-async function build_js(lang, legacy) {
+async function build_js(lang, legacy, ssr) {
 	await env_set(
 		prod ? version : 'dev',
 		false,
 		lang,
 		legacy,
 		prod ? '/api/minicraft/' : '//l3p3.de/api/minicraft/',
-		prod ? '/static/minicraft/' : '//l3p3.de/static/minicraft/'
+		prod ? '/static/minicraft/' : '//l3p3.de/static/minicraft/',
+		ssr
 	);
 
 	let combo = lang;
 	if (legacy) combo += '-legacy';
+	if (ssr) combo += '-ssr';
 	const tmp_path = `/tmp/app-${combo}.js`;
 
 	console.log(combo + ' js pass 1...');
@@ -129,72 +132,71 @@ async function build_js(lang, legacy) {
 	console.log(combo + ' js pass 1 done.');
 
 	checks_only ||
-	promises.push(
-		(async () => {
-			console.log(combo + ' js pass 2...');
-			await appendFile(
-				tmp_path,
-				`\n//# sourceMappingURL=app-${combo}.js.map\n`,
-				'ascii'
-			);
-			const gcc_output = (await exec(
-				GCC_COMMAND +
-				[
-					'assume_function_wrapper',
-					'compilation_level SIMPLE',
-					'externs ./src/externs.js',
-					'js ' + tmp_path,
-					`js_output_file ./dist/app-${combo}.js`,
-					`create_source_map ./dist/app-${combo}.js.map`,
-					'language_in ECMASCRIPT6_STRICT',
-					`language_out ECMASCRIPT${legacy ? '3' : '6_STRICT'}`,
-					'rewrite_polyfills false',
-					'strict_mode_input',
-					'warning_level VERBOSE',
-				]
-				.join(' --')
-			))[2].trim();
-			if (gcc_output) console.log(gcc_output);
-			await Promise.all([
-				appendFile(
-					`./dist/app-${combo}.js`,
-					`\n//# sourceMappingURL=app-${combo}.js.map\n`,
-					'ascii'
-				),
-				file_replace(
-					`./dist/app-${combo}.js.map`,
-					[
-						[ // closure compiler internals
-							'/tmp/src/com/google/',
-							'//raw.githubusercontent.com/google/closure-compiler/refs/heads/master/src/com/google/'
-						],
-						[ // all other paths are mine
-							'/tmp/', 
-							(
-								prod
-								?	`../minicraft@${process.env.GITHUB_SHA || 'master'}/`
-								:	'../'
-							),
-						],
-					]
-				),
-				exec(`rm ${tmp_path} ${tmp_path}.map`),
-			]);
-			console.log(combo + ' js pass 2 done.');
-		})(),
-		(async () => {
-			if (legacy) return;
-			console.log(combo + ' ssr html...');
+	promises.push((async () => {
+		if (ssr) {
+			console.log(combo + ' html...');
 			await writeFile(
-				`./dist/app-${combo}-ssr.html`,
+				`./dist/app-${combo}.html`,
 				lui_ssr(
 					await readFile(tmp_path, 'ascii')
 				)(),
 				'utf8'
 			);
-			console.log(combo + ' ssr html done.');
-		})()
-	);
+			console.log(combo + ' html done.');
+			return;
+		}
+
+		console.log(combo + ' js pass 2...');
+		await appendFile(
+			tmp_path,
+			`\n//# sourceMappingURL=app-${combo}.js.map\n`,
+			'ascii'
+		);
+		const gcc_output = (await exec(
+			GCC_COMMAND +
+			[
+				'assume_function_wrapper',
+				'compilation_level SIMPLE',
+				'externs ./src/externs.js',
+				'js ' + tmp_path,
+				`js_output_file ./dist/app-${combo}.js`,
+				`create_source_map ./dist/app-${combo}.js.map`,
+				'language_in ECMASCRIPT6_STRICT',
+				`language_out ECMASCRIPT${legacy ? '3' : '6_STRICT'}`,
+				'rewrite_polyfills false',
+				'strict_mode_input',
+				'warning_level VERBOSE',
+			]
+			.join(' --')
+		))[2].trim();
+		if (gcc_output) console.log(gcc_output);
+		await Promise.all([
+			appendFile(
+				`./dist/app-${combo}.js`,
+				`\n//# sourceMappingURL=app-${combo}.js.map\n`,
+				'ascii'
+			),
+			file_replace(
+				`./dist/app-${combo}.js.map`,
+				[
+					[ // closure compiler internals
+						'/tmp/src/com/google/',
+						'//raw.githubusercontent.com/google/closure-compiler/refs/heads/master/src/com/google/'
+					],
+					[ // all other paths are mine
+						'/tmp/', 
+						(
+							prod
+							?	`../minicraft@${process.env.GITHUB_SHA || 'master'}/`
+							:	'../'
+						),
+					],
+				]
+			),
+			exec(`rm ${tmp_path} ${tmp_path}.map`),
+		]);
+		console.log(combo + ' js pass 2 done.');
+	})());
 }
 
 if(
@@ -215,8 +217,9 @@ try {
 		[["@type {typeof import('lui/index')}", "@type {Object}"]]
 	);
 	for (const lang of languages) {
-		await build_js(lang, false);
-		await build_js(lang, true);
+		await build_js(lang, false, false);
+		await build_js(lang, true, false);
+		await build_js(lang, false, true);
 	}
 	promises.push(build_css());
 	await Promise.all(promises);
@@ -230,7 +233,8 @@ finally {
 				'en',
 				false,
 				'//l3p3.de/api/minicraft/',
-				'//l3p3.de/static/minicraft/'
+				'//l3p3.de/static/minicraft/',
+				false
 			),
 			file_replace(
 				'./src/etc/lui.js',
