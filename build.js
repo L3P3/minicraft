@@ -147,7 +147,7 @@ async function build_js(lang, legacy) {
 					`js_output_file ./dist/app-${combo}.js`,
 					`create_source_map ./dist/app-${combo}.js.map`,
 					'language_in ECMASCRIPT6_STRICT',
-					`language_out ECMASCRIPT${legacy ? '3' : '6'}_STRICT`,
+					`language_out ECMASCRIPT${legacy ? '3' : '6_STRICT'}`,
 					'rewrite_polyfills false',
 					'strict_mode_input',
 					'warning_level VERBOSE',
