@@ -82,11 +82,11 @@ export default function Inventory({
 
 	const {gamemode} = game.player;
 
-	hook_dom('div[className=menu overlay inventory]', hook_memo(() => ({
+	hook_dom('div[className=menu inventory]', hook_memo(() => ({
 		onclick: ({
 			target,
 		}) => {
-			if (target.className === 'menu overlay inventory') {
+			if (target.className === 'menu inventory') {
 				if (slot_hand.content) {
 					slot_hand.content = null;
 				}
@@ -112,7 +112,7 @@ export default function Inventory({
 		oncontextmenu: ({
 			target,
 		}) => {
-			if (target.className === 'menu overlay inventory') {
+			if (target.className === 'menu inventory') {
 				if (!slot_hand.content) {
 					game_menu_close(game);
 				}

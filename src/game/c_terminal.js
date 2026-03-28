@@ -37,7 +37,7 @@ export default function Terminal({
 		input: null,
 	});
 
-	hook_dom('div[className=menu overlay terminal]', {
+	hook_dom('div[className=menu terminal]', {
 		onclick: event => {
 			if (event.target !== ref.input)
 				ref.input.focus();

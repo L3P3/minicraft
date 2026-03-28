@@ -159,8 +159,6 @@ export default function MenuStart({
 	},
 	view_set,
 }) {
-	hook_dom('div[className=menu]');
-
 	const [world_selected_id_state, world_selected_id_set] = hook_state(config.world_last);
 	// if the world was renamed, update the selected id
 	const world_selected_id = (
@@ -179,6 +177,12 @@ export default function MenuStart({
 	if (!world_selected) menu_opened_set(false);
 	const [busy, busy_set] = hook_state(false);
 	const world_selected_opened = !!world_selected && worlds_opened.includes(world_selected_id);
+
+	const menu_element = hook_dom('div[className=menu]', {
+		S: {
+			overflowY: menu_opened ? 'hidden' : 'auto',
+		},
+	});
 
 	return [
 		node_dom(`h1[innerText=${locale_worlds}]`),
@@ -279,15 +283,25 @@ export default function MenuStart({
 		]),
 		menu_opened &&
 		world_selected &&
+		node_dom('div[className=backdrop]', {
+			S: {
+				top: `${menu_element.scrollTop}px`,
+			},
+		}),
+		menu_opened &&
+		world_selected &&
 		node_dom('div', {
 			F: {
-				'menu overlay advanced': true,
+				'menu advanced': true,
 				busy,
 			},
 			onclick: event => {
-				if (event.target.className === 'menu overlay advanced') {
+				if (event.target.className === 'menu advanced') {
 					menu_opened_set(false);
 				}
+			},
+			S: {
+				top: `${menu_element.scrollTop}px`,
 			},
 		}, [
 			node_dom('div[className=window]', null, [

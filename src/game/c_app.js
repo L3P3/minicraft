@@ -53,6 +53,8 @@ export default function App({
 			view_set,
 		}),
 		view === APP_VIEW_SETTINGS &&
+		node_dom('div[className=backdrop]'),
+		view === APP_VIEW_SETTINGS &&
 		node(Settings, {
 			game: null,
 			state,

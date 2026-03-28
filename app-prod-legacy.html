@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang=en>
+	<head>
+		<meta charset=utf-8>
+		<title>minicraft (legacy)</title>
+		<meta name=viewport content="width=device-width">
+		<link rel=stylesheet href=dist/app.css>
+		<link rel="shortcut icon" href=assets/logo.svg>
+	</head>
+	<body>
+		<script>
+			function define(mod) {
+				window.lui = mod;
+			}
+			// polyfill
+			function fetch(url, options) {
+				options = options || {};
+				return new Promise(function(resolve, reject) {
+					alert('fetch ' + url + ' : ' + JSON.stringify(options));
+					var xhr = new XMLHttpRequest();
+					xhr.open(options.method || "GET", url);
+					if (options.headers) {
+						for (var key in options.headers) {
+							xhr.setRequestHeader(key, options.headers[key]);
+						}
+					}
+					xhr.onload = function() {
+						resolve({
+							ok: xhr.status >= 200 && xhr.status < 300,
+							status: xhr.status,
+							text: function() { return Promise.resolve(xhr.responseText); },
+							json: function() { return Promise.resolve(JSON.parse(xhr.responseText)); }
+						});
+					};
+					xhr.onerror = function() {
+						alert('fetch error');
+						reject(new Error("Network request failed"));
+					};
+					xhr.send(options.body || null);
+				});
+			}
+			console.log = function() {
+				alert(Array.prototype.join.call(arguments, " "));
+			};
+		</script>
+		<script defer src=https://cdn.jsdelivr.net/gh/L3P3/lui@2/lui.r.dev.js></script>
+		<script defer src=dist/app-en-legacy.js></script>
+	</body>
+</html>

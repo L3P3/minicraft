@@ -89,7 +89,7 @@ export default function Settings({
 		.catch(_error => null)
 	), [textures_opened], null);
 
-	hook_dom('div[className=menu overlay]');
+	hook_dom('div[className=menu]');
 
 	return [
 		node_dom('h1', {

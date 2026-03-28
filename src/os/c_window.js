@@ -114,8 +114,9 @@ const drag_handler = (hook_model_state_actions, window_id, event) => {
 	actions.window_focus(window_id);
 	const element = event.target;
 	if (
-		element.className !== 'window borders' ||
-		event.button !== 0
+		event.button !== 0 ||
+		element.className !== 'window borders' &&
+		element.className !== 'window_title'
 	) {
 		return;
 	}
@@ -141,7 +142,7 @@ const drag_handler = (hook_model_state_actions, window_id, event) => {
 		:	AREA_END
 	);
 	const area = area_h + area_v * 3;
-	element.style.willChange = area === AREA_CENTER ? 'transform' : 'contents';
+	element.style.willChange = area === AREA_CENTER ? 'left,top' : 'contents';
 	actions.state_patch({
 		cursor: CURSORS[area],
 	});
@@ -291,21 +292,26 @@ const window_attributes_get = (
 		window: true,
 		borders: mode === WINDOW_MODE_FLOATING,
 	},
+	onmousedown: down_callback,
 	S: {
 		display: mode === WINDOW_MODE_HIDDEN ? 'none' : 'block',
-		height: mode === WINDOW_MODE_FULL ? '100%' : height + 'px',
-		transform: mode === WINDOW_MODE_FULL ? '' : `translate(${left}px, ${top}px)`,
-		width: mode === WINDOW_MODE_FULL ? '100%' : width + 'px',
+		left: mode === WINDOW_MODE_FULL ? '0' : (left - 1) + 'px',
+		top: mode === WINDOW_MODE_FULL ? '0' : (top - 1) + 'px',
+		height: mode === WINDOW_MODE_FULL ? '100%' : (height - 40) + 'px',
+		width: mode === WINDOW_MODE_FULL ? '100%' : (width - 16) + 'px',
 	},
-	onmousedown: down_callback,
 })
 
 const WindowCaption = ({
 	title,
+	width,
 	window_id,
 }) => [
 	node_dom('div[className=window_title]', {
 		innerText: title,
+		S: {
+			width: `${width - 40}px`,
+		},
 	}),
 	node_dom('div[className=window_button]', {
 		onclick: () => actions.window_remove(window_id),
@@ -360,6 +366,7 @@ export default function Window({
 		window_state.mode !== WINDOW_MODE_FULL &&
 		node(WindowCaption, {
 			title: window_state.title,
+			width: window_state.width,
 			window_id,
 		}),
 	];

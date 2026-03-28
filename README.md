@@ -75,9 +75,9 @@ If you use another IDE that does not have a similar feature, you may once do `su
 > [!IMPORTANT]
 > Building is **not needed** unless my server is down and you want to mirror https://l3p3.de/minicraft!
 
-After cloning, you need to run `npm install` once to install the build tools. The build script is designed to run under Linux, see [the GitHub actions file](.github/workflows/build.yml) and [the build script itself](build.js) to learn more about the build environment.
+After cloning, you need to run `bun install` once to install the build tools. The build script is designed to run under Linux with [bun](https://bun.sh), see [the GitHub actions file](.github/workflows/build.yml) and [the build script itself](build.js) to learn more about the build environment.
 
-To bundle the app, run `npm run build`. The result will be put into the `/dist` directory and can be tested at "http://localhost:5500/app-prod.html".
+To bundle the app, run `bun run build.js`. The result will be put into the `/dist` directory and can be tested at "http://localhost:5500/app-prod.html".
 
 ## My tools
 
@@ -85,8 +85,9 @@ To bundle the app, run `npm run build`. The result will be put into the `/dist` 
 - [code-server](https://github.com/cdr/code-server) for development on any device
 - [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) for developer preview
 - [lui](https://github.com/L3P3/lui) for GUI
+- [Minecraft-Font](https://github.com/IdreesInc/Minecraft-Font)
 - [Closure Compiler](https://github.com/google/closure-compiler) for packing JS
-- [cssnano](https://cssnano.co) for packing CSS
+- [bun](https://bun.sh) for packing CSS
 - [GitHub Actions](https://github.com/features/actions) for automatic building
 - [jsDelivr](https://www.jsdelivr.com) for distribution
 - [GitHub](https://github.com) for everything else

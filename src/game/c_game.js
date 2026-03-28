@@ -221,6 +221,8 @@ export default function Game({
 		}),
 		model.flag_hud &&
 		model.menu !== MENU_TERMINAL &&
+		model.messages.length > 0 &&
+		model.messages[model.messages.length - 1].time > time_now - 5e3 &&
 		node(Messages, {
 			messages: model.messages,
 			time_now,
@@ -243,6 +245,12 @@ export default function Game({
 			textures_id: textures_id_ref.val,
 			time_now,
 		}),
+		(
+			model.menu === MENU_SETTINGS ||
+			model.menu === MENU_TERMINAL ||
+			model.menu === MENU_INVENTORY
+		) &&
+		node_dom('div[className=backdrop]'),
 		model.menu === MENU_INVENTORY &&
 		node(Inventory, {
 			game: model,
