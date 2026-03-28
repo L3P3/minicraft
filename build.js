@@ -14,12 +14,13 @@ import lui_ssr from 'lui-ssr';
 const GCC_COMMAND = './node_modules/.bin/google-closure-compiler --';
 
 const prod = !!process.env.CI;
+const checks_only = prod && process.env.GITHUB_REF_NAME !== 'master';
 const {version} = JSON.parse(
 	await readFile('./package.json', 'utf8')
 );
 
 let languages = ['en'];
-if (prod) {
+if (prod && !checks_only) {
 	const files = await readdir('./locales');
 	languages = (
 		files
@@ -125,12 +126,15 @@ async function build_js(lang) {
 			'strict_mode_input',
 			'use_types_for_optimization',
 			'warning_level VERBOSE',
+			checks_only ? 'checks_only' : null,
 		]
+		.filter(Boolean)
 		.join(' --')
 	))[2].trim();
 	if (gcc_output) console.log(gcc_output);
 	console.log(lang + ' js pass 1 done.');
 
+	checks_only ||
 	promises.push(
 		(async () => {
 			console.log(lang + ' js pass 2...');
