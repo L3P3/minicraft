@@ -52,6 +52,7 @@ export default function App({
 		) &&
 		node(MenuStart, {
 			state,
+			view,
 			view_set,
 			viewport_height,
 			viewport_width,

@@ -433,6 +433,7 @@ export default function MenuStart({
 		worlds_merged,
 		worlds_opened,
 	},
+	view,
 	view_set,
 	viewport_height,
 	viewport_width,
@@ -452,7 +453,12 @@ export default function MenuStart({
 	]);
 	const [busy, busy_set] = hook_state(false);
 
-	hook_dom(`div[className=menu]${SSR ? '' : '[style=overflow-y:hidden]'}`);
+	hook_dom(`div${SSR ? '' : '[style=overflow-y:hidden]'}`, {
+		F: {
+			menu: true,
+			blurred: view === APP_VIEW_SETTINGS,
+		},
+	});
 
 	return [
 		node_dom(`button[innerText=${locale_settings}][style=position:absolute]`, {

@@ -1,4 +1,5 @@
 import {
+	hook_dom,
 	hook_effect,
 	hook_memo,
 	hook_rerender,
@@ -55,6 +56,13 @@ import Messages from './c_messages.js';
 import Settings from './c_settings.js';
 import Terminal from './c_terminal.js';
 import Touch from './c_touch.js';
+
+function Surface({
+	model,
+}) {
+	game_renderer_init(model, hook_dom('canvas'));
+	return null;
+}
 
 export default function Game({
 	frame,
@@ -214,10 +222,8 @@ export default function Game({
 	if (config.textures) textures_id_ref.val = config.textures;
 
 	return [
-		node_dom('canvas', {
-			R: hook_static(canvas_element => (
-				game_renderer_init(model, canvas_element)
-			)),
+		node(Surface, {
+			model,
 		}),
 		model.flag_hud &&
 		model.menu !== MENU_TERMINAL &&

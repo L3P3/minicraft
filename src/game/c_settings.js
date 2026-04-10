@@ -102,7 +102,7 @@ export default function Settings({
 				:	locale_settings
 			),
 		}),
-		node_dom('center', null, [
+		node_dom('div[className=row]', null, [
 			node_dom('button', {
 				innerText: (
 					game && !textures_opened
@@ -181,7 +181,7 @@ export default function Settings({
 		]),
 		game &&
 		!textures_opened &&
-		node_dom('center', null, [
+		node_dom('div[className=row]', null, [
 			node_dom(`button[innerText=${locale_world_leave}]`, {
 				onclick: () => {
 					view_set(APP_VIEW_WORLDS);
@@ -211,7 +211,7 @@ export default function Settings({
 			}),
 		]),
 		textures_opened &&
-		node_dom('center', null, [
+		node_dom('div[className=row]', null, [
 			node_dom(`button[innerText=${locale_surface_add}]`, {
 				onclick: () => {
 					open('//l3p3.de/svr/minicraft/textures.html');
