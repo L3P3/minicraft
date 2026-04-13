@@ -10,6 +10,7 @@ commands: Komutlar
 delete_local: Sil (yerel)
 delete_world: Dünyaylı sil
 delete: Sil
+disabled: Devre dışı
 download_world_from_server: Dünyayı sunucudan indir
 download: İndir
 error_amount_minimum_1: Miktar en az 1 olmalıdır!
@@ -96,8 +97,7 @@ unknown_world: Bilinmeyen dünya
 unpublish_world: Dünyayı yayından kaldır
 upload_world_to_server: Dünyayı sunucuya yükle
 upload: Yükle
-version_1: L3P3 tarafından 
-version_2:  sürümü
+version: Sürüm 
 view_angle: Görüş açısı
 view_distance: Görüş mesafesi
 warn_world_remote_missing_1: "

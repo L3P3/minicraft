@@ -10,6 +10,7 @@ commands: Команда
 delete_local: Удалить (локал)
 delete_world: Удалить мир
 delete: Удалить
+disabled: Отключено
 download_world_from_server: Загрузит мир из сервера 
 download: Скачать
 error_amount_minimum_1: Число должно быт минимум 1!
@@ -96,8 +97,7 @@ unknown_world: Неизвестный мир
 unpublish_world: Приватизировать мир
 upload_world_to_server: Загрузит мир на сервер
 upload: Загрузит
-version_1: Версия 
-version_2:  от L3P3
+version: Версия 
 view_angle: Радиус зрения
 view_distance: Далность зрения
 warn_world_remote_missing_1: Мир "

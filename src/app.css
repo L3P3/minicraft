@@ -21,6 +21,8 @@ body {
 	touch-action: none;
 }
 button {
+	cursor: hand;
+	cursor: pointer;
 	font-family: Minecraft, sans-serif, Verdana;
 }
 
@@ -100,40 +102,23 @@ button {
 .game > .bar {
 	position: absolute;
 	bottom: 0;
-	width: 360px;
 	left: 50%;
 	margin-left: -180px;
-	white-space: nowrap;
-	overflow: auto hidden;
-	font-size: 0;
+	border-spacing: 0;
+	background: #333;
 
-	@media (max-width: 360px) {
-		left: 0;
-		margin-left: 0;
-		width: 100%;
-	}
-
-	> * {
-		display: inline-block;
-		width: 40px;
-		height: 40px;
-		background: #333;
+	td {
+		width: 32px;
+		height: 32px;
 		padding: 4px;
+
+		&.active {
+			background: white;
+		}
 
 		> * {
 			background: black;
 		}
-	}
-
-	> .active {
-		background: white;
-	}
-
-	> :empty::after {
-		content: ' ';
-		display: block;
-		height: 100%;
-		background: black;
 	}
 }
 
@@ -215,18 +200,20 @@ button {
 	}
 
 	> .settings {
-		margin: 16px;
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-		gap: 16px;
+		margin: 0 auto;
+		border-spacing: 8px;
 
-		> * {
-			min-height: 32px;
+		td {
+			width: 200px;
+			height: 40px;
 		}
 
 		button {
-			width: 192px;
-			max-width: calc(50vw - 16px);
+			width: 100%;
+			height: 100%;
+		}
+		input {
+			width: 100%;
 		}
 	}
 
@@ -370,11 +357,10 @@ button {
 		left: 16px;
 		right: 16px;
 		top: 16px;
-		display: flex;
-		justify-content: flex-end;
-		gap: 4.8px;
+		text-align: right;
 
 		> * {
+			display: inline;
 			min-width: 32px;
 			color: black;
 			text-align: center;

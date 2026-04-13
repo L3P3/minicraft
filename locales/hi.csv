@@ -10,6 +10,7 @@ commands: कमांड्स
 delete_local: (स्थानीय) हटाएं
 delete_world: दुनिया हटाएं
 delete: हटाएं
+disabled: निष्क्रिय
 download_world_from_server: सर्वर से दुनिया डाउनलोड करें
 download: डाउनलोड
 error_amount_minimum_1: राशि कम से कम 1 होनी चाहिए!
@@ -96,8 +97,7 @@ unknown_world: अज्ञात दुनिया
 unpublish_world: दुनिया अप्रकाशित करें
 upload_world_to_server: सर्वर पर दुनिया अपलोड करें
 upload: अपलोड
-version_1: संस्करण 
-version_2:  L3P3 द्वारा
+version: संस्करण 
 view_angle: दृश्य कोण
 view_distance: दृश्य दूरी
 warn_world_remote_missing_1: दुनिया "

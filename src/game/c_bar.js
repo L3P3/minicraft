@@ -20,7 +20,7 @@ export default function Bar({
 	textures_id,
 	time_now,
 }) {
-	hook_dom('div[className=bar]', {
+	hook_dom('table[className=bar]', {
 		ontouchstart: hook_static(event => {
 			player.slot_index = Number(
 				event.target.closest('[data-slot]').dataset.slot
@@ -40,27 +40,31 @@ export default function Bar({
 
 	const {gamemode} = player;
 
-	return (
-		player.inventory
-		.slice(0, PLAYER_SLOTS)
-		.map(({content}, index) => (
-			node_dom('div', {
-				D: {
-					slot: index,
-				},
-				F: {
-					active: index === player.slot_index,
-				},
-			}, [
-				content &&
-				node(Stack, {
-					amount: content.amount,
-					data: content.data,
-					gamemode,
-					id: content.id,
-					textures_id,
-				}),
-			])
-		))
-	);
+	return [
+		node_dom('tr', null,
+			player.inventory
+			.slice(0, PLAYER_SLOTS)
+			.map(({content}, index) => (
+				node_dom('td', {
+					D: {
+						slot: index,
+					},
+					F: {
+						active: index === player.slot_index,
+					},
+				}, [
+					content &&
+					node(Stack, {
+						amount: content.amount,
+						data: content.data,
+						gamemode,
+						id: content.id,
+						textures_id,
+					}),
+					!content &&
+					node_dom('div[className=stack]'),
+				])
+			))
+		),
+	];
 }

@@ -10,6 +10,7 @@ commands: Befehle
 delete_local: Löschen (lokal)
 delete_world: Welt löschen
 delete: Löschen
+disabled: Deaktiviert
 download_world_from_server: Welt von Server herunterladen
 download: Herunterladen
 error_amount_minimum_1: Anzahl muss mindestens 1 sein!
@@ -96,8 +97,7 @@ unknown_world: Unbekannte Welt
 unpublish_world: Welt privat machen
 upload_world_to_server: Welt auf den Server hochladen
 upload: Hochladen
-version_1: Version 
-version_2:  von L3P3
+version: Version 
 view_angle: Blickwinkel
 view_distance: Sichtweite
 warn_world_remote_missing_1: Die Welt "

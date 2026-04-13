@@ -10,6 +10,7 @@ commands: Укази
 delete_local: видалити (локальні)
 delete_world: Видалити світ 
 delete: видалити 
+disabled: Вимкнено
 download_world_from_server: Завантажити світ з серверу
 download: Завантажити
 error_amount_minimum_1: Номер повинен бути як мінімум 1!
@@ -96,8 +97,7 @@ unknown_world: Недійсни світ
 unpublish_world: Зробіть світ приватний 
 upload_world_to_server: Завантажити світ на сервер
 upload: Завантажити
-version_1: Версія 
-version_2:  от L3P3
+version: Версія 
 view_angle: Точка огляду
 view_distance: Видимість
 warn_world_remote_missing_1: Світ "
