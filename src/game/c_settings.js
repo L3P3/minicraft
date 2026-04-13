@@ -13,7 +13,7 @@ import {
 	APP_VIEW_WORLDS,
 } from '../etc/constants.js';
 import {
-	Promise_,
+	Promise_resolve,
 	fetch_,
 	response_parse,
 } from '../etc/helpers.js';
@@ -86,7 +86,7 @@ export default function Settings({
 
 	const [textures_opened, textures_opened_set] = hook_state(false);
 	const textures = hook_async(() => (
-		!textures_opened ? Promise_.resolve(null) :
+		!textures_opened ? Promise_resolve(null) :
 		fetch_(`${API_DATA}textures.json`)
 		.then(response_parse)
 		.catch(_error => null)
