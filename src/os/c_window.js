@@ -292,8 +292,8 @@ const window_attributes_get = (
 	down_callback
 ) => ({
 	F: {
-		window: true,
-		borders: mode === WINDOW_MODE_FLOATING,
+		'window': true,
+		'borders': mode === WINDOW_MODE_FLOATING,
 	},
 	onmousedown: down_callback,
 	S: {

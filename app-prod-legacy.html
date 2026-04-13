@@ -12,33 +12,6 @@
 			function define(mod) {
 				window.lui = mod;
 			}
-			// polyfill
-			function fetch(url, options) {
-				options = options || {};
-				return new Promise(function(resolve, reject) {
-					alert('fetch ' + url + ' : ' + JSON.stringify(options));
-					var xhr = new XMLHttpRequest();
-					xhr.open(options.method || "GET", url);
-					if (options.headers) {
-						for (var key in options.headers) {
-							xhr.setRequestHeader(key, options.headers[key]);
-						}
-					}
-					xhr.onload = function() {
-						resolve({
-							ok: xhr.status >= 200 && xhr.status < 300,
-							status: xhr.status,
-							text: function() { return Promise.resolve(xhr.responseText); },
-							json: function() { return Promise.resolve(JSON.parse(xhr.responseText)); }
-						});
-					};
-					xhr.onerror = function() {
-						alert('fetch error');
-						reject(new Error("Network request failed"));
-					};
-					xhr.send(options.body || null);
-				});
-			}
 			console.log = function() {
 				alert(Array.prototype.join.call(arguments, " "));
 			};

@@ -455,8 +455,8 @@ export default function MenuStart({
 
 	hook_dom(`div${SSR ? '' : '[style=overflow-y:hidden]'}`, {
 		F: {
-			menu: true,
-			blurred: view === APP_VIEW_SETTINGS,
+			'menu': true,
+			'blurred': view === APP_VIEW_SETTINGS,
 		},
 	});
 
