@@ -44,7 +44,7 @@ export default function Bar({
 		node_dom('tr', null,
 			player.inventory
 			.slice(0, PLAYER_SLOTS)
-			.map(({content}, index) => (
+			.map(({content}, index) =>
 				node_dom('td', {
 					D: {
 						slot: index,
@@ -64,7 +64,7 @@ export default function Bar({
 					!content &&
 					node_dom('div[className=stack]'),
 				])
-			))
+			)
 		),
 	];
 }

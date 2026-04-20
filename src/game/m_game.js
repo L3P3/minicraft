@@ -18,6 +18,7 @@ import {
 	BLOCK_TYPE_GRASS,
 	BLOCK_TYPE_LEAVES,
 	BLOCK_TYPE_MAX,
+	BLOCK_TYPE_OBSIDIAN,
 	BLOCK_TYPE_STONE,
 	CHUNK_HEIGHT,
 	CHUNK_WIDTH,
@@ -255,7 +256,10 @@ export const game_menu_close = model => {
 */
 export const game_mouse_catch = async model => {
 	if (model.config.flag_touch) return;
-	return model.frame_element.requestPointerLock().catch(_error => {});
+	try {
+		await model.frame_element.requestPointerLock();
+	}
+	catch (_error) {}
 }
 
 export const game_mouse_move_player = (model, event) => {
@@ -389,6 +393,7 @@ export const game_key = (model, code, state) => {
 						if (id === BLOCK_TYPE_GRASS) id = BLOCK_TYPE_DIRT;
 						else if (id === BLOCK_TYPE_STONE) id = BLOCK_TYPE_COBBLE;
 						if (
+							id === BLOCK_TYPE_OBSIDIAN ||
 							id === BLOCK_TYPE_BEDROCK ||
 							id !== BLOCK_TYPE_LEAVES &&
 							id !== BLOCK_TYPE_GLASS &&

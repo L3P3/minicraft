@@ -51,6 +51,7 @@ export const BLOCK_TYPE_MAX = 24;
 
 export const ITEM_HANDLES = 'air,stone,grass,dirt,cobble,planks,bedrock,log,leaves,bricks,wool,sand,gravel,glass,bookshelf,obsidian,stone_bricks,sandstone,lapis_block,iron_block,gold_block,diamond_block,emerald_block,redstone_block,quartz_block'.split(',');
 export const ITEM_LABELS = locale_item_labels.split(',');
+export const ITEM_PALETTE_ROWS = 3;
 
 // B G R
 export const BLOCK_COLORS = [

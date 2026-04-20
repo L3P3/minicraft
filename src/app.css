@@ -171,6 +171,22 @@ button {
 		}
 	}
 
+	> .window {
+		border-radius: 8px;
+		background: #ccc;
+		display: flex;
+		flex-direction: column;
+		padding: 8px;
+		gap: 8px;
+		color: #333;
+
+		> h2 {
+			margin: 0;
+			font-size: 100%;
+			color: #666;
+		}
+	}
+
 	> .worlds {
 		margin: 16px auto;
 		overflow-y: scroll;
@@ -222,36 +238,19 @@ button {
 		align-items: center;
 		justify-content: center;
 		overflow: hidden;
-	}
 
-	> .window {
-		border-radius: 8px;
-		background: #ccc;
-		display: flex;
-		flex-direction: column;
-		padding: 8px;
-		gap: 8px;
-		color: #333;
+		> .window > table {
+			margin: -4px;
+			border-spacing: 4px;
 
-		> h2 {
-			margin: 0;
-			font-size: 100%;
-			color: #666;
-		}
-	}
+			td {
+				width: 32px;
+				height: 32px;
+				background: #aaa;
+				padding: 0;
+			}
 
-	&.inventory > .window > .grid {
-		display: grid;
-		grid-template-columns: repeat(9, 2rem);
-		gap: 4px;
-
-		> * {
-			width: 32px;
-			height: 32px;
-			background: #aaa;
-
-			&.first {
-				grid-row-start: 4;
+			.last > td {
 				background: #999;
 			}
 		}
@@ -266,6 +265,7 @@ button {
 		margin-left: -16px;
 		margin-top: -16px;
 		pointer-events: none;
+		will-change: left, top;
 	}
 }
 

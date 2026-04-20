@@ -6,12 +6,14 @@ import {
 } from '../etc/lui.js';
 
 import {
+	BLOCK_TYPE_MAX,
 	GAMEMODE_CREATIVE,
 	GAMEMODE_SURVIVAL,
-	ITEM_HANDLES,
+	ITEM_PALETTE_ROWS,
 	PLAYER_SLOTS,
 } from '../etc/constants.js';
 import {
+	Array_,
 	Math_ceil,
 	Number_,
 } from '../etc/helpers.js';
@@ -32,32 +34,44 @@ import {
 
 import Stack from './c_stack.js';
 
+/**
+	maps rows/columns to inventory index
+*/
+const template = Array_(4).fill(null).map((_, row) =>
+	Array_(PLAYER_SLOTS).fill(null).map((_, column) =>
+		row * PLAYER_SLOTS + column
+	)
+);
+// move first row to the end
+template.push(template.shift());
+
 function Palette({
 	slot_hand,
 	textures_id,
 }) {
-	hook_dom('div[className=grid]', {
+	hook_dom('table', {
 		onclick: ({
 			target,
 		}) => {
-			const slot_element = target.closest('[data-id]');
-			if (slot_element) {
+			if (target.className === 'bitmap') {
 				slot_transfer(
 					slot_create(
 						stack_create(
-							Number_(slot_element.dataset.id)
+							Number_(target.parentElement.parentElement.dataset.id)
 						)
 					),
 					slot_hand
 				);
 			}
+			return false;
 		},
 	});
 
-	return (
-		ITEM_HANDLES.map((_, id) => (
-			id > 0 &&
-			node_dom('div', {
+	let id = 0;
+	return Array_(ITEM_PALETTE_ROWS).fill(null).map(() =>
+		node_dom('tr', null, Array_(PLAYER_SLOTS).fill(null).map(() =>
+			++id < BLOCK_TYPE_MAX + 1 &&
+			node_dom('td', {
 				D: {
 					id,
 				},
@@ -94,18 +108,25 @@ export default function Inventory({
 					game_menu_close(game);
 				}
 			}
-			else{
-				const slot_element = target.closest('[data-slot]');
-				if (slot_element) {
-					const slot = game.player.inventory[
-						Number_(slot_element.dataset.slot)
-					];
-					if (slot_hand.content) {
-						slot_transfer(slot_hand, slot);
-					}
-					else if (slot.content) {
-						slot_transfer(slot, slot_hand);
-					}
+			else if (
+				target.parentElement.className === 'stack' &&
+					target.parentElement.parentElement.dataset.slot ||
+				target.tagName === 'TD'
+			) {
+				const slot = game.player.inventory[
+					Number_(
+						(
+							target.tagName === 'TD'
+							?	target
+							:	target.parentElement.parentElement
+						).dataset.slot
+					)
+				];
+				if (slot_hand.content) {
+					slot_transfer(slot_hand, slot);
+				}
+				else if (slot.content) {
+					slot_transfer(slot, slot_hand);
 				}
 			}
 		},
@@ -120,18 +141,25 @@ export default function Inventory({
 					slot_hand.content = null;
 				}
 			}
-			else {
-				const slot_element = target.closest('[data-slot]');
-				if (slot_element) {
-					const slot = game.player.inventory[
-						Number_(slot_element.dataset.slot)
-					];
-					if (slot_hand.content) {
-						slot_transfer(slot_hand, slot, 1);
-					}
-					else if (slot.content) {
-						slot_transfer(slot, slot_hand, Math_ceil(slot.content.amount / 2));
-					}
+			else if (
+				target.parentElement.className === 'stack' &&
+					target.parentElement.parentElement.dataset.slot ||
+				target.tagName === 'TD'
+			) {
+				const slot = game.player.inventory[
+					Number_(
+						(
+							target.tagName === 'TD'
+							?	target
+							:	target.parentElement.parentElement
+						).dataset.slot
+					)
+				];
+				if (slot_hand.content) {
+					slot_transfer(slot_hand, slot, 1);
+				}
+				else if (slot.content) {
+					slot_transfer(slot, slot_hand, Math_ceil(slot.content.amount / 2));
 				}
 			}
 		},
@@ -145,32 +173,32 @@ export default function Inventory({
 				slot_hand,
 				textures_id,
 			}),
-			node_dom('div[className=grid]', null,
-				game.player.inventory.map(({content}, index) =>
-					node_dom('div', {
-						D: {
-							slot: index,
-						},
-						F: {
-							first: index < PLAYER_SLOTS,
-						},
+			node_dom('table', null, template.map((columns, row_num) =>
+				node_dom((
+					row_num < 3 ? 'tr' : 'tr[className=last]'
+				), null, columns.map(slot =>
+					node_dom('td', {
+						D: hook_memo(() => ({
+							slot,
+						})),
 					}, [
-						content &&
+						(slot = game.player.inventory[slot].content) &&
 						node(Stack, {
-							amount: content.amount,
-							data: content.data,
+							amount: slot.amount,
+							data: slot.data,
 							gamemode,
-							id: content.id,
+							id: slot.id,
 							textures_id,
 						}),
 					])
-				)
-			),
+				))
+			)),
 		]),
 		slot_hand.content &&
 		node_dom('div[className=hand]', {
 			S: {
-				transform: `translate(${game.cursor_x}px, ${game.cursor_y}px)`,
+				left: game.cursor_x + 'px',
+				top: game.cursor_y + 'px',
 			},
 		}, [
 			node(Stack, {
