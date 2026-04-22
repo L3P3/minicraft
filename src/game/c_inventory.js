@@ -48,6 +48,7 @@ template.push(template.shift());
 function Palette({
 	slot_hand,
 	textures_id,
+	td_style,
 }) {
 	hook_dom('table', {
 		onclick: ({
@@ -75,6 +76,7 @@ function Palette({
 				D: {
 					id,
 				},
+				S: td_style,
 			}, [
 				node(Stack, {
 					amount: 1,
@@ -91,6 +93,7 @@ function Palette({
 export default function Inventory({
 	game,
 	textures_id,
+	viewport_min,
 }) {
 	const slot_hand = hook_memo(() => slot_create(null));
 
@@ -165,6 +168,14 @@ export default function Inventory({
 		},
 	})));
 
+	const td_style = hook_memo(small => ({
+		fontSize: small ? '75%' : '',
+		height: small ? '16px' : '32px',
+		width: small ? '16px' : '32px',
+	}), [
+		viewport_min < 400,
+	]);
+
 	return [
 		node_dom('div[className=window]', null, [
 			node_dom(`h2[innerText=${locale_inventory}]`),
@@ -172,6 +183,7 @@ export default function Inventory({
 			node(Palette, {
 				slot_hand,
 				textures_id,
+				td_style,
 			}),
 			node_dom('table', null, template.map((columns, row_num) =>
 				node_dom((
@@ -181,6 +193,7 @@ export default function Inventory({
 						D: hook_memo(() => ({
 							slot,
 						})),
+						S: td_style,
 					}, [
 						(slot = game.player.inventory[slot].content) &&
 						node(Stack, {

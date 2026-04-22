@@ -381,7 +381,6 @@ export default function Window({
 			viewport_height,
 			viewport_width,
 			window_actions,
-			window_id,
 		}),
 		window_state.mode !== WINDOW_MODE_FULL &&
 		node(WindowCaption, {

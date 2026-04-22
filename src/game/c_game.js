@@ -23,6 +23,7 @@ import {
 	flag_chromium,
 	Math_,
 	Math_max,
+	Math_min,
 	window_,
 } from '../etc/helpers.js';
 import {
@@ -69,8 +70,9 @@ export default function Game({
 	key_event,
 	state,
 	view_set,
+	viewport_height,
+	viewport_width,
 	window_actions,
-	window_id,
 }) {
 	const {config} = state;
 	const time_now = now();
@@ -242,6 +244,7 @@ export default function Game({
 		node(Touch, {
 			game: model,
 			keys_active_check: model.keys_active_check,
+			viewport_width,
 		}),
 		model.flag_hud &&
 		model.menu !== MENU_INVENTORY &&
@@ -250,6 +253,7 @@ export default function Game({
 			player: model.player,
 			textures_id: textures_id_ref.val,
 			time_now,
+			viewport_width,
 		}),
 		(
 			model.menu === MENU_SETTINGS ||
@@ -262,6 +266,7 @@ export default function Game({
 			game: model,
 			textures_id: textures_id_ref.val,
 			time_now,
+			viewport_min: Math_min(viewport_width, viewport_height),
 		}),
 		model.menu === MENU_SETTINGS &&
 		node(Settings, {

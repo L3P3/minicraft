@@ -1,5 +1,6 @@
 import {
 	hook_dom,
+	hook_memo,
 	hook_static,
 	node,
 	node_dom,
@@ -9,6 +10,7 @@ import {
 	PLAYER_SLOTS,
 } from '../etc/constants.js';
 import {
+	Math_floor,
 	Math_max,
 	Math_min,
 } from '../etc/helpers.js';
@@ -19,6 +21,7 @@ export default function Bar({
 	player,
 	textures_id,
 	time_now,
+	viewport_width,
 }) {
 	hook_dom('table[className=bar]', {
 		ontouchstart: hook_static(event => {
@@ -28,6 +31,7 @@ export default function Bar({
 			player.slot_time = event.timeStamp;
 		}),
 		S: {
+			left: Math_max(0, viewport_width / 2 - PLAYER_SLOTS * 20) + 'px',
 			opacity: Math_max(
 				.5,
 				Math_min(
@@ -38,6 +42,12 @@ export default function Bar({
 		},
 	});
 
+	const td_style = hook_memo(tile_size => ({
+		height: tile_size = Math_floor(tile_size - 8) + 'px',
+		width: tile_size,
+	}), [
+		Math_min(viewport_width / PLAYER_SLOTS, 40),
+	]);
 	const {gamemode} = player;
 
 	return [
@@ -52,6 +62,7 @@ export default function Bar({
 					F: {
 						active: index === player.slot_index,
 					},
+					S: td_style,
 				}, [
 					content &&
 					node(Stack, {

@@ -29,7 +29,6 @@ export default function App({
 	viewport_height,
 	viewport_width,
 	window_actions,
-	window_id,
 }) {
 	const [view, view_set] = hook_state(APP_VIEW_WORLDS);
 
@@ -71,8 +70,9 @@ export default function App({
 			key_event,
 			state,
 			view_set,
+			viewport_height,
+			viewport_width,
 			window_actions,
-			window_id,
 		}),
 		view === APP_VIEW_WORLDS &&
 		state.connection_error &&

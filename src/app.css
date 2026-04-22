@@ -102,14 +102,10 @@ button {
 .game > .bar {
 	position: absolute;
 	bottom: 0;
-	left: 50%;
-	margin-left: -180px;
 	border-spacing: 0;
 	background: #333;
 
 	td {
-		width: 32px;
-		height: 32px;
 		padding: 4px;
 
 		&.active {
@@ -136,7 +132,6 @@ button {
 		position: absolute;
 		right: 0;
 		bottom: 0;
-		font-size: 19px;
 		color: white;
 		text-shadow: 2px 2px black;
 	}
@@ -244,8 +239,6 @@ button {
 			border-spacing: 4px;
 
 			td {
-				width: 32px;
-				height: 32px;
 				background: #aaa;
 				padding: 0;
 			}
@@ -352,115 +345,59 @@ button {
 	}
 
 	> .top {
-		position: absolute;
-		height: 32px;
-		left: 16px;
-		right: 16px;
-		top: 16px;
 		text-align: right;
 
-		> * {
-			display: inline;
-			min-width: 32px;
+		> .button {
+			display: inline-block;
+			padding: 2px;
 			color: black;
-			text-align: center;
 		}
 	}
 
 	> .move {
 		position: absolute;
-		width: 160px;
-		height: 160px;
-		max-width: 40vw;
-		max-height: 40vw;
-		left: 16px;
-		bottom: 16px;
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		grid-template-rows: repeat(3, 1fr);
-		gap: 3.2px;
 
-		@media (max-width: 672px) {
-			bottom: 64px;
-		}
-
-		&.sec {
-			left: auto;
-			right: 16px;
-		}
-
-		> * {
+		.button {
 			position: relative;
-			overflow: hidden;
 
-			&::before {
-				content: '';
+			> div {
 				position: absolute;
 				margin: 50%;
-				width: 0;
-				height: 0;
 				left: -16px;
 				top: -16px;
 				border: 0 solid transparent;
 			}
-		}
-
-		> .up {
-			grid-column: 2;
-			grid-row: 1;
-
-			&::before {
+			&.up > div {
+				top: -19.2px;
 				border-bottom-color: black;
 				border-width: 4.8px 16px 27.2px 16px;
-				top: -19.2px;
 			}
-		}
-
-		> .down {
-			grid-column: 2;
-			grid-row: 3;
-
-			&::before {
+			&.down > div {
+				top: -12.8px;
 				border-top-color: black;
 				border-width: 27.2px 16px 4.8px 16px;
-				top: -12.8px;
 			}
-		}
-
-		> .left {
-			grid-column: 1;
-			grid-row: 2;
-
-			&::before {
+			&.left > div {
+				left: -19.2px;
 				border-right-color: black;
 				border-width: 16px 27.2px 16px 4.8px;
-				left: -19.2px;
 			}
-		}
-
-		> .right {
-			grid-column: 3;
-			grid-row: 2;
-
-			&::before {
+			&.right > div {
+				left: -12.8px;
 				border-left-color: black;
 				border-width: 16px 4.8px 16px 27.2px;
-				left: -12.8px;
 			}
-		}
+			&.center {
+				margin: 4px;
 
-		> .center {
-			grid-column: 2;
-			grid-row: 2;
-			margin: 3.2px;
-
-			&::before {
-				width: 16px;
-				height: 16px;
-				left: -8px;
-				top: -8px;
-				background: black;
-				transform: rotate(45deg);
+				> div {
+					left: -8px;
+					top: -8px;
+					width: 16px;
+					height: 16px;
+					background: black;
+					transform: rotate(45deg);
+				}
 			}
 		}
 	}
