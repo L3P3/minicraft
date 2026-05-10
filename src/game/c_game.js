@@ -1,4 +1,5 @@
 import {
+	hook_dom,
 	hook_effect,
 	hook_memo,
 	hook_rerender,
@@ -56,13 +57,22 @@ import Settings from './c_settings.js';
 import Terminal from './c_terminal.js';
 import Touch from './c_touch.js';
 
+function Surface({
+	model,
+}) {
+	// fine without hook_effect since this component will only render once
+	game_renderer_init(model, hook_dom('canvas'));
+	return null;
+}
+
 export default function Game({
 	frame,
 	key_event,
 	state,
 	view_set,
+	viewport_height,
+	viewport_width,
 	window_actions,
-	window_id,
 }) {
 	const {config} = state;
 	const time_now = now();
@@ -214,13 +224,13 @@ export default function Game({
 	if (config.textures) textures_id_ref.val = config.textures;
 
 	return [
-		node_dom('canvas', {
-			R: hook_static(canvas_element => (
-				game_renderer_init(model, canvas_element)
-			)),
+		node(Surface, {
+			model,
 		}),
 		model.flag_hud &&
 		model.menu !== MENU_TERMINAL &&
+		model.messages.length > 0 &&
+		model.messages[model.messages.length - 1].time > time_now - 5e3 &&
 		node(Messages, {
 			messages: model.messages,
 			time_now,
@@ -234,6 +244,7 @@ export default function Game({
 		node(Touch, {
 			game: model,
 			keys_active_check: model.keys_active_check,
+			viewport_width,
 		}),
 		model.flag_hud &&
 		model.menu !== MENU_INVENTORY &&
@@ -242,12 +253,21 @@ export default function Game({
 			player: model.player,
 			textures_id: textures_id_ref.val,
 			time_now,
+			viewport_width,
 		}),
+		(
+			model.menu === MENU_SETTINGS ||
+			model.menu === MENU_TERMINAL ||
+			model.menu === MENU_INVENTORY
+		) &&
+		node_dom('div[className=backdrop]'),
 		model.menu === MENU_INVENTORY &&
 		node(Inventory, {
 			game: model,
 			textures_id: textures_id_ref.val,
 			time_now,
+			viewport_height,
+			viewport_width,
 		}),
 		model.menu === MENU_SETTINGS &&
 		node(Settings, {
@@ -259,6 +279,7 @@ export default function Game({
 		node(Terminal, {
 			game: model,
 			messages: model.messages,
+			viewport_width,
 		}),
 	];
 }

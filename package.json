@@ -1,6 +1,6 @@
 {
 	"name": "minicraft",
-	"version": "0.11.15",
+	"version": "0.12.0",
 	"description": "voxel-based 3d game, written in javascript",
 	"homepage": "https://l3p3.de/minicraft",
 	"repository": {
@@ -13,7 +13,7 @@
 	"main": "./src/app.js",
 	"type": "module",
 	"scripts": {
-		"build": "node build.js",
+		"build": "bun run build.js",
 		"start": "esbuild --servedir=."
 	},
 	"keywords": [
@@ -27,10 +27,8 @@
 	"author": "L3P3 <dev@l3p3.de> (https://l3p3.de)",
 	"license": "Zlib",
 	"dependencies": {
-		"cssnano": "latest",
 		"google-closure-compiler": "latest",
-		"lui-ssr": "latest",
-		"postcss": "latest"
+		"lui-ssr": "latest"
 	},
 	"devDependencies": {
 		"lui": "github:L3P3/lui"

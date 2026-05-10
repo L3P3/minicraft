@@ -6,13 +6,16 @@ import {
 } from '../etc/lui.js';
 
 import {
+	BLOCK_TYPE_MAX,
 	GAMEMODE_CREATIVE,
 	GAMEMODE_SURVIVAL,
-	ITEM_HANDLES,
+	ITEM_PALETTE_ROWS,
 	PLAYER_SLOTS,
 } from '../etc/constants.js';
 import {
+	Array_,
 	Math_ceil,
+	Math_min,
 	Number_,
 } from '../etc/helpers.js';
 import {
@@ -32,35 +35,49 @@ import {
 
 import Stack from './c_stack.js';
 
+/**
+	maps rows/columns to inventory index
+*/
+const template = Array_(4).fill(null).map((_, row) =>
+	Array_(PLAYER_SLOTS).fill(null).map((_, column) =>
+		row * PLAYER_SLOTS + column
+	)
+);
+// move first row to the end
+template.push(template.shift());
+
 function Palette({
 	slot_hand,
 	textures_id,
+	td_style,
 }) {
-	hook_dom('div[className=grid]', {
+	hook_dom('table', {
 		onclick: ({
 			target,
 		}) => {
-			const slot_element = target.closest('[data-id]');
-			if (slot_element) {
+			if (target.className === 'bitmap') {
 				slot_transfer(
 					slot_create(
 						stack_create(
-							Number_(slot_element.dataset.id)
+							Number_(target.parentElement.parentElement.dataset.id)
 						)
 					),
 					slot_hand
 				);
 			}
+			return false;
 		},
 	});
 
-	return (
-		ITEM_HANDLES.map((_, id) => (
-			id > 0 &&
-			node_dom('div', {
+	let id = 0;
+	return Array_(ITEM_PALETTE_ROWS).fill(null).map(() =>
+		node_dom('tr', null, Array_(PLAYER_SLOTS).fill(null).map(() =>
+			++id < BLOCK_TYPE_MAX + 1 &&
+			node_dom('td', {
 				D: {
 					id,
 				},
+				S: td_style,
 			}, [
 				node(Stack, {
 					amount: 1,
@@ -74,19 +91,32 @@ function Palette({
 	);
 }
 
+const td_style_big = {
+	fontSize: '',
+	height: '32px',
+	width: '32px',
+};
+const td_style_small = {
+	fontSize: '75%',
+	height: '16px',
+	width: '16px',
+};
+
 export default function Inventory({
 	game,
 	textures_id,
+	viewport_height,
+	viewport_width,
 }) {
 	const slot_hand = hook_memo(() => slot_create(null));
 
 	const {gamemode} = game.player;
 
-	hook_dom('div[className=menu overlay inventory]', hook_memo(() => ({
+	hook_dom('div[className=menu]', hook_memo(() => ({
 		onclick: ({
 			target,
 		}) => {
-			if (target.className === 'menu overlay inventory') {
+			if (target.className === 'menu') {
 				if (slot_hand.content) {
 					slot_hand.content = null;
 				}
@@ -94,25 +124,32 @@ export default function Inventory({
 					game_menu_close(game);
 				}
 			}
-			else{
-				const slot_element = target.closest('[data-slot]');
-				if (slot_element) {
-					const slot = game.player.inventory[
-						Number_(slot_element.dataset.slot)
-					];
-					if (slot_hand.content) {
-						slot_transfer(slot_hand, slot);
-					}
-					else if (slot.content) {
-						slot_transfer(slot, slot_hand);
-					}
+			else if (
+				target.parentElement.className === 'stack' &&
+					target.parentElement.parentElement.dataset.slot ||
+				target.tagName === 'TD'
+			) {
+				const slot = game.player.inventory[
+					Number_(
+						(
+							target.tagName === 'TD'
+							?	target
+							:	target.parentElement.parentElement
+						).dataset.slot
+					)
+				];
+				if (slot_hand.content) {
+					slot_transfer(slot_hand, slot);
+				}
+				else if (slot.content) {
+					slot_transfer(slot, slot_hand);
 				}
 			}
 		},
 		oncontextmenu: ({
 			target,
 		}) => {
-			if (target.className === 'menu overlay inventory') {
+			if (target.className === 'menu') {
 				if (!slot_hand.content) {
 					game_menu_close(game);
 				}
@@ -120,57 +157,88 @@ export default function Inventory({
 					slot_hand.content = null;
 				}
 			}
-			else {
-				const slot_element = target.closest('[data-slot]');
-				if (slot_element) {
-					const slot = game.player.inventory[
-						Number_(slot_element.dataset.slot)
-					];
-					if (slot_hand.content) {
-						slot_transfer(slot_hand, slot, 1);
-					}
-					else if (slot.content) {
-						slot_transfer(slot, slot_hand, Math_ceil(slot.content.amount / 2));
-					}
+			else if (
+				target.parentElement.className === 'stack' &&
+					target.parentElement.parentElement.dataset.slot ||
+				target.tagName === 'TD'
+			) {
+				const slot = game.player.inventory[
+					Number_(
+						(
+							target.tagName === 'TD'
+							?	target
+							:	target.parentElement.parentElement
+						).dataset.slot
+					)
+				];
+				if (slot_hand.content) {
+					slot_transfer(slot_hand, slot, 1);
+				}
+				else if (slot.content) {
+					slot_transfer(slot, slot_hand, Math_ceil(slot.content.amount / 2));
 				}
 			}
 		},
 	})));
 
+	const [window_style, td_style] = hook_memo(() => {
+		const small = Math_min(viewport_width, viewport_height) < 400;
+
+		return [
+			{
+				// values have been measured, not perfect, I know
+				left: `${viewport_width / 2 - (small ? 192 / 2 : 336 / 2)}px`,
+				top: `${viewport_height / 2 - (small ? 182 / 2 : 294 / 2)}px`,
+			},
+			(
+				small
+				?	td_style_small
+				:	td_style_big
+			),
+		];
+	}, [
+		viewport_height,
+		viewport_width,
+	]);
+
 	return [
-		node_dom('div[className=window]', null, [
+		node_dom('div[className=window]', {
+			S: window_style,
+		}, [
 			node_dom(`h2[innerText=${locale_inventory}]`),
 			gamemode === GAMEMODE_CREATIVE &&
 			node(Palette, {
 				slot_hand,
 				textures_id,
+				td_style,
 			}),
-			node_dom('div[className=grid]', null,
-				game.player.inventory.map(({content}, index) =>
-					node_dom('div', {
-						D: {
-							slot: index,
-						},
-						F: {
-							first: index < PLAYER_SLOTS,
-						},
+			node_dom('table', null, template.map((columns, row_num) =>
+				node_dom((
+					row_num < 3 ? 'tr' : 'tr[className=last]'
+				), null, columns.map(slot =>
+					node_dom('td', {
+						D: hook_memo(() => ({
+							slot,
+						})),
+						S: td_style,
 					}, [
-						content &&
+						(slot = game.player.inventory[slot].content) &&
 						node(Stack, {
-							amount: content.amount,
-							data: content.data,
+							amount: slot.amount,
+							data: slot.data,
 							gamemode,
-							id: content.id,
+							id: slot.id,
 							textures_id,
 						}),
 					])
-				)
-			),
+				))
+			)),
 		]),
 		slot_hand.content &&
 		node_dom('div[className=hand]', {
 			S: {
-				transform: `translate(${game.cursor_x}px, ${game.cursor_y}px)`,
+				left: game.cursor_x + 'px',
+				top: game.cursor_y + 'px',
 			},
 		}, [
 			node(Stack, {

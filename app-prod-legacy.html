@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang=en>
+	<head>
+		<meta charset=utf-8>
+		<title>minicraft (legacy)</title>
+		<meta name=viewport content="width=device-width">
+		<link rel=stylesheet href=dist/app.css>
+		<link rel="shortcut icon" href=assets/logo.svg>
+	</head>
+	<body>
+		<script>
+			function define(mod) {
+				window.lui = mod;
+			}
+			console.log = function() {
+				alert(Array.prototype.join.call(arguments, " "));
+			};
+		</script>
+		<script defer src=https://cdn.jsdelivr.net/gh/L3P3/lui@2/lui.r.dev.js></script>
+		<script defer src=dist/app-en-legacy.js></script>
+	</body>
+</html>

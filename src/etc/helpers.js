@@ -1,8 +1,11 @@
 import {
+	LEGACY,
+} from './env.js';
+import {
 	locale_error_connection,
 	locale_error_no_permission_logged_in,
 	locale_today,
-} from '../etc/locale.js';
+} from './locale.js';
 
 export const window_ = window;
 export const document_ = document;
@@ -39,8 +42,38 @@ export const localStorage_getItem = key => localStorage_.getItem(key);
 export const localStorage_setItem = localStorage_.setItem.bind(localStorage_);
 export const localStorage_removeItem = localStorage_.removeItem.bind(localStorage_);
 export const indexedDB_ = window_.indexedDB || null;
-export const fetch_ = fetch;
 export const Error_ = msg => new Error(msg);
+export const fetch_ = /** @type {function(string, RequestInit=): Promise<Response>} */ (
+	!LEGACY || window_.fetch
+	?	fetch
+	:	((url, options) =>
+		new Promise_((resolve, reject) => {
+			//alert('fetch ' + url + ' : ' + JSON_stringify(options));
+			options = options || {};
+			const xhr = new XMLHttpRequest();
+			xhr.open(options.method || 'GET', url);
+			if (options.headers) {
+				for (var key in options.headers) {
+					xhr.setRequestHeader(key, options.headers[key]);
+				}
+			}
+			xhr.onload = () => {
+				resolve({
+					ok: xhr.status >= 200 && xhr.status < 300,
+					status: xhr.status,
+					text: () => Promise_resolve(xhr.responseText),
+					json: () => Promise_resolve(JSON_parse(xhr.responseText)),
+				});
+			};
+			xhr.onerror = () => {
+				reject(
+					Error_('Network request failed')
+				);
+			};
+			xhr.send(/** @type {null|string} */ (options.body || null));
+		})
+	)
+);
 export const Array_ = Array;
 export const Uint8Array_ = Uint8Array;
 export const Uint32Array_ = Uint32Array;
@@ -61,14 +94,15 @@ export const confirm_ = confirm;
 export const prompt_ = prompt;
 export const flag_chromium = navigator_.userAgent.includes('WebKit');
 
-// old safari does not support fill for typed arrays
-/*if (!Uint32Array_.prototype.fill) {
-	Uint32Array_.prototype.fill = Array_.prototype.fill;
-}*/
-
 export const headers_json_post = {
 	method: 'POST',
 	headers: {'Content-Type': 'application/json'},
+};
+
+export const scrollIntoView_settings = {
+	behavior: 'smooth',
+	block: 'center',
+	container: 'nearest',
 };
 
 /**
@@ -157,4 +191,9 @@ export const response_parse = response => {
 		);
 	}
 	return response.json();
+}
+
+// old safari does not support fill for typed arrays
+if (LEGACY && !Uint32Array_.prototype.fill) {
+	Uint32Array_.prototype.fill = Array_.prototype.fill;
 }

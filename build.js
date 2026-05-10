@@ -1,26 +1,24 @@
 #!/bin/env node
 
+import {exec as child_process_exec} from 'child_process';
 import {
 	appendFile,
 	readdir,
 	readFile,
 	writeFile,
 } from 'fs/promises';
-import {exec as child_process_exec} from 'child_process';
-
-import cssnano from 'cssnano';
 import lui_ssr from 'lui-ssr';
 
-const GCC_COMMAND = './node_modules/.bin/google-closure-compiler --';
+const GCC_COMMAND = 'node_modules/.bin/google-closure-compiler --';
 
-const prod = !!process.env.CI;
-const checks_only = prod && process.env.GITHUB_REF_NAME !== 'master';
 const {version} = JSON.parse(
 	await readFile('./package.json', 'utf8')
 );
+const CI = !!process.env.CI;
+const checks_only = CI && process.env.GITHUB_REF_NAME !== 'master';
 
-let languages = ['en'];
-if (prod && !checks_only) {
+let languages = process.argv.includes('css') ? [] : ['en'];
+if (CI && !checks_only) {
 	const files = await readdir('./locales');
 	languages = (
 		files
@@ -30,10 +28,17 @@ if (prod && !checks_only) {
 }
 
 const exec = cmd => (
-	new Promise(resolve =>
+	new Promise((resolve, reject) =>
 		child_process_exec(
 			cmd,
-			(...args) => resolve(args)
+			(error, stdout, stderr) => {
+				if (error) reject(error);
+				else if (stderr.trim()) {
+					console.error(stderr);
+					reject(new Error('error output'));
+				}
+				else resolve(stdout);
+			}
 		)
 	)
 );
@@ -61,14 +66,16 @@ async function lang_generate(lang) {
 	);
 }
 
-const env_set = async (version, debug, lang, api, api_data) => Promise.all([
+const env_set = async (version, debug, lang, legacy, api, api_data, ssr) => Promise.all([
 	writeFile(
 		'./src/etc/env.js',
-`export const VERSION = '${version}';
+`export const API = '${api}';
+export const API_DATA = '${api_data}';
 export const DEBUG = ${debug};
 export const LANG = '${lang}';
-export const API = '${api}';
-export const API_DATA = '${api_data}';
+export const LEGACY = ${legacy};
+export const SSR = ${ssr};
+export const VERSION = '${version}';
 `,
 		'utf8'
 	),
@@ -76,40 +83,36 @@ export const API_DATA = '${api_data}';
 ]);
 
 async function build_css() {
-	const css_raw = await readFile('./src/app.css', 'utf8');
-
 	console.log('css...');
-	const css_minified = '' + await (
-		cssnano()
-		.process(
-			css_raw,
-			{from: undefined}
-		)
-	);
+	await Bun.build({
+		entrypoints: ['./src/app.css'],
+		outdir: 'dist',
+		minify: true,
+		sourcemap: 'linked',
+	});
 	console.log('css done.');
-
-	await writeFile(
-		'./dist/app.css',
-		css_minified,
-		'ascii'
-	);
 }
 
 const promises = [];
 
-async function build_js(lang) {
+async function build_js(lang, legacy, ssr) {
 	await env_set(
-		prod ? version : 'dev',
+		CI ? version : 'dev',
 		false,
 		lang,
-		prod ? '/api/minicraft/' : '//l3p3.de/api/minicraft/',
-		prod ? '/static/minicraft/' : '//l3p3.de/static/minicraft/'
+		legacy,
+		CI ? '/api/minicraft/' : '//l3p3.de/api/minicraft/',
+		CI ? '/static/minicraft/' : '//l3p3.de/static/minicraft/',
+		ssr
 	);
 
-	const TMP_FILE = `/tmp/app-${lang}.js`;
+	let combo = lang;
+	if (legacy) combo += '-legacy';
+	if (ssr) combo += '-ssr';
+	const tmp_path = `/tmp/app-${combo}.js`;
 
-	console.log(lang + ' js pass 1...');
-	const gcc_output = (await exec(
+	console.log(combo + ' js pass 1...');
+	await exec(
 		GCC_COMMAND +
 		[
 			'assume_function_wrapper',
@@ -117,8 +120,8 @@ async function build_js(lang) {
 			'dependency_mode PRUNE',
 			'entry_point ./src/app.js',
 			'js ./src',
-			'js_output_file ' + TMP_FILE,
-			'create_source_map ' + TMP_FILE + '.map',
+			'js_output_file ' + tmp_path,
+			'create_source_map ' + tmp_path + '.map',
 			'language_in ECMASCRIPT_NEXT',
 			'language_out ECMASCRIPT6_STRICT',
 			'module_resolution BROWSER',
@@ -130,108 +133,114 @@ async function build_js(lang) {
 		]
 		.filter(Boolean)
 		.join(' --')
-	))[2].trim();
-	if (gcc_output) console.log(gcc_output);
-	console.log(lang + ' js pass 1 done.');
+	);
+	console.log(combo + ' js pass 1 done.');
 
 	checks_only ||
-	promises.push(
-		(async () => {
-			console.log(lang + ' js pass 2...');
-			await appendFile(
-				TMP_FILE,
-				`\n//# sourceMappingURL=app-${lang}.js.map\n`,
-				'ascii'
-			);
-			const gcc_output = (await exec(
-				GCC_COMMAND +
-				[
-					'assume_function_wrapper',
-					'compilation_level SIMPLE',
-					'externs ./src/externs.js',
-					'js ' + TMP_FILE,
-					`js_output_file ./dist/app-${lang}.js`,
-					`create_source_map ./dist/app-${lang}.js.map`,
-					'language_in ECMASCRIPT6_STRICT',
-					'language_out ECMASCRIPT6_STRICT',
-					'rewrite_polyfills false',
-					'strict_mode_input',
-					'warning_level VERBOSE',
-				]
-				.join(' --')
-			))[2].trim();
-			if (gcc_output) console.log(gcc_output);
-			await Promise.all([
-				appendFile(
-					`./dist/app-${lang}.js`,
-					`\n//# sourceMappingURL=app-${lang}.js.map\n`,
-					'ascii'
-				),
-				file_replace(
-					`./dist/app-${lang}.js.map`,
-					[
-						[ // closure compiler internals
-							'/tmp/src/com/google/',
-							'//raw.githubusercontent.com/google/closure-compiler/refs/heads/master/src/com/google/'
-						],
-						[ // all other paths are mine
-							'/tmp/', 
-							(
-								prod
-								?	`../minicraft@${process.env.GITHUB_SHA}/`
-								:	'../'
-							),
-						],
-					]
-				),
-				exec(`rm ${TMP_FILE} ${TMP_FILE}.map`),
-			]);
-			console.log(lang + ' js pass 2 done.');
-		})(),
-		(async () => {
-			console.log(lang + ' ssr html...');
+	promises.push((async () => {
+		if (ssr) {
+			console.log(combo + ' html...');
 			await writeFile(
-				`./dist/app-${lang}-ssr.html`,
+				`./dist/app-${combo}.html`,
 				lui_ssr(
-					await readFile(TMP_FILE, 'ascii')
+					await readFile(tmp_path, 'ascii')
 				)(),
 				'utf8'
 			);
-			console.log(lang + ' ssr html done.');
-		})()
-	);
+			console.log(combo + ' html done.');
+			return;
+		}
+
+		console.log(combo + ' js pass 2...');
+		await appendFile(
+			tmp_path,
+			`\n//# sourceMappingURL=app-${combo}.js.map\n`,
+			'ascii'
+		);
+		await exec(
+			GCC_COMMAND +
+			[
+				'assume_function_wrapper',
+				'compilation_level SIMPLE',
+				'externs ./src/externs.js',
+				'js ' + tmp_path,
+				`js_output_file ./dist/app-${combo}.js`,
+				`create_source_map ./dist/app-${combo}.js.map`,
+				'language_in ECMASCRIPT6_STRICT',
+				`language_out ECMASCRIPT${legacy ? '3' : '6_STRICT'}`,
+				'rewrite_polyfills false',
+				'strict_mode_input',
+				'warning_level VERBOSE',
+			]
+			.join(' --')
+		);
+		await Promise.all([
+			appendFile(
+				`./dist/app-${combo}.js`,
+				`\n//# sourceMappingURL=app-${combo}.js.map\n`,
+				'ascii'
+			),
+			file_replace(
+				`./dist/app-${combo}.js.map`,
+				[
+					[ // closure compiler internals
+						'/tmp/src/com/google/',
+						'//raw.githubusercontent.com/google/closure-compiler/refs/heads/master/src/com/google/'
+					],
+					[ // all other paths are mine
+						'/tmp/', 
+						(
+							CI
+							?	`../minicraft@${process.env.GITHUB_SHA || 'master'}/`
+							:	'../'
+						),
+					],
+				]
+			),
+			exec(`rm ${tmp_path} ${tmp_path}.map`),
+		]);
+		console.log(combo + ' js pass 2 done.');
+	})());
 }
 
-if(
-	!(
-		await exec(GCC_COMMAND + 'version')
-	)[1].includes('Version: v202')
-) {
-	throw new Error('google closure compiler required!');
+const gcc_version_output = await exec(GCC_COMMAND + 'version');
+if(!gcc_version_output.includes('Version: v202')) {
+	console.log('command output: ' + gcc_version_output);
+	throw new Error('newer closure compiler version required!');
 }
 
-await exec('rm ./dist/app*');
+await exec('mkdir -p ./dist;rm ./dist/app*').catch(() => {});
 
-console.log(`build ${version} (${prod ? 'production' : 'dev'})...`);
+console.log(`build ${version} (${CI ? 'production' : 'dev'})...`);
 
 try {
 	await file_replace(
 		'./src/etc/lui.js',
 		[["@type {typeof import('lui/index')}", "@type {Object}"]]
 	);
-	for (const lang of languages) await build_js(lang);
+	for (const lang of languages) {
+		await build_js(lang, false, false);
+		await build_js(lang, true, false);
+		await build_js(lang, false, true);
+	}
 	promises.push(build_css());
 	await Promise.all(promises);
 }
+catch (error) {
+	console.error(error);
+	process.exitCode = 1;
+}
 finally {
-	if (!prod) {
+	if (!CI) {
 		await Promise.all([
 			env_set(
 				'dev',
 				true,
 				'en',
+				false,
 				'//l3p3.de/api/minicraft/',
-				'//l3p3.de/static/minicraft/'
+				'//l3p3.de/static/minicraft/',
+				false
 			),
 			file_replace(
 				'./src/etc/lui.js',

@@ -21,6 +21,9 @@ import {
 	WINDOW_TYPE_GAME,
 } from '../etc/constants.js';
 import {
+	SSR,
+} from '../etc/env.js';
+import {
 	addEventListener_,
 	document_,
 	Math_ceil,
@@ -114,8 +117,9 @@ const drag_handler = (hook_model_state_actions, window_id, event) => {
 	actions.window_focus(window_id);
 	const element = event.target;
 	if (
-		element.className !== 'window borders' ||
-		event.button !== 0
+		event.button !== 0 ||
+		element.className !== 'window borders' &&
+		element.className !== 'window_title'
 	) {
 		return;
 	}
@@ -141,7 +145,7 @@ const drag_handler = (hook_model_state_actions, window_id, event) => {
 		:	AREA_END
 	);
 	const area = area_h + area_v * 3;
-	element.style.willChange = area === AREA_CENTER ? 'transform' : 'contents';
+	element.style.willChange = area === AREA_CENTER ? 'left,top' : 'contents';
 	actions.state_patch({
 		cursor: CURSORS[area],
 	});
@@ -288,24 +292,29 @@ const window_attributes_get = (
 	down_callback
 ) => ({
 	F: {
-		window: true,
-		borders: mode === WINDOW_MODE_FLOATING,
-	},
-	S: {
-		display: mode === WINDOW_MODE_HIDDEN ? 'none' : 'block',
-		height: mode === WINDOW_MODE_FULL ? '100%' : height + 'px',
-		transform: mode === WINDOW_MODE_FULL ? '' : `translate(${left}px, ${top}px)`,
-		width: mode === WINDOW_MODE_FULL ? '100%' : width + 'px',
+		'window': true,
+		'borders': mode === WINDOW_MODE_FLOATING,
 	},
 	onmousedown: down_callback,
+	S: {
+		display: mode === WINDOW_MODE_HIDDEN ? 'none' : 'block',
+		left: mode === WINDOW_MODE_FULL ? '0' : (left - 1) + 'px',
+		top: mode === WINDOW_MODE_FULL ? '0' : (top - 1) + 'px',
+		height: mode === WINDOW_MODE_FULL ? '100%' : (height - 40) + 'px',
+		width: mode === WINDOW_MODE_FULL ? '100%' : (width - 16) + 'px',
+	},
 })
 
 const WindowCaption = ({
 	title,
+	width,
 	window_id,
 }) => [
 	node_dom('div[className=window_title]', {
 		innerText: title,
+		S: {
+			width: `${width - 40}px`,
+		},
 	}),
 	node_dom('div[className=window_button]', {
 		onclick: () => actions.window_remove(window_id),
@@ -320,6 +329,18 @@ export default function Window({
 	},
 	state,
 }) {
+	// skip window stuff for ssr
+	if (SSR) {
+		return [
+			node(App, {
+				state,
+				viewport_height: 600,
+				viewport_width: 800,
+				window_id: 0,
+			}),
+		];
+	}
+
 	// HACK: lui does not support model parameters (yet), so we use a global variable
 	mode_initial_last = mode_initial;
 	const hook_model_state_actions = hook_model(model);
@@ -349,17 +370,22 @@ export default function Window({
 		}
 	}, [state.screen_width, state.screen_height]);
 
+	const viewport_width = window_state.mode === WINDOW_MODE_FULL ? state.screen_width : window_state.width - 16;
+	const viewport_height = window_state.mode === WINDOW_MODE_FULL ? state.screen_height : window_state.height - 40;
+
 	return [
 		type === WINDOW_TYPE_GAME &&
 		node(App, {
 			key_event: window_state.key_event,
 			state,
+			viewport_height,
+			viewport_width,
 			window_actions,
-			window_id,
 		}),
 		window_state.mode !== WINDOW_MODE_FULL &&
 		node(WindowCaption, {
 			title: window_state.title,
+			width: window_state.width,
 			window_id,
 		}),
 	];

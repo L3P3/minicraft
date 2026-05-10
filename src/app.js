@@ -10,6 +10,7 @@ import {
 
 import {
 	DEBUG,
+	SSR,
 } from './etc/env.js';
 import {
 	addEventListener_,
@@ -113,7 +114,13 @@ function Root() {
 	});
 
 	const handler_key = hook_static(event => {
-		if (event.target.tagName === 'INPUT') return true;
+		const key_state = event.type === 'keydown';
+		if (
+			key_state &&
+			event.target.tagName === 'INPUT'
+		) {
+			return true;
+		}
 		in_event = true;
 		actions.config_touch_set(false);
 
@@ -121,7 +128,6 @@ function Root() {
 			const window_focussed_actions = windows_actions.get(
 				app_state.windows[app_state.windows.length - 1].id
 			);
-			const key_state = event.type === 'keydown';
 			if (event.key !== 'f') {
 				window_focussed_actions.key_event_set({
 					code: event.keyCode,
@@ -197,7 +203,7 @@ function ErrorOpened() {
 	];
 }
 
-if (window.SSR) {
+if (SSR) {
 	init(Root);
 }
 else if (BroadcastChannel_) {

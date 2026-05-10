@@ -9,9 +9,10 @@ html {
 body {
 	margin: 0;
 	height: 100%;
+	overflow: hidden;
 
-	font-family: Minecraft, sans-serif;
-	background: #000;
+	font-family: Minecraft, sans-serif, Verdana;
+	background: green;
 	color: #ddd;
 	-webkit-user-select: none;
 	-moz-user-select: none;
@@ -19,18 +20,68 @@ body {
 	cursor: default;
 	touch-action: none;
 }
-div {
-	box-sizing: border-box;
-}
 button {
-	cursor: unset;
-	font-family: unset;
+	cursor: hand;
+	cursor: pointer;
+	font-family: Minecraft, sans-serif, Verdana;
+}
+
+.blurred {
+	filter: blur(8px);
+}
+.backdrop {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: black;
+	opacity: 0.7;
+	filter: alpha(opacity=70);
+}
+.cursormask {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+
+.window {
+	position: absolute;
+	background: #333;
+
+	&.borders {
+		padding: 32px 8px 8px 8px;
+		border-top-left-radius: 8px;
+		border-top-right-radius: 8px;
+		border: 1px solid black;
+	}
+}
+.window_title {
+	position: absolute;
+	top: 8px;
+	left: 8px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+.window_button {
+	position: absolute;
+	background: #a00;
+	right: 8px;
+	top: 8px;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	cursor: pointer;
+	transition: background .2s;
+
+	&:hover {
+		background: #f00;
+	}
 }
 
 .game {
 	position: relative;
-	overflow: hidden;
 	height: 100%;
+	overflow: hidden;
 }
 .game > canvas, .game .bitmap {
 	position: absolute;
@@ -44,369 +95,300 @@ button {
 	image-rendering: crisp-edges;
 	image-rendering: pixelated;
 }
-.game > .bar {
-	position: absolute;
-	width: 22.5rem;
-	left: 50%;
-	margin-left: -11.25rem;
-	bottom: 0;
-	white-space: nowrap;
-	overflow: auto hidden;
-	font-size: 0;
-}
-@media (max-width: 22.5rem) {
-	.game > .bar {
-		left: 0;
-		margin-left: 0;
-		width: 100%;
-	}
-}
-.game > .bar > * {
-	display: inline-block;
-	width: 2.5rem;
-	height: 2.5rem;
-	background: #333;
-	padding: .25rem;
-}
-.game > .bar > .active {
-	background: #fff;
-}
-.game > .bar > :empty::after {
-	content: ' ';
-	display: block;
-	height: 100%;
-	background: #000;
-}
-.game > .bar > * > * {
-	background: #000;
-}
 .game .bitmap {
 	background-size: 100% auto;
 }
+
+.game > .bar {
+	position: absolute;
+	bottom: 0;
+	border-spacing: 0;
+	background: #333;
+
+	td {
+		padding: 4px;
+
+		&.active {
+			background: white;
+		}
+
+		> * {
+			background: black;
+		}
+	}
+}
+
 .game > .diagnostics {
 	position: absolute;
 	font-family: monospace;
-	color: #fff;
+	color: white;
 }
+
 .game .stack {
 	height: 100%;
 	position: relative;
-}
-.game .stack > .amount {
-	position: absolute;
-	right: 0;
-	bottom: 0;
-	font-size: 1.2rem;
-	color: #fff;
-	text-shadow: 2px 2px #000;
-}
-.game > .touch {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	opacity: .5;
-}
-.game > .touch .button {
-	border: .3rem outset;
-	border-radius: .5rem;
-	background: #ccc;
-}
-.game > .touch .button.active {
-	border-color: transparent;
-}
-.game > .touch > .top {
-	position: absolute;
-	height: 2rem;
-	left: 1rem;
-	right: 1rem;
-	top: 1rem;
-	display: flex;
-	justify-content: flex-end;
-	gap: .3rem;
-}
-.game > .touch > .top > * {
-	min-width: 2rem;
-	color: black;
-	text-align: center;
-}
 
-.game > .touch > .move {
-	position: absolute;
-	width: 10rem;
-	height: 10rem;
-	max-width: 40vw;
-	max-height: 40vw;
-	left: 1rem;
-	bottom: 1rem;
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	grid-template-rows: repeat(3, 1fr);
-	gap: .2rem;
-}
-@media (max-width: 42rem) {
-	.game > .touch > .move {
-		bottom: 4rem;
+	> .amount {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		color: white;
+		text-shadow: 2px 2px black;
 	}
-}
-.game > .touch > .move.sec {
-	left: auto;
-	right: 1rem;
-}
-.game > .touch > .move > * {
-	position: relative;
-	overflow: hidden;
-}
-.game > .touch > .move > *::before {
-	content: '';
-	position: absolute;
-	margin: 50%;
-	width: 0;
-	height: 0;
-	left: -1rem;
-	top: -1rem;
-	border: 0 solid transparent;
-}
-.game > .touch > .move > .up {
-	grid-column: 2;
-	grid-row: 1;
-}
-.game > .touch > .move > .up::before {
-	border-bottom-color: black;
-	border-width: .3rem 1rem 1.7rem 1rem;
-	top: -1.2rem;
-}
-.game > .touch > .move > .down {
-	grid-column: 2;
-	grid-row: 3;
-}
-.game > .touch > .move > .down::before {
-	border-top-color: black;
-	border-width: 1.7rem 1rem .3rem 1rem;
-	top: -.8rem;
-}
-.game > .touch > .move > .left {
-	grid-column: 1;
-	grid-row: 2;
-}
-.game > .touch > .move > .left::before {
-	border-right-color: black;
-	border-width: 1rem 1.7rem 1rem .3rem;
-	left: -1.2rem;
-}
-.game > .touch > .move > .right {
-	grid-column: 3;
-	grid-row: 2;
-}
-.game > .touch > .move > .right::before {
-	border-left-color: black;
-	border-width: 1rem .3rem 1rem 1.7rem;
-	left: -.8rem;
-}
-.game > .touch > .move > .center {
-	grid-column: 2;
-	grid-row: 2;
-	margin: .2rem;
-}
-.game > .touch > .move > .center::before {
-	width: 1rem;
-	height: 1rem;
-	left: -.5rem;
-	top: -.5rem;
-	background: black;
-	transform: rotate(45deg);
 }
 
 .game .menu {
 	position: absolute;
 	width: 100%;
 	height: 100%;
-	overflow-y: auto;
+	overflow: hidden auto;
+
+	&.busy {
+		cursor: wait;
+	}
+
+	> h1 {
+		text-align: center;
+	}
+
+	button {
+		height: 32px;
+	}
+
+	> .row {
+		text-align: center;
+		margin: 16px 0;
+
+		> button {
+			margin: 0 8px;
+		}
+	}
+
+	> .worlds {
+		margin: 16px auto 0;
+		overflow: auto scroll;
+		touch-action: pan-y;
+
+		> table {
+			width: 100%;
+
+			tr {
+				cursor: pointer;
+				background: #222;
+
+				&:hover {
+					background: #444;
+				}
+
+				&.selected {
+					cursor: default;
+					background: green;
+
+					div {
+						margin: 8px 0;
+					}
+				}
+
+				> td {
+					padding: 4px 8px;
+				}
+			}
+		}
+	}
+
+	> .settings {
+		margin: 0 auto;
+		border-spacing: 8px;
+
+		td {
+			width: 200px;
+			height: 40px;
+		}
+
+		button {
+			width: 100%;
+			height: 100%;
+		}
+		input {
+			width: 100%;
+		}
+	}
+
+	> .window {
+		position: absolute;
+		border-radius: 8px;
+		background: #ccc;
+		padding: 8px;
+		color: #333;
+
+		> h2 {
+			margin: 0;
+			font-size: 100%;
+			color: #666;
+		}
+
+		> table {
+			margin: -4px;
+			margin-top: 4px;
+			border-spacing: 4px;
+
+			td {
+				background: #aaa;
+				padding: 0;
+			}
+
+			.last > td {
+				background: #999;
+			}
+		}
+	}
+
+	> .hand {
+		position: absolute;
+		width: 32px;
+		height: 32px;
+		margin-left: -16px;
+		margin-top: -16px;
+		pointer-events: none;
+		will-change: left, top;
+	}
+
+	&.terminal {
+		> .toolbar {
+			position: absolute;
+			right: 16px;
+			top: 16px;
+			text-align: right;
+
+			> button {
+				width: 32px;
+				height: 32px;
+			}
+		}
+
+		> .history {
+			position: absolute;
+			bottom: 56px;
+			font-family: Minecraft, 'Courier New', Courier, monospace;
+			padding: 16px;
+
+			> * {
+				padding: 1px;
+			}
+			> .minor {
+				font-style: italic;
+				color: #999;
+			}
+		}
+
+		> input {
+			position: absolute;
+			left: 16px;
+			bottom: 16px;
+			height: 32px;
+			border: none;
+			background: black;
+			color: #ddd;
+			font: 100% Minecraft, 'Courier New', Courier, monospace;
+			padding: 4px;
+		}
+	}
 }
-.game .menu.busy {
-	cursor: wait;
-}
-.game .menu.overlay {
-	left: 0;
-	top: 0;
-	background: rgba(0, 0, 0, .7);
-}
-.game .menu h1 {
-	text-align: center;
-}
-.game .menu > center {
-	margin: 1rem 0;
-}
-.game .menu center button {
-	width: 12rem;
-	max-width: calc(50vw - 1rem);
-	height: 3rem;
-}
-.game .menu > .worlds {
-	width: 100%;
-	max-width: 30rem;
-	margin: 1rem auto;
-	height: calc(100vh - 18rem);
-	overflow-y: scroll;
-	touch-action: pan-y;
-}
-.game .menu > .worlds > * {
-	cursor: pointer;
-	padding: .2rem .5rem;
-}
-.game .menu > .worlds > :nth-child(odd) {
-	background: #222;
-}
-.game .menu > .worlds > .selected {
-	background: green;
-}
-.game .menu > .worlds > * > :last-child {
-	float: right;
-}
-.game .menu > .settings {
-	margin: 1rem;
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-	gap: 1rem;
-}
-.game .menu > .settings > * {
-	min-height: 2rem;
-}
-.game .menu.inventory, .game .menu.advanced {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	overflow: hidden;
-}
-.game .menu > .window {
-	border-radius: .5rem;
-	background: #ccc;
-	display: flex;
-	flex-direction: column;
-	padding: .5rem;
-	gap: .5rem;
-	color: #333;
-}
-.game .menu > .window > h2 {
-	margin: 0;
-	font-size: unset;
-	color: #666;
-}
-.game .menu.inventory > .window > .grid {
-	display: grid;
-	grid-template-columns: repeat(9, 2rem);
-	gap: .25rem;
-}
-.game .menu.inventory > .window > .grid > * {
-	width: 2rem;
-	height: 2rem;
-	background: #aaa;
-}
-.game .menu.inventory > .window > .grid > .first {
-	grid-row-start: 4;
-	background: #999;
-}
-.game .menu.inventory > .hand {
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: 2rem;
-	height: 2rem;
-	margin-left: -1rem;
-	margin-top: -1rem;
-	pointer-events: none;
-}
-.game > .terminal {
-	display: flex;
-	flex-direction: column;
-	padding: 1rem;
-	gap: 1rem;
-	font-family: Minecraft, 'Courier New', Courier, monospace;
-}
-.game > .terminal > .toolbar {
-	text-align: right;
-}
-.game > .terminal > .toolbar > button {
-	width: 2rem;
-	height: 2rem;
-}
-.game > .terminal > .history {
-	flex: 1;
-	overflow-y: auto;
-	display: flex;
-	flex-direction: column;
-}
-.game > .terminal > .history > * {
-	padding: 1px;
-}
-.game > .terminal > .history > :first-child,
-.game > .messages > :first-child {
-	margin-top: auto;
-}
-.game > .terminal > .history > .minor,
-.game > .messages > .minor {
-	font-style: italic;
-	color: #999;
-}
-.game > .terminal > input {
-	border: none;
-	background: black;
-	color: unset;
-	font: unset;
-	padding: 4px;
-}
+
 .game > .messages {
 	position: absolute;
-	left: 1rem;
-	top: 1rem;
-	right: 1rem;
-	bottom: 12rem;
-	overflow-y: hidden;
-	display: flex;
-	flex-direction: column;
+	bottom: 30%;
+	left: 16px;
+	width: 90%;
+	overflow: hidden;
 	font-family: Minecraft, 'Courier New', Courier, monospace;
+
+	> * {
+		position: relative;
+		display: table;
+		padding: 1px;
+
+		> span {
+			position: relative;
+		}
+	}
+	> .minor {
+		font-style: italic;
+		color: #999;
+	}
 }
-.game > .messages > * {
-	width: fit-content;
-	background: rgba(0, 0, 0, .7);
-	padding: 1px;
-}
-.cursormask {
-	position: fixed;
+
+.game > .touch {
+	position: absolute;
 	width: 100%;
 	height: 100%;
-}
-.window {
-	position: absolute;
-	background: #333;
-}
-.window.borders {
-	padding: 2rem .5rem .5rem .5rem;
-	border-top-left-radius: .5rem;
-	border-top-right-radius: .5rem;
-	outline: 1px solid #000;
-}
-.window_title {
-	position: absolute;
-	top: .5rem;
-	left: .5rem;
-	right: 2rem;
-	pointer-events: none;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-.window_button {
-	position: absolute;
-	background: red;
-	right: .5rem;
-	top: .5rem;
-	width: 1rem;
-	height: 1rem;
-	border-radius: 50%;
 	opacity: .5;
-	cursor: pointer;
-	transition: opacity .2s;
-}
-.window_button:hover {
-	opacity: 1;
+
+	.button {
+		border: 5px outset;
+		border-radius: 8px;
+		background: #ccc;
+
+		&.active {
+			border-color: transparent;
+		}
+	}
+
+	> .top {
+		text-align: right;
+
+		> .button {
+			display: inline-block;
+			padding: 2px;
+			color: black;
+		}
+	}
+
+	> .move {
+		position: absolute;
+
+		.button {
+			position: relative;
+
+			> div {
+				position: absolute;
+				margin: 50%;
+				left: -16px;
+				top: -16px;
+				border: 0 solid transparent;
+			}
+			&.up > div {
+				top: -19.2px;
+				border-bottom-color: black;
+				border-width: 4.8px 16px 27.2px 16px;
+			}
+			&.down > div {
+				top: -12.8px;
+				border-top-color: black;
+				border-width: 27.2px 16px 4.8px 16px;
+			}
+			&.left > div {
+				left: -19.2px;
+				border-right-color: black;
+				border-width: 16px 27.2px 16px 4.8px;
+			}
+			&.right > div {
+				left: -12.8px;
+				border-left-color: black;
+				border-width: 16px 4.8px 16px 27.2px;
+			}
+			&.center {
+				margin: 4px;
+
+				> div {
+					left: -8px;
+					top: -8px;
+					width: 16px;
+					height: 16px;
+					background: black;
+					transform: rotate(45deg);
+				}
+			}
+		}
+	}
 }

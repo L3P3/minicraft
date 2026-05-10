@@ -10,6 +10,7 @@ commands: Commands
 delete_local: Delete (local)
 delete_world: Delete world
 delete: Delete
+disabled: Disabled
 download_world_from_server: Download world from server
 download: Download
 error_amount_minimum_1: Amount must be at least 1!
@@ -96,8 +97,7 @@ unknown_world: Unknown world
 unpublish_world: Unpublish world
 upload_world_to_server: Upload world to server
 upload: Upload
-version_1: Version 
-version_2:  by L3P3
+version: Version 
 view_angle: View angle
 view_distance: View distance
 warn_world_remote_missing_1: The world "

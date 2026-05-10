@@ -52,8 +52,7 @@ export let world_list_remote = null;
 let reload_cooldown_timeout = 0;
 
 // just a hint so the ui selection can be kept
-export let world_renamed_id_old = null;
-export let world_renamed_id_new = 0;
+export let world_rename = null;
 
 export const world_store_init = () => world_list_remote_load(true);
 
@@ -309,9 +308,10 @@ const world_store_sync = async world => {
 					})
 				);
 				rename_promise = chunks_rename(
-					world_renamed_id_old = id,
-					world_renamed_id_new = id_new = result_register.id
+					id,
+					id_new = result_register.id
 				);
+				world_rename = [id, id_new];
 				actions.world_prop(id, {
 					id: id_new,
 				});
