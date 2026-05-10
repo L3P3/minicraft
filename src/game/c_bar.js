@@ -43,7 +43,7 @@ export default function Bar({
 	});
 
 	const td_style = hook_memo(tile_size => ({
-		height: tile_size = Math_floor(tile_size - 8) + 'px',
+		height: tile_size = (tile_size - 8) + 'px',
 		width: tile_size,
 	}), [
 		Math_min(viewport_width / PLAYER_SLOTS, 40),

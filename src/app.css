@@ -139,11 +139,9 @@ button {
 
 .game .menu {
 	position: absolute;
-	left: 0;
-	top: 0;
 	width: 100%;
 	height: 100%;
-	overflow-y: auto;
+	overflow: hidden auto;
 
 	&.busy {
 		cursor: wait;
@@ -166,25 +164,9 @@ button {
 		}
 	}
 
-	> .window {
-		border-radius: 8px;
-		background: #ccc;
-		display: flex;
-		flex-direction: column;
-		padding: 8px;
-		gap: 8px;
-		color: #333;
-
-		> h2 {
-			margin: 0;
-			font-size: 100%;
-			color: #666;
-		}
-	}
-
 	> .worlds {
-		margin: 16px auto;
-		overflow-y: scroll;
+		margin: 16px auto 0;
+		overflow: auto scroll;
 		touch-action: pan-y;
 
 		> table {
@@ -193,6 +175,10 @@ button {
 			tr {
 				cursor: pointer;
 				background: #222;
+
+				&:hover {
+					background: #444;
+				}
 
 				&.selected {
 					cursor: default;
@@ -228,14 +214,22 @@ button {
 		}
 	}
 
-	&.inventory {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		overflow: hidden;
+	> .window {
+		position: absolute;
+		border-radius: 8px;
+		background: #ccc;
+		padding: 8px;
+		color: #333;
 
-		> .window > table {
+		> h2 {
+			margin: 0;
+			font-size: 100%;
+			color: #666;
+		}
+
+		> table {
 			margin: -4px;
+			margin-top: 4px;
 			border-spacing: 4px;
 
 			td {
@@ -251,8 +245,6 @@ button {
 
 	> .hand {
 		position: absolute;
-		left: 0;
-		top: 0;
 		width: 32px;
 		height: 32px;
 		margin-left: -16px;
@@ -260,48 +252,46 @@ button {
 		pointer-events: none;
 		will-change: left, top;
 	}
-}
 
-.game > .terminal {
-	display: flex;
-	flex-direction: column;
-	padding: 16px;
-	gap: 16px;
-	font-family: Minecraft, 'Courier New', Courier, monospace;
+	&.terminal {
+		> .toolbar {
+			position: absolute;
+			right: 16px;
+			top: 16px;
+			text-align: right;
 
-	> .toolbar {
-		text-align: right;
+			> button {
+				width: 32px;
+				height: 32px;
+			}
+		}
 
-		> button {
-			width: 32px;
+		> .history {
+			position: absolute;
+			bottom: 56px;
+			font-family: Minecraft, 'Courier New', Courier, monospace;
+			padding: 16px;
+
+			> * {
+				padding: 1px;
+			}
+			> .minor {
+				font-style: italic;
+				color: #999;
+			}
+		}
+
+		> input {
+			position: absolute;
+			left: 16px;
+			bottom: 16px;
 			height: 32px;
+			border: none;
+			background: black;
+			color: #ddd;
+			font: 100% Minecraft, 'Courier New', Courier, monospace;
+			padding: 4px;
 		}
-	}
-
-	> .history {
-		flex: 1;
-		overflow-y: auto;
-		display: flex;
-		flex-direction: column;
-
-		> * {
-			padding: 1px;
-		}
-		> .minor {
-			font-style: italic;
-			color: #999;
-		}
-		> :first-child {
-			margin-top: auto;
-		}
-	}
-
-	> input {
-		border: none;
-		background: black;
-		color: #ddd;
-		font: 100% Minecraft, sans-serif, Verdana;
-		padding: 4px;
 	}
 }
 
@@ -310,7 +300,7 @@ button {
 	bottom: 30%;
 	left: 16px;
 	width: 90%;
-	overflow-y: hidden;
+	overflow: hidden;
 	font-family: Minecraft, 'Courier New', Courier, monospace;
 
 	> * {

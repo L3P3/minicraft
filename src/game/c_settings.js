@@ -250,6 +250,7 @@ export default function Settings({
 			}),
 		]),
 		textures_opened &&
+		textures &&
 		node_dom('div[className=row]', null, [
 			node_dom(`button[innerText=${locale_surface_add}]`, {
 				onclick: () => {

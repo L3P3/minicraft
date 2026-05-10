@@ -453,7 +453,7 @@ export default function MenuStart({
 	]);
 	const [busy, busy_set] = hook_state(false);
 
-	hook_dom(`div${SSR ? '' : '[style=overflow-y:hidden]'}`, {
+	hook_dom('div', {
 		F: {
 			'menu': true,
 			'blurred': view === APP_VIEW_SETTINGS,

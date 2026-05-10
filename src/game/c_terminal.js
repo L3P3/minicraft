@@ -2,6 +2,7 @@ import {
 	hook_dom,
 	hook_effect,
 	hook_static,
+	node,
 	node_dom,
 	node_map,
 } from '../etc/lui.js';
@@ -14,6 +15,44 @@ import {
 	game_menu_close,
 	game_message_send,
 } from './m_game.js';
+
+const StaticUI = ({
+	game,
+	ref,
+	viewport_width,
+}) => [
+	node_dom('div[className=toolbar]', null, [
+		node_dom('button[innerText=❌]', {
+			onclick: () => {
+				game_menu_close(game);
+			},
+		}),
+	]),
+	node_dom('input[autocomplete=off][enterkeyhint=send][mozactionhint=send][name=message][required]', {
+		onkeydown: event => {
+			const {
+				keyCode,
+				target,
+			} = event;
+			if (keyCode === 13) {
+				game_message_send(game, target.value);
+				target.value = '';
+			}
+			else if (keyCode === 27) {
+				game_menu_close(game);
+			}
+		},
+		R: element => {
+			ref.input = element;
+			setTimeout_(() => (
+				element.focus()
+			), 0);
+		},
+		S: {
+			width: `${viewport_width - 40}px`,
+		},
+	}),
+];
 
 const Message = ({
 	I: {
@@ -31,6 +70,7 @@ const Message = ({
 export default function Terminal({
 	game,
 	messages,
+	viewport_width,
 }) {
 	const ref = hook_static({
 		history: null,
@@ -55,13 +95,6 @@ export default function Terminal({
 	]);
 
 	return [
-		hook_static(node_dom('div[className=toolbar]', null, [
-			node_dom('button[innerText=❌]', {
-				onclick: () => {
-					game_menu_close(game);
-				},
-			}),
-		])),
 		node_dom('div[className=history]', {
 			R: hook_static(element => {
 				ref.history = element;
@@ -69,26 +102,10 @@ export default function Terminal({
 		}, [
 			node_map(Message, messages),
 		]),
-		hook_static(node_dom('input[autocomplete=off][enterkeyhint=send][mozactionhint=send][name=message][required]', {
-			onkeydown: event => {
-				const {
-					keyCode,
-					target,
-				} = event;
-				if (keyCode === 13) {
-					game_message_send(game, target.value);
-					target.value = '';
-				}
-				else if (keyCode === 27) {
-					game_menu_close(game);
-				}
-			},
-			R: element => {
-				ref.input = element;
-				setTimeout_(() => (
-					element.focus()
-				), 0);
-			},
-		})),
+		node(StaticUI, {
+			game,
+			ref,
+			viewport_width,
+		}),
 	];
 }

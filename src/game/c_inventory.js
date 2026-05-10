@@ -15,6 +15,7 @@ import {
 import {
 	Array_,
 	Math_ceil,
+	Math_min,
 	Number_,
 } from '../etc/helpers.js';
 import {
@@ -90,20 +91,32 @@ function Palette({
 	);
 }
 
+const td_style_big = {
+	fontSize: '',
+	height: '32px',
+	width: '32px',
+};
+const td_style_small = {
+	fontSize: '75%',
+	height: '16px',
+	width: '16px',
+};
+
 export default function Inventory({
 	game,
 	textures_id,
-	viewport_min,
+	viewport_height,
+	viewport_width,
 }) {
 	const slot_hand = hook_memo(() => slot_create(null));
 
 	const {gamemode} = game.player;
 
-	hook_dom('div[className=menu inventory]', hook_memo(() => ({
+	hook_dom('div[className=menu]', hook_memo(() => ({
 		onclick: ({
 			target,
 		}) => {
-			if (target.className === 'menu inventory') {
+			if (target.className === 'menu') {
 				if (slot_hand.content) {
 					slot_hand.content = null;
 				}
@@ -136,7 +149,7 @@ export default function Inventory({
 		oncontextmenu: ({
 			target,
 		}) => {
-			if (target.className === 'menu inventory') {
+			if (target.className === 'menu') {
 				if (!slot_hand.content) {
 					game_menu_close(game);
 				}
@@ -168,16 +181,30 @@ export default function Inventory({
 		},
 	})));
 
-	const td_style = hook_memo(small => ({
-		fontSize: small ? '75%' : '',
-		height: small ? '16px' : '32px',
-		width: small ? '16px' : '32px',
-	}), [
-		viewport_min < 400,
+	const [window_style, td_style] = hook_memo(() => {
+		const small = Math_min(viewport_width, viewport_height) < 400;
+
+		return [
+			{
+				// values have been measured, not perfect, I know
+				left: `${viewport_width / 2 - (small ? 192 / 2 : 336 / 2)}px`,
+				top: `${viewport_height / 2 - (small ? 182 / 2 : 294 / 2)}px`,
+			},
+			(
+				small
+				?	td_style_small
+				:	td_style_big
+			),
+		];
+	}, [
+		viewport_height,
+		viewport_width,
 	]);
 
 	return [
-		node_dom('div[className=window]', null, [
+		node_dom('div[className=window]', {
+			S: window_style,
+		}, [
 			node_dom(`h2[innerText=${locale_inventory}]`),
 			gamemode === GAMEMODE_CREATIVE &&
 			node(Palette, {

@@ -23,7 +23,6 @@ import {
 	flag_chromium,
 	Math_,
 	Math_max,
-	Math_min,
 	window_,
 } from '../etc/helpers.js';
 import {
@@ -266,7 +265,8 @@ export default function Game({
 			game: model,
 			textures_id: textures_id_ref.val,
 			time_now,
-			viewport_min: Math_min(viewport_width, viewport_height),
+			viewport_height,
+			viewport_width,
 		}),
 		model.menu === MENU_SETTINGS &&
 		node(Settings, {
@@ -278,6 +278,7 @@ export default function Game({
 		node(Terminal, {
 			game: model,
 			messages: model.messages,
+			viewport_width,
 		}),
 	];
 }
