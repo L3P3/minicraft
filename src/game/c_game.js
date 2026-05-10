@@ -60,6 +60,7 @@ import Touch from './c_touch.js';
 function Surface({
 	model,
 }) {
+	// fine without hook_effect since this component will only render once
 	game_renderer_init(model, hook_dom('canvas'));
 	return null;
 }
