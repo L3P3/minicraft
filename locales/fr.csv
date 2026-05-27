@@ -1,0 +1,108 @@
+amount: Quantité
+ask_world_delete_1: Voulez-vous vraiment supprimer le monde "
+ask_world_delete_2: " ?
+back: Retour
+back_to_game: Retour au jeu
+change_world_name: Changer le nom du monde
+chunk_regenerated: Chunk régénéré.
+chunks_loaded: Chunks chargés.
+commands: Commandes
+delete_local: Supprimer (local)
+delete_world: Supprimer le monde
+delete: Supprimer
+disabled: Désactivé
+download_world_from_server: Télécharger le monde depuis le serveur
+download: Télécharger
+error_amount_minimum_1: La quantité doit être d\'au moins 1 !
+error_conflict_1: Conflit ! Le monde "
+error_conflict_2: " a été modifié ici et ailleurs.\nOK : Prendre la variante du serveur (
+error_conflict_3: ) | Annuler : Garder la variante locale (
+error_conflict_4: )
+error_connection: Erreur de connexion.
+error_delete_world: Erreur lors de la suppression du monde : 
+error_download_world: Erreur lors du téléchargement du monde : 
+error_edit_world: Erreur lors de la modification du monde : 
+error_gamemode_range: Le mode de jeu doit être compris entre 0 et 2 !
+error_invalid_block_type: Type de bloc invalide !
+error_inventory_full: L\'inventaire est plein !
+error_list_is_loading: La liste est en cours de chargement !
+error_loading_surface: Erreur lors du chargement de la surface !
+error_loading_worldlist: Erreur lors du chargement de la liste des mondes : 
+error_name_too_long: Le nom est trop long !
+error_no_permission_logged_in: Permission manquante. Connecté ?
+error_no_permission: Pas de permission !
+error_no_world_selected: Aucun monde sélectionné !
+error_not_logged_in: Non connecté !
+error_only_vert_supported: Seul "vert" est pris en charge !
+error_opened: minicraft est déjà en cours d\'exécution !
+error_parameter_missing: Paramètre manquant !
+error_pitch: Pas de chance !
+error_selection_required: Sélection requise !
+error_storage: Espace de stockage insuffisant !
+error_upload_world: Erreur lors du téléversement du monde : 
+error_world_is_loading: Le monde est toujours en cours de chargement !
+error_world_is_opened: Le monde est déjà ouvert !
+error_world_is_present_both_sides: Le monde est présent des deux côtés !
+error_world_not_downloaded: Le monde n\'est pas encore téléchargé !
+error_world_not_uploaded: Le monde n\'est pas téléversé !
+game_saved: Partie sauvegardée.
+gamemode_set_to: Mode de jeu défini
+inventory_cleared: Inventaire vidé.
+inventory: Inventaire
+item_labels: Air,Roche,Bloc d\'herbe,Terre,Pierre,Planches,Pierre de fondation,Bûche,Feuilles,Briques,Laine,Sable,Gravier,Verre,Bibliothèque,Obsidienne,Briques de pierre,Grès,Bloc de lapis-lazuli,Bloc de fer,Bloc d\'or,Bloc de diamant,Bloc d\'émeraude,Bloc de redstone,Bloc de quartz
+items_given: Objets donnés
+join_selected_world: Rejoindre le monde sélectionné
+login: Connexion
+modification: Modifié
+mouse_mode_normal: Mode de souris normal.
+mouse_mode_selection: Sélection à l\'aide des boutons de la souris.
+mouse_sensitivity: Sensibilité de la souris
+name_existing_world: Nouveau nom du monde :\n(16 caractères max.)
+name_new_world: Nom du nouveau monde :\n(16 caractères max.)
+new_world: Nouveau monde
+no: Non
+only_local: Seulement un monde local
+open: Ouvrir
+owner: Propriétaire
+pixel_grouping: Regroupement de pixels
+player: Joueur
+project_page: Page du projet
+public: Public
+publish_world: Publier le monde
+refresh: Actualiser
+reload_list: Recharger la liste
+rename: Renommer
+resolution: Résolution
+retry: Réessayer
+selection_expanded: Sélection élargie.
+selection_none: aucun
+selection_primary_short: Principal
+selection_primary: Point principal
+selection_secondary_short: Secondaire
+selection_secondary: Point secondaire
+settings: Paramètres
+show_world_settings: Afficher les paramètres du monde
+spawn_updated: Point d\'apparition mis à jour.
+surface_add: Ajouter une surface
+surface_plain: Uni
+surfaces: Surfaces
+teleported_to_spawn: Téléporté au point d\'apparition.
+teleported_to: Téléporté à
+time_set_to: Heure définie
+today: aujourd\'hui
+transfer: Transférer
+unknown_command: Commande inconnue
+unknown_world_found: Un monde sans nom a été trouvé. Comment doit-il s\'appeler ?
+unknown_world: Monde inconnu
+unpublish_world: Dépublier le monde
+upload_world_to_server: Téléverser le monde sur le serveur
+upload: Téléverser
+version: Version 
+view_angle: Angle de vue
+view_distance: Distance d\'affichage
+warn_world_remote_missing_1: Le monde "
+warn_world_remote_missing_2: " n\'a pas été trouvé sur le serveur, c\'est donc maintenant un monde local.
+world_etc: Monde...
+world_leave: Quitter le monde
+worlds: Mondes
+yes: Oui

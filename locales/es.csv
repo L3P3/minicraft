@@ -1,0 +1,108 @@
+amount: Cantidad
+ask_world_delete_1: ¿Realmente deseas eliminar el mundo "
+ask_world_delete_2: "?
+back: Volver
+back_to_game: Volver al juego
+change_world_name: Cambiar nombre del mundo
+chunk_regenerated: Chunk regenerado.
+chunks_loaded: Chunks cargados.
+commands: Comandos
+delete_local: Eliminar (local)
+delete_world: Eliminar mundo
+delete: Eliminar
+disabled: Desactivado
+download_world_from_server: Descargar mundo del servidor
+download: Descargar
+error_amount_minimum_1: ¡La cantidad debe ser al menos 1!
+error_conflict_1: ¡Conflicto! El mundo "
+error_conflict_2: " fue modificado aquí y en otro lugar.\nAceptar: Tomar variante del servidor (
+error_conflict_3: ) | Cancelar: Mantener variante local (
+error_conflict_4: )
+error_connection: Error de conexión.
+error_delete_world: Error al eliminar el mundo: 
+error_download_world: Error al descargar el mundo: 
+error_edit_world: Error al editar el mundo: 
+error_gamemode_range: ¡El modo de juego debe estar entre 0 y 2!
+error_invalid_block_type: ¡Tipo de bloque no válido!
+error_inventory_full: ¡El inventario está lleno!
+error_list_is_loading: ¡La lista se está cargando!
+error_loading_surface: ¡Error al cargar la superficie!
+error_loading_worldlist: Error al cargar la lista de mundos: 
+error_name_too_long: ¡El nombre es demasiado largo!
+error_no_permission_logged_in: Falta de permisos. ¿Sesión iniciada?
+error_no_permission: ¡Sin permisos!
+error_no_world_selected: ¡Ningún mundo seleccionado!
+error_not_logged_in: ¡Sesión no iniciada!
+error_only_vert_supported: ¡Solo se admite "vert"!
+error_opened: ¡minicraft ya se está ejecutando!
+error_parameter_missing: ¡Falta parámetro!
+error_pitch: ¡Mala suerte!
+error_selection_required: ¡Se requiere selección!
+error_storage: ¡Almacenamiento insuficiente!
+error_upload_world: Error al subir el mundo: 
+error_world_is_loading: ¡El mundo aún se está cargando!
+error_world_is_opened: ¡El mundo ya está abierto!
+error_world_is_present_both_sides: ¡El mundo está presente en ambos lados!
+error_world_not_downloaded: ¡El mundo aún no se ha descargado!
+error_world_not_uploaded: ¡El mundo no se ha subido!
+game_saved: Juego guardado.
+gamemode_set_to: Modo de juego establecido
+inventory_cleared: Inventario vaciado.
+inventory: Inventario
+item_labels: Aire,Piedra,Bloque de hierba,Tierra,Adoquín,Tablones,Piedra base,Tronco,Hojas,Ladrillos,Lana,Arena,Grava,Cristal,Estantería,Obsidiana,Ladrillos de piedra,Arenisca,Bloque de lapislázuli,Bloque de hierro,Bloque de oro,Bloque de diamante,Bloque de esmeralda,Bloque de redstone,Bloque de cuarzo
+items_given: Se han dado
+join_selected_world: Entrar al mundo seleccionado
+login: Iniciar sesión
+modification: Modificado
+mouse_mode_normal: Modo de ratón normal.
+mouse_mode_selection: Selección usando los botones del ratón.
+mouse_sensitivity: Sensibilidad del ratón
+name_existing_world: Nueva etiqueta del mundo:\n(máx. 16 caracteres)
+name_new_world: Etiqueta del nuevo mundo:\n(máx. 16 caracteres)
+new_world: Nuevo mundo
+no: No
+only_local: Solo un mundo local
+open: Entrar
+owner: Propietario
+pixel_grouping: Agrupación de píxeles
+player: Jugador
+project_page: Página del proyecto
+public: Público
+publish_world: Publicar mundo
+refresh: Actualizar
+reload_list: Recargar lista
+rename: Renombrar
+resolution: Resolución
+retry: Reintentar
+selection_expanded: Selección ampliada.
+selection_none: ninguno
+selection_primary_short: Principal
+selection_primary: Punto principal
+selection_secondary_short: Secundario
+selection_secondary: Punto secundario
+settings: Ajustes
+show_world_settings: Mostrar ajustes del mundo
+spawn_updated: Punto de aparición actualizado.
+surface_add: Añadir superficie
+surface_plain: Liso
+surfaces: Superficies
+teleported_to_spawn: Teletransportado al punto de aparición.
+teleported_to: Teletransportado a
+time_set_to: Hora establecida
+today: hoy
+transfer: Transferir
+unknown_command: Comando desconocido
+unknown_world_found: Se ha encontrado un mundo sin nombre. ¿Cómo debería llamarse?
+unknown_world: Mundo desconocido
+unpublish_world: Despublicar mundo
+upload_world_to_server: Subir mundo al servidor
+upload: Subir
+version: Versión 
+view_angle: Ángulo de visión
+view_distance: Distancia de visión
+warn_world_remote_missing_1: El mundo "
+warn_world_remote_missing_2: " no se encontró en el servidor, por lo que ahora es un mundo local.
+world_etc: Mundo...
+world_leave: Salir del mundo
+worlds: Mundos
+yes: Sí
