@@ -5,8 +5,10 @@ import {
 	appendFile,
 	readdir,
 	readFile,
+	watch,
 	writeFile,
 } from 'fs/promises';
+import {setTimeout} from 'node:timers/promises';
 import lui_ssr from 'lui-ssr';
 
 const GCC_COMMAND = 'node_modules/.bin/google-closure-compiler --';
@@ -16,8 +18,10 @@ const {version} = JSON.parse(
 );
 const CI = !!process.env.CI;
 const checks_only = CI && process.env.GITHUB_REF_NAME !== 'master';
+const css_only = process.argv.includes('--css');
+const watch_enabled = process.argv.includes('--watch');
 
-let languages = process.argv.includes('css') ? [] : ['en'];
+let languages = ['en'];
 if (CI && !checks_only) {
 	const files = await readdir('./locales');
 	languages = (
@@ -25,6 +29,11 @@ if (CI && !checks_only) {
 		.filter(name => name.endsWith('.csv'))
 		.map(name => name.split('.')[0])
 	);
+	// make sure english is last so it does not need to be generated again at the end
+	if (languages[languages.length - 1] !== 'en') {
+		languages = languages.filter(lang => lang !== 'en');
+		languages.push('en');
+	}
 }
 
 const exec = cmd => (
@@ -66,7 +75,7 @@ async function lang_generate(lang) {
 	);
 }
 
-const env_set = async (version, debug, lang, legacy, api, api_data, ssr) => Promise.all([
+const env_set = async (version, debug, lang, legacy, api, api_data, ssr) => (
 	writeFile(
 		'./src/etc/env.js',
 `export const API = '${api}';
@@ -78,9 +87,8 @@ export const SSR = ${ssr};
 export const VERSION = '${version}';
 `,
 		'utf8'
-	),
-	lang_generate(lang),
-]);
+	)
+);
 
 async function build_css() {
 	console.log('css...');
@@ -93,9 +101,7 @@ async function build_css() {
 	console.log('css done.');
 }
 
-const promises = [];
-
-async function build_js(lang, legacy, ssr) {
+async function build_js(promises_before, lang, legacy, ssr) {
 	await env_set(
 		CI ? version : 'dev',
 		false,
@@ -105,6 +111,7 @@ async function build_js(lang, legacy, ssr) {
 		CI ? '/static/minicraft/' : '//l3p3.de/static/minicraft/',
 		ssr
 	);
+	await promises_before;
 
 	let combo = lang;
 	if (legacy) combo += '-legacy';
@@ -136,8 +143,9 @@ async function build_js(lang, legacy, ssr) {
 	);
 	console.log(combo + ' js pass 1 done.');
 
-	checks_only ||
-	promises.push((async () => {
+	if (checks_only) return null;
+
+	return (async () => {
 		if (ssr) {
 			console.log(combo + ' html...');
 			await writeFile(
@@ -200,7 +208,7 @@ async function build_js(lang, legacy, ssr) {
 			exec(`rm ${tmp_path} ${tmp_path}.map`),
 		]);
 		console.log(combo + ' js pass 2 done.');
-	})());
+	})();
 }
 
 const gcc_version_output = await exec(GCC_COMMAND + 'version');
@@ -209,44 +217,96 @@ if(!gcc_version_output.includes('Version: v202')) {
 	throw new Error('newer closure compiler version required!');
 }
 
-await exec('mkdir -p ./dist;rm ./dist/app*').catch(() => {});
+if (!css_only) {
+	await exec('mkdir -p ./dist;rm ./dist/app*').catch(() => {});
+}
 
 console.log(`build ${version} (${CI ? 'production' : 'dev'})...`);
 
-try {
-	await file_replace(
-		'./src/etc/lui.js',
-		[["@type {typeof import('lui/index')}", "@type {Object}"]]
-	);
-	for (const lang of languages) {
-		await build_js(lang, false, false);
-		await build_js(lang, true, false);
-		await build_js(lang, false, true);
-	}
-	promises.push(build_css());
-	await Promise.all(promises);
-}
-catch (error) {
-	console.error(error);
-	process.exitCode = 1;
-}
-finally {
-	if (!CI) {
-		await Promise.all([
-			env_set(
-				'dev',
-				true,
-				'en',
-				false,
-				'//l3p3.de/api/minicraft/',
-				'//l3p3.de/static/minicraft/',
-				false
-			),
-			file_replace(
+const watcher = (
+	watch_enabled
+	?	watch('./src', {recursive: true})[Symbol.asyncIterator]()
+	:	null
+);
+
+let lang_last = null;
+let css_changed = true;
+let js_changed = !css_only;
+
+while (true) {
+	try {
+		const promises_after = [];
+		if (js_changed) {
+			const promise_lui_replace = file_replace(
 				'./src/etc/lui.js',
-				[["@type {Object}", "@type {typeof import('lui/index')}"]]
-			),
+				[["@type {typeof import('lui/index')}", "@type {Object}"]]
+			);
+			for (const lang of languages) {
+				const promises_before = Promise.all([
+					lang_generate(lang),
+					promise_lui_replace,
+				]);
+				lang_last = lang;
+				promises_after.push(
+					await build_js(promises_before, lang, false, false),
+					await build_js(promises_before, lang, true, false),
+					await build_js(promises_before, lang, false, true),
+				);
+			}
+		}
+		if (css_changed) promises_after.push(build_css());
+		await Promise.all(promises_after);
+	}
+	catch (error) {
+		console.error(error);
+		process.exitCode = 1;
+	}
+	finally {
+		if (!CI && js_changed) {
+			await Promise.all([
+				env_set(
+					'dev',
+					true,
+					'en',
+					false,
+					'//l3p3.de/api/minicraft/',
+					'//l3p3.de/static/minicraft/',
+					false
+				),
+				file_replace(
+					'./src/etc/lui.js',
+					[["@type {Object}", "@type {typeof import('lui/index')}"]]
+				),
+				lang_last === 'en' ? null : lang_generate('en'),
+			]);
+		}
+	}
+
+	if (!watch_enabled) break;
+
+	css_changed = false;
+	js_changed = false;
+
+	// await for any file change in src dir
+	let {value: event} = await watcher.next();
+
+	while (event) {
+		const path = event.filename;
+		if (path.endsWith('.css')) css_changed = true;
+		else if (
+			!path.endsWith('env.js') &&
+			!path.endsWith('locale.js') &&
+			!path.endsWith('lui.js')
+		) js_changed = true;
+
+		// consume all other events that happened during build
+		const result = await Promise.race([
+			watcher.next(),
+			setTimeout(10, null),
 		]);
+
+		if (!result || result.done) break;
+		event = result.value;
 	}
 }
 
