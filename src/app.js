@@ -1,8 +1,6 @@
 import {
 	hook_assert,
-	hook_dom,
 	hook_effect,
-	hook_static,
 	init,
 	node_dom,
 	node_map,
@@ -17,6 +15,7 @@ import {
 	BroadcastChannel_,
 	clearTimeout_,
 	Date_now,
+	document_,
 	handler_noop,
 	localStorage_,
 	localStorage_getItem,
@@ -24,6 +23,7 @@ import {
 	localStorage_setItem,
 	Map_,
 	Number_,
+	Object_,
 	Object_keys,
 	removeEventListener_,
 	Set_,
@@ -65,6 +65,15 @@ export const in_event_set = value => {
 }
 let last_touch_event = 0;
 let sync_check_timeout = 0;
+
+const handler_touch = () => {
+	actions.config_touch_set(true);
+};
+const handler_mouse = event => {
+	if (event.timeStamp - last_touch_event > 999) {
+		actions.config_touch_set(false);
+	}
+};
 
 function Root() {
 	hook_app_state();
@@ -111,44 +120,44 @@ function Root() {
 		addEventListener_('touchend', event => {
 			last_touch_event = event.timeStamp;
 		}, true);
-	});
 
-	const handler_key = hook_static(event => {
-		const key_state = event.type === 'keydown';
-		if (
-			key_state &&
-			event.target.tagName === 'INPUT'
-		) {
-			return true;
-		}
-		in_event = true;
-		actions.config_touch_set(false);
-
-		if (app_state.windows.length > 0) {
-			const window_focussed_actions = windows_actions.get(
-				app_state.windows[app_state.windows.length - 1].id
-			);
-			if (event.key !== 'f') {
-				window_focussed_actions.key_event_set({
-					code: event.keyCode,
-					state: key_state,
-				});
+		const handler_key = event => {
+			const key_state = event.type === 'keydown';
+			if (
+				key_state &&
+				event.target.tagName === 'INPUT'
+			) {
+				return true;
 			}
-			else if (key_state) {
-				window_focussed_actions.fullscreen_toggle();
-			}
-		}
-
-		in_event = false;
-		return false;
-	});
-	const handler_touch = hook_static(() => {
-		actions.config_touch_set(true);
-	});
-	const handler_mouse = hook_static(event => {
-		if (event.timeStamp - last_touch_event > 999) {
+			in_event = true;
 			actions.config_touch_set(false);
-		}
+
+			if (app_state.windows.length > 0) {
+				const window_focussed_actions = windows_actions.get(
+					app_state.windows[app_state.windows.length - 1].id
+				);
+				if (event.key !== 'f') {
+					window_focussed_actions.key_event_set({
+						code: event.keyCode,
+						state: key_state,
+					});
+				}
+				else if (key_state) {
+					window_focussed_actions.fullscreen_toggle();
+				}
+			}
+
+			in_event = false;
+			return false;
+		};
+
+		Object_.assign(document_.body, {
+			style: 'background:green',
+			onkeydown: handler_key,
+			onkeyup: handler_key,
+			oncontextmenu: handler_noop,
+			ondragstart: handler_noop,
+		});
 	});
 
 	const {flag_touch} = app_state.config;
@@ -175,13 +184,6 @@ function Root() {
 		app_state.connection_error,
 		app_state.worlds_merged,
 	]);
-
-	hook_dom('', {
-		onkeydown: handler_key,
-		onkeyup: handler_key,
-		oncontextmenu: handler_noop,
-		ondragstart: handler_noop,
-	});
 
 	return [
 		node_map(Window, app_state.windows, {

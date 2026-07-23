@@ -59,16 +59,14 @@ const CURSORS = 'nwse-resize,ns-resize,nesw-resize,ew-resize,move,ew-resize,nesw
 const WIDTH_MIN = 100;
 const HEIGHT_MIN = 50;
 
-// hack until lui supports model parameters
-let mode_initial_last = 0;
 const model = {
-	init: () => model.resize_to({
+	init: (_, mode_initial) => model.resize_to({
 		custom_height: 0,
 		custom_width: 0,
 		height: 0,
 		key_event: null,
 		left: 0,
-		mode: mode_initial_last,
+		mode: mode_initial,
 		title: '...',
 		top: 0,
 		width: 0,
@@ -115,11 +113,13 @@ const model = {
 
 const drag_handler = (hook_model_state_actions, window_id, event) => {
 	actions.window_focus(window_id);
-	const element = event.target;
-	if (
+	let element = event.target;
+	if (element.className === 'window_title') {
+		element = element.parentElement;
+	}
+	else if (
 		event.button !== 0 ||
-		element.className !== 'window borders' &&
-		element.className !== 'window_title'
+		element.className !== 'window borders'
 	) {
 		return;
 	}
@@ -341,9 +341,7 @@ export default function Window({
 		];
 	}
 
-	// HACK: lui does not support model parameters (yet), so we use a global variable
-	mode_initial_last = mode_initial;
-	const hook_model_state_actions = hook_model(model);
+	const hook_model_state_actions = hook_model(model, mode_initial);
 	const [window_state, window_actions] = hook_model_state_actions;
 
 	hook_effect(() => (

@@ -501,14 +501,30 @@ export default function MenuStart({
 			}),
 		]),
 		node_dom('div[className=worlds]', {
-			S: {
-				height: (
-					SSR
-					?	'300px;height:calc(100%-140px)'
-					:	`${Math_max(100, viewport_height - 140)}px`
-				),
-				width: `${Math_min(480, viewport_width - 16)}px`,
-			},
+			S: (
+				LEGACY
+				?	{
+					height: (
+						SSR
+						?	'300px;height:calc(100%-140px)'
+						:	`${Math_max(100, viewport_height - 140)}px`
+					),
+					width: `${Math_min(480, viewport_width - 16)}px`,
+					overflow: (
+						view === APP_VIEW_SETTINGS
+						?	'hidden'
+						:	''
+					),
+				}
+				:	{
+					height: (
+						SSR
+						?	'300px;height:calc(100%-140px)'
+						:	`${Math_max(100, viewport_height - 140)}px`
+					),
+					width: `${Math_min(480, viewport_width - 16)}px`,
+				}
+			),
 		}, [
 			!SSR &&
 			node_dom('table[cellSpacing=0]', null, [
