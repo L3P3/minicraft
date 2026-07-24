@@ -192,10 +192,11 @@ lui.hook_memo = function(getter, deps){}
 	Model state with set of methods.
 	Methods object must include `init` returning the initial state.
 	@template T
-	@param {!Object<string, !Function>} reducer
+	@param {!Object<string, !Function>} reducers
+	@param {*=} init_arg
 	@return {!Array<T|!Object<string, function(...*):T>>}
 */
-lui.hook_model = function(reducer){}
+lui.hook_model = function(reducers, init_arg){}
 
 /**
 	List of changed properties since previous rendering.

@@ -266,15 +266,10 @@ const drag_handler = (hook_model_state_actions, window_id, event) => {
 	const up_handler = event => {
 		removeEventListener_('mousemove', move_handler, true);
 		removeEventListener_('mouseup', up_handler);
-		if (
-			event.clientX !== mouse_x_start ||
-			event.clientY !== mouse_y_start
-		) {
-			move_handler(event);
-		}
 		actions.state_patch({
 			cursor: null,
 		});
+		move_handler(event);
 		element.style.willChange = 'auto';
 	};
 	addEventListener_('mousemove', move_handler, true);
