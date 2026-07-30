@@ -28,8 +28,8 @@ import {
 	window_,
 } from './helpers.js';
 import {
-	locale_unknown_world,
-	locale_unknown_world_found,
+	locale_world_unknown,
+	locale_world_unknown_found,
 } from './locale.js';
 
 import {
@@ -115,7 +115,7 @@ const reducers = {
 				config.worlds[0] = {
 					id: 0,
 					label: (
-						prompt_(locale_unknown_world_found, '') || locale_unknown_world
+						prompt_(locale_world_unknown_found, '') || locale_world_unknown
 					).substring(0, 16),
 					mod_l: Date_now(),
 					mod_r: WORLD_STORED_NOT,

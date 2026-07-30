@@ -56,6 +56,7 @@ const chunk_data_tmp_u8 = new Uint8Array_(chunk_data_tmp.buffer);
 const chunks_checklists = new Map_();
 
 export const world_create = id => {
+	const world_meta = app_state.worlds_merged.find(i => i.id === id);
 	const world = {
 		// blocks of superchunk
 		// uint8[]
@@ -72,7 +73,7 @@ export const world_create = id => {
 		// could have been modified since last save
 		flag_dirty: false,
 		// nothing must change
-		flag_frozen: !app_state.worlds_merged.find(i => i.id === id).writable,
+		flag_frozen: !world_meta.writable || world_meta.locked,
 		// currently centered chunk (relative chunk position inside superchunk)
 		focus_x: 0,
 		focus_y: 0,

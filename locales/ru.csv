@@ -1,17 +1,14 @@
 amount: Число
 ask_world_delete_1: Мир "
 ask_world_delete_2: " точно удалить?
-back: Вернуться
 back_to_game: Вернуться в игру
-change_world_name: Изменит имя миру
+back: Вернуться
 chunk_regenerated: Чанки перезагружается 
 chunks_loaded: Чанки загружаются.
 commands: Команда
 delete_local: Удалить (локал)
-delete_world: Удалить мир
 delete: Удалить
 disabled: Отключено
-download_world_from_server: Загрузит мир из сервера 
 download: Скачать
 error_amount_minimum_1: Число должно быт минимум 1!
 error_conflict_1: Конфликт! Мир. "
@@ -19,9 +16,6 @@ error_conflict_2: " было изменено как здесь, так и в д
 error_conflict_3: ) | Отменит: Вот это загрузить (
 error_conflict_4: )
 error_connection: Ошибка поключения.
-error_delete_world: Ошибка при удалении мира: 
-error_download_world: Ошибка при загрузке мира: 
-error_edit_world: Ошибка при изменении мира: 
 error_gamemode_range: Игровой режим должен быт 0..2!
 error_invalid_block_type: Неверный тип блока!
 error_inventory_full: Инвентар полный!
@@ -39,27 +33,27 @@ error_parameter_missing: Параметр отсутствует!
 error_pitch: Неповезло!
 error_selection_required: Выберите сначяло!
 error_storage: Нехватает памяти!
-error_upload_world: Ошибка при загруске мира: 
+error_world_delete: Ошибка при удалении мира: 
+error_world_download: Ошибка при загрузке мира: 
+error_world_edit: Ошибка при изменении мира: 
 error_world_is_loading: Мир еще загружаетса!
 error_world_is_opened: Мир уже открыт!
 error_world_is_present_both_sides: Мир уже есть на двух страницах!
 error_world_not_downloaded: Мир еще не скачен!
 error_world_not_uploaded: Мир не загружен!
+error_world_upload: Ошибка при загруске мира: 
 game_saved: Игра сохранена.
 gamemode_set_to: Игровой режим сменён на
 inventory_cleared: Инвентар пуст
 inventory: Инвентар
 item_labels: Воздух,Камень,Дерн,Земля,Булыжник,Доски,Коренная порода,Бревно,Листья,Кирпичи,Шерсть,Песок,Гравий,Стекло,Книжная полка,Обсидиан,Каменные кирпичи,Песчаник,Лазуритовый блок,Железный блок,Золотой блок,Алмазный блок,Изумрудный блок,Редстоуновый блок,Кварцевый блок
 items_given: Вещи даны
-join_selected_world: Зайти на выбраный сервер
+locked: Заблокировано
 login: Зарегистрироваться 
 modification: Изменения
 mouse_mode_normal: Классический режим компьютерной мышки.
 mouse_mode_selection: Выборь с компьютерной мышки.
 mouse_sensitivity: Чуствительность компьютерной мышки.
-name_existing_world: Новое имя мира:\n(макс. 16 символов)
-name_new_world: Имя нового Мира:\n(макс. 16 симболов)
-new_world: Новый мир
 no: Нет
 only_local: Толко локалный мир
 open: Открыт
@@ -68,7 +62,6 @@ pixel_grouping: Группировка пикселей
 player: Игрок
 project_page: Сайт проекта
 public: Публичный
-publish_world: Опубликоват мир
 refresh: Обновит
 reload_list: Обновит список
 rename: Переименовать
@@ -81,7 +74,6 @@ selection_primary: Первая выбраная точка
 selection_secondary_short: Второй
 selection_secondary: Вторая выбраная точка
 settings: Настройки
-show_world_settings: Акции/Показать настройки мира
 spawn_updated: Началная точка обновлена
 surface_add: Добавить поверхность
 surface_plain: Одноцветный
@@ -92,17 +84,28 @@ time_set_to: Новое время
 today: сегодня
 transfer: Перенести
 unknown_command: Неправилная команда
-unknown_world_found: Был найден без имени локалный мир. Как его назавёшь? 
-unknown_world: Неизвестный мир
-unpublish_world: Приватизировать мир
-upload_world_to_server: Загрузит мир на сервер
 upload: Загрузит
 version: Версия 
 view_angle: Радиус зрения
 view_distance: Далность зрения
 warn_world_remote_missing_1: Мир "
 warn_world_remote_missing_2: " был на сервере не найдень, поэтому он теперь локалный!
+world_delete: Удалить мир
+world_download_from_server: Загрузит мир из сервера 
 world_etc: Мир...
+world_existing_name: Новое имя мира:\n(макс. 16 символов)
 world_leave: Покинут мир
+world_lock: Заблокировать мир
+world_name_change: Изменит имя миру
+world_new_name: Имя нового Мира:\n(макс. 16 симболов)
+world_new: Новый мир
+world_publish: Опубликоват мир
+world_selected_join: Зайти на выбраный сервер
+world_settings_show: Акции/Показать настройки мира
+world_unknown_found: Был найден без имени локалный мир. Как его назавёшь? 
+world_unknown: Неизвестный мир
+world_unlock: Разблокировать мир
+world_unpublish: Приватизировать мир
+world_upload_to_server: Загрузит мир на сервер
 worlds: Миры
 yes: Да

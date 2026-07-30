@@ -426,6 +426,7 @@ var TYPE_WORLD_LISTING_LOCAL;
 		hash: number,
 		id: number,
 		label: string,
+		locked: boolean,
 		modified: number,
 		public: boolean,
 		writable: boolean,

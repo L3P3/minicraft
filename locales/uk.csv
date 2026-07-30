@@ -1,17 +1,14 @@
 amount: Номер
 ask_world_delete_1: Світ "
 ask_world_delete_2: " дійсно видалити?
-back: Повернуться
 back_to_game: Повернуться в гру
-change_world_name: Змінити ім\'я світу
+back: Повернуться
 chunk_regenerated: Участки відновлені.
 chunks_loaded: Участки будуть завантаженні.
 commands: Укази 
 delete_local: видалити (локальні)
-delete_world: Видалити світ 
 delete: видалити 
 disabled: Вимкнено
-download_world_from_server: Завантажити світ з серверу
 download: Завантажити
 error_amount_minimum_1: Номер повинен бути як мінімум 1!
 error_conflict_1: Конфлікт! Світ "
@@ -19,9 +16,6 @@ error_conflict_2: " Було змінено як тут, так і в інших
 error_conflict_3: ) | Скасувати: Завантажте це сюди (
 error_conflict_4: )
 error_connection: Помилка підключения
-error_delete_world: Помилка при видаленні світу: 
-error_download_world: Помилка завантаження світу: 
-error_edit_world: Помилка редагування світу: 
 error_gamemode_range: Ігровий режим повинен бути 0..2!
 error_invalid_block_type: Недійсний тип блоку!
 error_inventory_full: Інвентар повний!
@@ -39,27 +33,27 @@ error_parameter_missing: Відсутній параметр!
 error_pitch: Невдачя!
 error_selection_required: Необхідний вибір!
 error_storage: Недостатньо місця!
-error_upload_world: Помилка завантаження світу:
+error_world_delete: Помилка при видаленні світу: 
+error_world_download: Помилка завантаження світу: 
+error_world_edit: Помилка редагування світу: 
 error_world_is_loading: Світ ще завантажується!
 error_world_is_opened: Світ уже відкритий!
 error_world_is_present_both_sides: Світ уже існує на сайті!
 error_world_not_downloaded: Світ ще не завантажений!
 error_world_not_uploaded: Світ не завантажений!
+error_world_upload: Помилка завантаження світу:
 game_saved: Гра збережена.
 gamemode_set_to: Ігровий режим встановлений на
 inventory_cleared: Інвентар теперь порожній
 inventory: Інвентар
 item_labels: Повітря,Камінь,Блок трави,Земля,Булыжник,Дошки,Корінна порода,Колода,Листя,Цегла,Вовна,Пісок,Гравій,Скло,Книжкова полиця,Обсидіан,Кам\'яні цегли,Пісковик,Лазуритовий блок,Залізний блок,Золотий блок,Алмазний блок,Смарагдовий блок,Редстоун блок,Кварцовий блок
 items_given: Данні предмети
-join_selected_world: Ввійти у вибраний світ 
+locked: Заблоковано
 login: Зареєструватися
 modification: Зміни
 mouse_mode_normal: Звичайний режим компьютерної мишки.
 mouse_mode_selection: Виділення кнопками компьютерної мишки.
 mouse_sensitivity: Чутливість компьютерної мишки
-name_existing_world: Нове имя світу:\n(макс. 16 символів)
-name_new_world: Имя новому світу:\n(макс. 16 Символів)
-new_world: Новий світ
 no: Ні
 only_local: Тільки локальні світ.
 open: Відчинити
@@ -68,7 +62,6 @@ pixel_grouping: Групування пікселів
 player: Грок
 project_page: Сторінка проекту
 public: Публічно 
-publish_world: Зробіть світ публічним
 refresh: Оновити
 reload_list: Оновити список
 rename: Перейменувати
@@ -81,7 +74,6 @@ selection_primary: Перша крапка вибору
 selection_secondary_short: Другий
 selection_secondary: Друга крапка вибору
 settings: Налаштування
-show_world_settings: Акції/Показати налаштування світу.
 spawn_updated: Початкова крапка оновлена.
 surface_add: Додати поверхню
 surface_plain: Однотонні
@@ -92,17 +84,28 @@ time_set_to: Новий час
 today: сегодня 
 transfer: Перемістити 
 unknown_command: Недійсна команда 
-unknown_world_found: Був знайден без назви локальний світ. Як його назвати?
-unknown_world: Недійсни світ
-unpublish_world: Зробіть світ приватний 
-upload_world_to_server: Завантажити світ на сервер
 upload: Завантажити
 version: Версія 
 view_angle: Точка огляду
 view_distance: Видимість
 warn_world_remote_missing_1: Світ "
 warn_world_remote_missing_2: " був не знайден на сервері, тому він тепер локальний!
+world_delete: Видалити світ 
+world_download_from_server: Завантажити світ з серверу
 world_etc: Світ...
+world_existing_name: Нове имя світу:\n(макс. 16 символів)
 world_leave: Покинуті світ
+world_lock: Заблокувати світ
+world_name_change: Змінити ім\'я світу
+world_new_name: Имя новому світу:\n(макс. 16 Символів)
+world_new: Новий світ
+world_publish: Зробіть світ публічним
+world_selected_join: Ввійти у вибраний світ 
+world_settings_show: Акції/Показати налаштування світу.
+world_unknown_found: Був знайден без назви локальний світ. Як його назвати?
+world_unknown: Недійсни світ
+world_unlock: Розблокувати світ
+world_unpublish: Зробіть світ приватний 
+world_upload_to_server: Завантажити світ на сервер
 worlds: Світі
 yes: Так 

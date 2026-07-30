@@ -25,10 +25,10 @@ import {
 	locale_error_conflict_2,
 	locale_error_conflict_3,
 	locale_error_conflict_4,
-	locale_error_download_world,
 	locale_error_loading_worldlist,
 	locale_error_storage,
-	locale_error_upload_world,
+	locale_error_world_download,
+	locale_error_world_upload,
 	locale_warn_world_remote_missing_1,
 	locale_warn_world_remote_missing_2,
 } from '../etc/locale.js';
@@ -126,6 +126,7 @@ export const world_store_lists_merge = config => {
 				id: world.id,
 				label: world.label,
 				local: WORLD_STORED_NOT,
+				locked: world.locked,
 				public: world.public,
 				remote: world.modified,
 				writable: world.writable,
@@ -201,6 +202,7 @@ export const world_store_lists_merge = config => {
 				id: world_local.id,
 				label: world_local.label,
 				local: world_local.mod_l,
+				locked: false,
 				public: false,
 				remote: (
 					world_local.mod_r === WORLD_STORED_SHOULD
@@ -276,12 +278,12 @@ const world_store_sync = async world => {
 				actions.world_remove(id);
 			}
 			else {
-				throw Error_(locale_error_download_world + error.message);
+				throw Error_(locale_error_world_download + error.message);
 			}
 		}
 	}
 	// upload not allowed?
-	else if (!world.writable) {
+	else if (!world.writable || world.locked) {
 		// set local modification time to remote to prevent further sync attempts
 		actions.world_prop(id, {
 			mod_l: world.remote,
@@ -345,7 +347,7 @@ const world_store_sync = async world => {
 			actions.world_prop(id, {
 				mod_r: WORLD_STORED_NOT,
 			});
-			throw Error_(locale_error_upload_world + error.message);
+			throw Error_(locale_error_world_upload + error.message);
 		}
 		await rename_promise;
 	}

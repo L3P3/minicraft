@@ -1,17 +1,14 @@
 amount: Amount
 ask_world_delete_1: Really delete world "
 ask_world_delete_2: "?
-back: Back
 back_to_game: Back to game
-change_world_name: Change world name
+back: Back
 chunk_regenerated: Chunk regenerated.
 chunks_loaded: Chunks loaded.
 commands: Commands
 delete_local: Delete (local)
-delete_world: Delete world
 delete: Delete
 disabled: Disabled
-download_world_from_server: Download world from server
 download: Download
 error_amount_minimum_1: Amount must be at least 1!
 error_conflict_1: Conflict! The world "
@@ -19,9 +16,6 @@ error_conflict_2: " was modified here and somewhere else.\nOK: Take variant from
 error_conflict_3: ) | Cancel: Keep local variant (
 error_conflict_4: )
 error_connection: Connection error.
-error_delete_world: Error while deleting world: 
-error_download_world: Error while downloading world: 
-error_edit_world: Error while editing world: 
 error_gamemode_range: Game mode must be in 0..2!
 error_invalid_block_type: Invalid block type!
 error_inventory_full: Inventory is full!
@@ -39,27 +33,27 @@ error_parameter_missing: Parameter missing!
 error_pitch: Pitch!
 error_selection_required: Selection required!
 error_storage: Insufficient storage!
-error_upload_world: Error while uploading world: 
+error_world_delete: Error while deleting world: 
+error_world_download: Error while downloading world: 
+error_world_edit: Error while editing world: 
 error_world_is_loading: The world is still loading!
 error_world_is_opened: The world is already opened!
 error_world_is_present_both_sides: The world is present on both sides!
 error_world_not_downloaded: The world is not downloaded yet!
 error_world_not_uploaded: The world is not uploaded!
+error_world_upload: Error while uploading world: 
 game_saved: Game saved.
 gamemode_set_to: Game mode set to
 inventory_cleared: Inventory cleared.
 inventory: Inventory
 item_labels: !!!not used in english!!!
 items_given: Gave items
-join_selected_world: Enter selected world
+locked: Locked
 login: Login
 modification: Modified
 mouse_mode_normal: Normal mouse mode.
 mouse_mode_selection: Select using mouse buttons.
 mouse_sensitivity: Mouse sensitivity
-name_existing_world: World\'s new label:\n(max. 16 characters)
-name_new_world: New world\'s label:\n(max. 16 characters)
-new_world: New world
 no: No
 only_local: Just a local world
 open: Enter
@@ -68,7 +62,6 @@ pixel_grouping: Pixel grouping
 player: Player
 project_page: Project page
 public: Public
-publish_world: Publish world
 refresh: Refresh
 reload_list: Reload list
 rename: Rename
@@ -81,7 +74,6 @@ selection_primary: Primary point
 selection_secondary_short: Secondary
 selection_secondary: Secondary point
 settings: Settings
-show_world_settings: Show world settings
 spawn_updated: Spawn updated.
 surface_add: Add surface
 surface_plain: Plain
@@ -92,17 +84,28 @@ time_set_to: Time set to
 today: today
 transfer: Transfer
 unknown_command: Unknown command
-unknown_world_found: There was an unnamed world found. How should it be called?
-unknown_world: Unknown world
-unpublish_world: Unpublish world
-upload_world_to_server: Upload world to server
 upload: Upload
 version: Version 
 view_angle: View angle
 view_distance: View distance
 warn_world_remote_missing_1: The world "
 warn_world_remote_missing_2: " was not found on the server, so it is a local world now.
+world_delete: Delete world
+world_download_from_server: Download world from server
 world_etc: World...
+world_existing_name: World\'s new label:\n(max. 16 characters)
 world_leave: Leave world
+world_lock: Lock world
+world_name_change: Change world name
+world_new_name: New world\'s label:\n(max. 16 characters)
+world_new: New world
+world_publish: Publish world
+world_selected_join: Enter selected world
+world_settings_show: Show world settings
+world_unknown_found: There was an unnamed world found. How should it be called?
+world_unknown: Unknown world
+world_unlock: Unlock world
+world_unpublish: Unpublish world
+world_upload_to_server: Upload world to server
 worlds: Worlds
 yes: Yes
