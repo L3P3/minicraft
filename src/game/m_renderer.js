@@ -24,7 +24,7 @@ import {
 	VERSION,
 } from '../etc/env.js';
 import {
-	clearInterval_,
+	clearTimeout_,
 	document_,
 	Math_ceil,
 	Math_cos,
@@ -152,7 +152,7 @@ export const renderer_create = (game, canvas_element) => {
 
 export const renderer_destroy = model => (
 	renderer_instances.delete(model),
-	clearInterval_(model.fps_interval)
+	clearTimeout_(model.fps_interval)
 );
 
 export const renderer_render = (model, now) => {

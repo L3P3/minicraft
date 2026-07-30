@@ -114,8 +114,11 @@ function Root() {
 		};
 		setInterval_(() => (
 			actions.config_save(),
-			!BroadcastChannel_ && localStorage_setItem('minicraft.lock', Date_now())
-		), 500);
+			!BroadcastChannel_ && localStorage_getItem('minicraft.lock_requested') && (
+				localStorage_removeItem('minicraft.lock_requested'),
+				localStorage_setItem('minicraft.lock', Date_now())
+			)
+		), 200);
 
 		addEventListener_('touchend', event => {
 			last_touch_event = event.timeStamp;
@@ -229,23 +232,22 @@ else if (BroadcastChannel_) {
 	channel_lock.postMessage('anyone there?');
 }
 else {
-	const lock_found = Number_(localStorage_getItem('minicraft.lock'));
-	const lock_limit = Date_now() - 1500;
-	// if lock still valid, wait and check again
-	if (lock_found > lock_limit) {
-		setTimeout_(() => {
-			// chunks_db_promise will already be resolved by then
-			init(
-				Number_(localStorage_getItem('minicraft.lock')) === lock_found
-				?	Root
-				:	ErrorOpened
+	localStorage_setItem('minicraft.lock_requested', '1');
+	const request_time = Date_now();
+	let counter = 0;
+	// periodically check if another instance has responded to the lock request
+	const check_interval = setInterval_(() => {
+		// if lock valid, show error
+		if (Number_(localStorage_getItem('minicraft.lock')) > request_time) {
+			clearTimeout_(check_interval);
+			init(ErrorOpened);
+		}
+		// if waited for 1.25s, assume no other instance is running
+		else if (++counter > 4) {
+			clearTimeout_(check_interval);
+			chunks_db_promise.then(() =>
+				init(Root)
 			);
-		}, lock_found - lock_limit);
-	}
-	// if not, init right away
-	else {
-		chunks_db_promise.then(() =>
-			init(Root)
-		)
-	}
+		}
+	}, 250);
 }

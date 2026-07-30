@@ -59,7 +59,6 @@ import {
 	VERSION,
 } from '../etc/env.js';
 import {
-	clearInterval_,
 	clearTimeout_,
 	fetch_,
 	flag_chromium,
@@ -192,7 +191,7 @@ export const game_create = (frame_element, window_actions, {config, account}) =>
 
 export const game_destroy = model => {
 	clearTimeout_(model.poll_timeout);
-	clearInterval_(model.tick_interval);
+	clearTimeout_(model.tick_interval);
 
 	world_save(model.world, model.player);
 	world_destroy(model.world);
