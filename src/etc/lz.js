@@ -304,12 +304,13 @@ export const testCompression = () => {
 	}
 	let inputUint8 = new Uint8Array_(input.buffer);
 	let compressed = compress(inputUint8);
-	let decompressed = new Uint16Array(
-		decompress(
-			compressed,
-			new Uint8Array_(inputUint8.length)
-		).buffer
+	let decompress_array = new Uint8Array_(inputUint8.length);
+	decompress(
+		compressed,
+		decompress_array
 	);
+	let decompressed = new Uint16Array(decompress_array.buffer);
+
 	let mismatches = [];
 	for (let i = 0; i < input.length; i++) {
 		if (input[i] !== decompressed[i]) {
