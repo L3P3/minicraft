@@ -21,7 +21,7 @@ import {
 import {
 	document_,
 	flag_chromium,
-	Math_,
+	Math_abs,
 	Math_max,
 	window_,
 } from '../etc/helpers.js';
@@ -110,7 +110,7 @@ export default function Game({
 			if (
 				model.menu === MENU_NONE &&
 				!model.flag_paused &&
-				Math_.abs(event.deltaY) > 5
+				Math_abs(event.deltaY) > 5
 			) {
 				const key =
 					event.deltaY > 0

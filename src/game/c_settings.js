@@ -85,7 +85,7 @@ export default function Settings({
 	view_set,
 }) {
 	game && hook_effect(() => (
-		game_save(game)
+		game_save(game, false)
 	));
 
 	const [textures_opened, textures_opened_set] = hook_state(false);

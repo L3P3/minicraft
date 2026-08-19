@@ -83,7 +83,7 @@ import {
 	locale_yes,
 } from '../etc/locale.js';
 import {
-	chunks_delete,
+	world_delete,
 } from '../etc/storage.js';
 import {
 	actions,
@@ -91,7 +91,7 @@ import {
 
 import {
 	world_list_remote,
-	world_rename,
+	world_rename_last,
 	world_store_remote_reload,
 } from './m_world_store.js';
 
@@ -323,7 +323,7 @@ const WorldButtons = ({
 				locale_ask_world_delete_1 + world.label + locale_ask_world_delete_2
 			)) return;
 			if (world.local) {
-				chunks_delete(world.id);
+				world_delete(world.id);
 				actions.world_remove(world.id);
 			}
 			else {
@@ -488,10 +488,10 @@ export default function MenuStart({
 	const [world_selected_id, world_selected_id_set] = hook_state(config.world_last);
 	// if the world was renamed, update the selected id
 	hook_effect(() => {
-		if (world_rename && world_selected_id === world_rename[0]) {
-			world_selected_id_set(world_rename[1]);
+		if (world_rename_last && world_selected_id === world_rename_last[0]) {
+			world_selected_id_set(world_rename_last[1]);
 		}
-	}, [world_rename]);	
+	}, [world_rename_last]);	
 	const world_selected = hook_memo(() => (
 		worlds_merged.find(world => world.id === world_selected_id) || null
 	), [

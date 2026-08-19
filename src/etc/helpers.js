@@ -11,6 +11,7 @@ export const window_ = window;
 export const document_ = document;
 export const navigator_ = navigator;
 export const Math_ = Math;
+export const Math_abs = Math_.abs;
 export const Math_PI = Math_.PI;
 export const Math_PI_h = Math_PI * .5;
 export const Math_PI_180d = 180 / Math_PI;
@@ -31,6 +32,7 @@ const Date_ = Date;
 export const Date_now = () => Date_.now();
 const JSON_ = JSON;
 export const Promise_ = Promise;
+export const Promise_all = Promise_.all;
 /**
 	@param {*=} v
 */

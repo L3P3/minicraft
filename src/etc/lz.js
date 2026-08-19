@@ -192,10 +192,10 @@ export const compress = input => {
 /**
 	@param {string?} compressed
 	@param {Uint8Array} result
-	@return {Uint8Array?}
+	@return {boolean} success?
 */
 export const decompress = (compressed, result) => {
-	if (!compressed) return null;
+	if (!compressed) return false;
 
 	const compressed_length = compressed.length;
 	const getValue = () => utoi(compressed.charCodeAt(data_index++));
@@ -228,7 +228,7 @@ export const decompress = (compressed, result) => {
 	}
 
 	if (bits === TOKEN_END_OF_STREAM) {
-		return null;
+		return false;
 	}
 
 	// else, get byte value
@@ -263,7 +263,7 @@ export const decompress = (compressed, result) => {
 		}
 		// end of stream token
 		else if (bits === TOKEN_END_OF_STREAM) {
-			return result;
+			return true;
 		}
 
 		// if (bits > dictionary.length) break;
@@ -279,7 +279,7 @@ export const decompress = (compressed, result) => {
 			enlargeIn = 1 << numBits++;
 		}
 	}
-	return null;
+	return false;
 }
 
 export const testCompression = () => {

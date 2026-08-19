@@ -37,10 +37,10 @@ import {
 	app_state,
 } from '../etc/state.js';
 import {
-	chunks_delete,
-	chunks_get,
-	chunks_rename,
-	chunks_set,
+	world_delete,
+	world_get,
+	world_rename,
+	world_set,
 } from '../etc/storage.js';
 
 /**
@@ -52,7 +52,7 @@ export let world_list_remote = null;
 let reload_cooldown_timeout = 0;
 
 // just a hint so the ui selection can be kept
-export let world_rename = null;
+export let world_rename_last = null;
 
 export const world_store_init = () => world_list_remote_load(true);
 
@@ -261,7 +261,7 @@ const world_store_sync = async world => {
 	// download?
 	if (world.local < world.remote) {
 		try {
-			await chunks_set(id, /** @type {!Object<string, string>} */ (
+			await world_set(id, /** @type {!Object<string, string>} */ (
 				await response_parse(
 					await fetch_(`${API_DATA}worlds/${world.hash}.json`)
 				)
@@ -274,7 +274,7 @@ const world_store_sync = async world => {
 		catch (error) {
 			if (error.name === 'QuotaExceededError') {
 				alert_(locale_error_storage);
-				chunks_delete(id);
+				world_delete(id);
 				actions.world_remove(id);
 			}
 			else {
@@ -296,7 +296,7 @@ const world_store_sync = async world => {
 		// can be done in background as its only the chunks id in db
 		let rename_promise = null;
 		try {
-			const data_promise = chunks_get(id);
+			const data_promise = world_get(id);
 
 			// world must be registered first?
 			if (world.remote === WORLD_STORED_SHOULD) {
@@ -309,11 +309,11 @@ const world_store_sync = async world => {
 						}),
 					})
 				);
-				rename_promise = chunks_rename(
+				rename_promise = world_rename(
 					id,
 					id_new = result_register.id
 				);
-				world_rename = [id, id_new];
+				world_rename_last = [id, id_new];
 				actions.world_prop(id, {
 					id: id_new,
 				});

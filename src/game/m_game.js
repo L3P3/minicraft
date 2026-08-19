@@ -131,7 +131,7 @@ import {
 	world_block_get,
 	world_block_set,
 	world_block_set_try,
-	world_chunk_load,
+	world_chunk_load_all,
 	world_chunk_reset,
 	world_create,
 	world_data_init,
@@ -177,7 +177,7 @@ export const game_create = (frame_element, window_actions, {config, account}) =>
 		rotate_last_v: 0,
 		tick_interval: setInterval_(() => (
 			model.flag_paused ||
-			world_tick(world, player)
+			world_tick(world)
 		), 50),
 		window_actions,
 		world,
@@ -193,7 +193,7 @@ export const game_destroy = model => {
 	clearTimeout_(model.poll_timeout);
 	clearTimeout_(model.tick_interval);
 
-	world_save(model.world, model.player);
+	world_save(model.world, model.player, true);
 	world_destroy(model.world);
 
 	renderer_destroy(model.renderer);
@@ -203,8 +203,8 @@ export const game_renderer_init = (model, canvas_element) => (
 	model.renderer = renderer_create(model, canvas_element)
 )
 
-export const game_save = model => {
-	world_save(model.world, model.player);
+export const game_save = (model, force) => {
+	world_save(model.world, model.player, force);
 }
 
 export const game_resolution_update = model => {
@@ -733,7 +733,11 @@ export const game_message_send = (model, value) => {
 			game_message_print(model, locale_commands + ': clear, clearinv, gamemode, give, help, load, me, save, spawn, teleport, time, version');
 			break;
 		case 'load':
-			world_chunk_load(world, true)
+			if (world.flag_busy) {
+				game_message_print(model, locale_error_no_permission);
+				return;
+			}
+			world_chunk_load_all(world)
 			.then(() => {
 				model.renderer.flag_dirty = true;
 				game_message_print(model, locale_chunks_loaded, true);
@@ -743,11 +747,14 @@ export const game_message_send = (model, value) => {
 			game_message_print(model, player.name + ' ' + args.join(' '), true);
 			break;
 		case 'save':
-			if (model.world.flag_frozen) {
+			if (
+				model.world.flag_frozen ||
+				world.flag_busy
+			) {
 				game_message_print(model, locale_error_no_permission);
 				return;
 			}
-			game_save(model);
+			game_save(model, false);
 			game_message_print(model, locale_game_saved, true);
 			break;
 		case 'spawn':
@@ -850,7 +857,10 @@ export const game_message_send = (model, value) => {
 			);
 			break;
 		case '/regen':
-			if (model.world.flag_frozen) {
+			if (
+				model.world.flag_frozen ||
+				world.flag_busy
+			) {
 				game_message_print(model, locale_error_no_permission);
 				return;
 			}

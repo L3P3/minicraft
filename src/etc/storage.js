@@ -17,6 +17,8 @@ import {
 import './state.js';
 
 let chunks_db = null;
+let chunks_db_ro_chunks = null;
+let chunks_db_rw_chunks = null;
 export const chunks_db_promise = indexedDB_
 ?	new Promise_(resolve => {
 		navigator_.storage?.persist?.();
@@ -54,9 +56,16 @@ export const chunks_db_promise = indexedDB_
 */
 export const chunk_get = indexedDB_
 ?	(world, coords) => new Promise_(resolve => {
-		const request = chunks_db
-			.transaction('chunks', 'readonly')
-			.objectStore('chunks')
+		if (!chunks_db_ro_chunks) {
+			chunks_db_ro_chunks = chunks_db
+				.transaction('chunks', 'readonly')
+				.objectStore('chunks');
+
+			Promise_resolve().then(() => {
+				chunks_db_ro_chunks = null;
+			});
+		}
+		const request = chunks_db_ro_chunks
 			.get([
 				world,
 				coords,
@@ -75,9 +84,17 @@ export const chunk_get = indexedDB_
 */
 export const chunk_set = indexedDB_
 ?	(world, coords, data) => new Promise_((resolve, reject) => {
-		const request = chunks_db
-			.transaction('chunks', 'readwrite')
-			.objectStore('chunks')
+		if (!chunks_db_rw_chunks) {
+			chunks_db_rw_chunks = chunks_db
+				.transaction('chunks', 'readwrite')
+				.objectStore('chunks');
+
+			Promise_resolve().then(() => {
+				chunks_db_rw_chunks = null;
+			});
+		}
+
+		const request = chunks_db_rw_chunks
 			.put({
 				world,
 				coords,
@@ -98,9 +115,17 @@ export const chunk_set = indexedDB_
 */
 export const chunk_delete = indexedDB_
 ?	(world, coords) => new Promise_((resolve, reject) => {
-		const request = chunks_db
-			.transaction('chunks', 'readwrite')
-			.objectStore('chunks')
+		if (!chunks_db_rw_chunks) {
+			chunks_db_rw_chunks = chunks_db
+				.transaction('chunks', 'readwrite')
+				.objectStore('chunks');
+
+			Promise_resolve().then(() => {
+				chunks_db_rw_chunks = null;
+			});
+		}
+
+		const request = chunks_db_rw_chunks
 			.delete([
 				world,
 				coords,
@@ -117,7 +142,7 @@ export const chunk_delete = indexedDB_
 	@param {number} world
 	@return {Promise<!Object<string, string>>}
 */
-export const chunks_get = indexedDB_
+export const world_get = indexedDB_
 ?	world => new Promise_(resolve => {
 		const meta_data = localStorage_getItem(`minicraft.world.${world}:meta`);
 		if (!meta_data) return resolve({});
@@ -157,7 +182,7 @@ export const chunks_get = indexedDB_
 	@param {!Object<string, string>} chunks
 	@return {Promise<void>}
 */
-export const chunks_set = indexedDB_
+export const world_set = indexedDB_
 ?	(world, chunks) => new Promise_((resolve, reject) => {
 		const transaction = chunks_db.transaction('chunks', 'readwrite');
 		const store = transaction.objectStore('chunks');
@@ -189,7 +214,7 @@ export const chunks_set = indexedDB_
 	@param {number} world
 	@return {void}
 */
-export const chunks_delete = indexedDB_
+export const world_delete = indexedDB_
 ?	world => {
 		const request = chunks_db
 			.transaction('chunks', 'readwrite')
@@ -219,7 +244,7 @@ export const chunks_delete = indexedDB_
 	@param {number} world_new
 	@return {Promise<void>}
 */
-export const chunks_rename = indexedDB_
+export const world_rename = indexedDB_
 ?	(world_old, world_new) => new Promise_(resolve => {
 		const store = chunks_db
 			.transaction('chunks', 'readwrite')

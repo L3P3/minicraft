@@ -9,6 +9,7 @@ import {
 	BLOCK_TYPE_FACE_I,
 	BLOCK_TYPE_FACE_LABELS,
 	CHUNK_HEIGHT,
+	CHUNK_HEIGHT_FACTOR,
 	CHUNK_HEIGHT_L2,
 	CHUNK_WIDTH_L2,
 	COORDINATE_OFFSET,
@@ -64,6 +65,7 @@ import {
 
 import {
 	world_block_get,
+	world_microtick,
 } from './m_world.js';
 
 // parse png
@@ -615,8 +617,29 @@ export const renderer_render = (model, now) => {
 		}
 	}
 
-	model.diagnostics = (
-		game.flag_diagnostics ?
+	world_microtick(world, player);
+
+	if (!game.flag_diagnostics) {
+		model.diagnostics = '';
+	}
+	else {
+		const chunk_y = Math_floor(player.position_y) >> CHUNK_WIDTH_L2;
+		const chunk = (
+			chunk_y >= 0 &&
+			chunk_y < CHUNK_HEIGHT_FACTOR &&
+			world.chunks_checklist &&
+			world.chunks[
+				world.chunks_checklist[0].chunks_index
+			]
+		);
+		let chunk_flags = [];
+		if (chunk) {
+			if (chunk.flag_dirty) chunk_flags.push('modified');
+			if (chunk.flag_loading) chunk_flags.push('loading');
+			if (!chunk.flag_used) chunk_flags.push('empty');
+		}
+
+		model.diagnostics = (
 `minicraft ${VERSION} ${
 	number_padStart2(model.fps, '\xa0')
 } fps, T: ${
@@ -628,7 +651,7 @@ export const renderer_render = (model, now) => {
 	now % 1e3 < 500
 	?	''
 	:	world.time
-}
+}${world.flag_busy ? ' busy' : ''}
 R: ${resolution_x}x${resolution_y} (x${config.resolution_scaling}), D: ${config.view_distance}, C: ${world.chunks_checklist_index}/${world.chunks_checklist.length}, M: ${
 	number_square(
 		1 << (CHUNK_WIDTH_L2 + world.size_l2)
@@ -652,9 +675,9 @@ Angle: ${
 Focus: ${
 	player.block_focus_y < 0
 	?	''
-	:	player.block_focus_x + ' ' +
+	:	'(' + player.block_focus_x + ' ' +
 		player.block_focus_y + ' ' +
-		player.block_focus_z + ' ' +
+		player.block_focus_z + ') ' +
 		BLOCK_TYPE_FACE_LABELS[player.block_focus_face] + ': ' +
 		ITEM_HANDLES[
 			world_block_get(
@@ -665,14 +688,19 @@ Focus: ${
 			)
 		]
 }
-Chunk abs: ${
+Chunk abs: (${
 	Math_floor(player.position_x) >> CHUNK_WIDTH_L2
 } ${
 	Math_floor(player.position_z) >> CHUNK_WIDTH_L2
 } ${
-	Math_floor(player.position_y) >> CHUNK_WIDTH_L2
-} rel: ${world.focus_x} ${world.focus_z} ${world.focus_y}` : ''
-	);
+	chunk_y
+}) ${
+	chunk
+	?	'rel: (' + chunk.x + ' ' + chunk.z + ' ' + chunk.y + ') ' + chunk_flags.join(' ')
+	:	'void'
+}`
+		);
+	}
 }
 
 export const renderer_canvas_init = model => {

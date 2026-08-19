@@ -98,7 +98,7 @@ function Root() {
 		onbeforeunload = onunload = onpagehide = onblur = () => {
 			if (unloaded) return;
 			unloaded = true;
-			for (const game of games) game_save(game);
+			for (const game of games) game_save(game, true);
 			actions.config_save();
 		};
 		onpageshow = onfocus = () => {
