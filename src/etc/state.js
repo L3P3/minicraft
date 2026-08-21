@@ -196,6 +196,16 @@ const reducers = {
 				flag_touch,
 			})
 	),
+	screen_resize: (state, width, height) => (
+		width === state.screen_width &&
+		height === state.screen_height
+		?	state
+		:	{
+			...state,
+			screen_width: width,
+			screen_height: height,
+		}
+	),
 	state_patch: (state, patch) => ({
 		...state,
 		...patch,

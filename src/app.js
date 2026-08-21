@@ -29,6 +29,7 @@ import {
 	Set_,
 	setInterval_,
 	setTimeout_,
+	visualViewport_,
 	window_,
 } from './etc/helpers.js';
 import {
@@ -95,24 +96,30 @@ function Root() {
 		let unloaded = false;
 
 		// shotgun method
-		onbeforeunload = onunload = onpagehide = onblur = () => {
+		window_.onunload = onbeforeunload = onpagehide = onblur = () => {
 			if (unloaded) return;
 			unloaded = true;
 			for (const game of games) game_save(game, true);
 			actions.config_save();
 		};
-		onpageshow = onfocus = () => {
-			unloaded = false;
-		};
-		onresize = () => {
+		onpageshow = onfocus = () => (
+			unloaded = false,
+			onresize()
+		);
+		window_.onorientationchange = onresize = () => {
 			in_event = true;
-			actions.state_patch({
-				screen_height: window_.innerHeight,
-				screen_width: window_.innerWidth,
-			});
+			actions.screen_resize(
+				visualViewport_
+				?	visualViewport_.width
+				:	window_.innerWidth,
+				visualViewport_
+				?	visualViewport_.height
+				:	window_.innerHeight
+			);
 			in_event = false;
 		};
 		setInterval_(() => (
+			onresize(),
 			actions.config_save(),
 			!BroadcastChannel_ && localStorage_getItem('minicraft.lock_requested') && (
 				localStorage_removeItem('minicraft.lock_requested'),
