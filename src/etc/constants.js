@@ -15,7 +15,6 @@ export const CHUNK_HEIGHT_FACTOR_L2 = 2;
 export const CHUNK_HEIGHT_FACTOR = 1 << CHUNK_HEIGHT_FACTOR_L2;
 export const CHUNK_HEIGHT_L2 = CHUNK_WIDTH_L2 + CHUNK_HEIGHT_FACTOR_L2;
 export const CHUNK_HEIGHT = 1 << CHUNK_HEIGHT_L2;
-export const COORDINATE_OFFSET = 1 << 16;
 
 export const WORLD_FORMAT = 1;
 

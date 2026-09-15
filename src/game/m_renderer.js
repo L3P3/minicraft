@@ -12,7 +12,6 @@ import {
 	CHUNK_HEIGHT_FACTOR,
 	CHUNK_HEIGHT_L2,
 	CHUNK_WIDTH_L2,
-	COORDINATE_OFFSET,
 	GAMEMODE_CREATIVE,
 	GAMEMODE_SPECTATOR,
 	ITEM_HANDLES,
@@ -32,10 +31,12 @@ import {
 	Math_floor,
 	Math_min,
 	Math_PI_180d,
+	Math_PI_d360,
 	Math_random,
 	Math_round,
 	Math_sin,
 	Math_sqrt,
+	Math_tan,
 	number_padStart2,
 	number_square,
 	number_toFixed2,
@@ -175,7 +176,6 @@ export const renderer_render = (model, now) => {
 		world,
 	} = game;
 
-	//let check_count = 0;
 	let block_inside = 0;
 
 	if (
@@ -216,17 +216,15 @@ export const renderer_render = (model, now) => {
 		const angle_h_sin = Math_sin(angle_h);
 		const angle_v_cos = Math_cos(-angle_v);
 		const angle_v_sin = Math_sin(-angle_v);
-		const fov = config.view_angle / 45;// TODO
+		// virtual screen size at unit focal distance, along the longer screen dimension
+		const fov = 2 * Math_tan(config.view_angle * Math_PI_d360);
 		const fov_x = resolution_x < resolution_y ? fov * resolution_x * resolution_y_1d : fov;
 		const fov_y = resolution_y < resolution_x ? fov * resolution_y * resolution_x_1d : fov;
 		const resolution_x_1d__fov_x = resolution_x_1d * fov_x;
 		const resolution_y_1d__fov_y = resolution_y_1d * fov_y;
-		const position_x_shifted = position_x + COORDINATE_OFFSET;
-		const position_y_shifted = position_y + COORDINATE_OFFSET;
-		const position_z_shifted = position_z + COORDINATE_OFFSET;
-		const position_x_shifted_rest = position_x_shifted % 1;
-		const position_y_shifted_rest = position_y_shifted % 1;
-		const position_z_shifted_rest = position_z_shifted % 1;
+		const position_x_block = Math_floor(position_x);
+		const position_y_block = Math_floor(position_y);
+		const position_z_block = Math_floor(position_z);
 		const world_width_l2 = CHUNK_WIDTH_L2 + size_l2;
 		const world_width_m1 = (1 << world_width_l2) - 1;
 		const group_width = pixel_grouping < resolution_x ? pixel_grouping : 1;
@@ -240,16 +238,15 @@ export const renderer_render = (model, now) => {
 			player.block_focus_x =
 			player.block_focus_z =
 			player.block_focus_face = 0;
-		let dim_next = 0;
 
 		player.block_focus_y = -1;
 		block_inside =
 			(position_y < 0 || position_y >= CHUNK_HEIGHT) ? 0 :
 			world_block_get(
 				world,
-				position_x_shifted & world_width_m1,
-				position_y_shifted & (CHUNK_HEIGHT - 1),
-				position_z_shifted & world_width_m1
+				position_x_block & world_width_m1,
+				position_y_block & (CHUNK_HEIGHT - 1),
+				position_z_block & world_width_m1
 			);
 
 		// inside block?
@@ -257,9 +254,9 @@ export const renderer_render = (model, now) => {
 			gamemode !== GAMEMODE_SPECTATOR &&
 			block_inside > 0
 		) {
-			player.block_focus_x = position_x_shifted & world_width_m1;
-			player.block_focus_y = position_y_shifted & (CHUNK_HEIGHT - 1);
-			player.block_focus_z = position_z_shifted & world_width_m1;
+			player.block_focus_x = position_x_block & world_width_m1;
+			player.block_focus_y = position_y_block & (CHUNK_HEIGHT - 1);
+			player.block_focus_z = position_z_block & world_width_m1;
 			player.block_focus_face = BLOCK_TYPE_FACE_I;
 			canvas_surface_data.fill(BLOCK_COLORS[block_inside] | 0xff000000);
 		}
@@ -269,10 +266,12 @@ export const renderer_render = (model, now) => {
 			for (let canvas_y = 0; canvas_y < resolution_y; ++canvas_y) {
 				const canvas_y_relative = (resolution_y_h - canvas_y) * resolution_y_1d__fov_y;
 
-				const step_y_raw = canvas_y_relative * angle_v_cos - angle_v_sin;
-				const step_z_rot = canvas_y_relative * angle_v_sin + angle_v_cos;
-				const step_z_rot_sin = step_z_rot * angle_h_sin;
-				const step_z_rot_cos = step_z_rot * angle_h_cos;
+				// vertical head rotation
+				const step_y_row = canvas_y_relative * angle_v_cos - angle_v_sin;
+				const step_xz_row = canvas_y_relative * angle_v_sin + angle_v_cos;
+				// apply horizontal head rotation
+				const step_x_center = step_xz_row * angle_h_sin;
+				const step_z_center = step_xz_row * angle_h_cos;
 
 				let canvas_x = 0;
 				let group_color = 0;
@@ -328,199 +327,214 @@ export const renderer_render = (model, now) => {
 
 					const canvas_x_relative = (canvas_x - resolution_x_h) * resolution_x_1d__fov_x;
 
-					const step_x_raw = step_z_rot_sin + angle_h_cos * canvas_x_relative;
-					const step_z_raw = step_z_rot_cos - angle_h_sin * canvas_x_relative;
-
-					const dim_offset = dim_next;
+					// ray direction, yet unnormalized
+					const step_x_raw = step_x_center + canvas_x_relative * angle_h_cos;
+					const step_z_raw = step_z_center - canvas_x_relative * angle_h_sin;
 
 					let pixel_color = SKY_COLOR;
 					let pixel_factor = 1.0;
-
-					let check_distance_min = view_distance;
 					let check_distance_start = 0;
 
-					// make nearest blocks partly transparent
+					// see through blocks in spectator mode
 					if (
 						gamemode === GAMEMODE_SPECTATOR &&
 						block_inside > 0
 					) {
-						check_distance_start = Math_random() * 10;
+						check_distance_start = Math_random() * Math_random() * 10;
 					}
 
-					// step for each x, y, z
-					for (let dim_i = 0; dim_i < 3; ++dim_i) {
-						const dim = (dim_offset + dim_i) % 3;
+					// normalize ray direction
+					const step_inverse = 1 / Math_sqrt(
+						step_x_raw * step_x_raw +
+						step_y_row * step_y_row +
+						step_z_raw * step_z_raw
+					);
+					const step_x = step_x_raw * step_inverse;
+					const step_y = step_y_row * step_inverse;
+					const step_z = step_z_raw * step_inverse;
+					// split signs and amounts
+					const step_x_sign = step_x > 0 ? 1 : step_x < 0 ? -1 : 0;
+					const step_y_sign = step_y > 0 ? 1 : step_y < 0 ? -1 : 0;
+					const step_z_sign = step_z > 0 ? 1 : step_z < 0 ? -1 : 0;
+					const step_x_delta = step_x_sign === 0 ? 1 / 0 : step_x_sign / step_x;
+					const step_y_delta = step_y_sign === 0 ? 1 / 0 : step_y_sign / step_y;
+					const step_z_delta = step_z_sign === 0 ? 1 / 0 : step_z_sign / step_z;
 
-						// https://jsben.ch/AqXcR
-						let step_dim = step_z_raw;
-						// subblock distance to first intersection
-						let offset = position_z_shifted_rest;
+					// current position, in full blocks world coordinates
+					let check_x_block = position_x_block;
+					let check_y_block = position_y_block;
+					let check_z_block = position_z_block;
+
+					// current distance to first boundary, in world units
+					let check_distance_x = (
+						step_x < 0
+						?	(position_x - check_x_block) * step_x_delta
+						:	(check_x_block - position_x + 1) * step_x_delta
+					);
+					let check_distance_y = (
+						step_y < 0
+						?	(position_y - check_y_block) * step_y_delta
+						:	(check_y_block - position_y + 1) * step_y_delta
+					);
+					let check_distance_z = (
+						step_z < 0
+						?	(position_z - check_z_block) * step_z_delta
+						:	(check_z_block - position_z + 1) * step_z_delta
+					);
+
+					// render pixel, using dda raymarching
+					for (;;) {
+						let dim = 0;
+						let step_dim = step_x;
+						let check_distance = check_distance_x;
+
+						if (check_distance_y < check_distance) {
+							dim = 1;
+							step_dim = step_y;
+							check_distance = check_distance_y;
+						}
+						if (check_distance_z < check_distance) {
+							dim = 2;
+							step_dim = step_z;
+							check_distance = check_distance_z;
+						}
+
+						if (check_distance >= view_distance) break;
+
 						if (dim === 0) {
-							step_dim = step_x_raw;
-							offset = position_x_shifted_rest;
+							check_x_block += step_x_sign;
+							check_distance_x += step_x_delta;
 						}
-						if (dim === 1) {
-							step_dim = step_y_raw;
-							offset = position_y_shifted_rest;
+						else if (dim === 1) {
+							check_y_block += step_y_sign;
+							check_distance_y += step_y_delta;
 						}
-						let step_normal = -1 / step_dim;
-						if (step_dim > 0) {
-							offset = 1 - offset;
-							step_normal *= -1;
+						else {
+							check_z_block += step_z_sign;
+							check_distance_z += step_z_delta;
 						}
 
-						// https://jsben.ch/hKgi4
-						const step_x = step_x_raw * step_normal;
-						const step_y = step_y_raw * step_normal;
-						const step_z = step_z_raw * step_normal;
-						const step_diagonal = Math_sqrt(
-							step_x * step_x +
-							step_y * step_y +
-							step_z * step_z
-						);
+						if (check_y_block < 0) {
+							if (step_y > 0) continue;
+							break;
+						}
+						if (check_y_block >= CHUNK_HEIGHT) {
+							if (step_y < 0) continue;
+							break;
+						}
 
-						// initial position
-						let check_x = position_x_shifted + step_x * offset - ((dim === 0)&(step_dim < 0)|0);
-						let check_y = position_y_shifted + step_y * offset - ((dim === 1)&(step_dim < 0)|0);
-						let check_z = position_z_shifted + step_z * offset - ((dim === 2)&(step_dim < 0)|0);
-						let check_distance = step_diagonal * offset;
-
-						// add steps until collision or out of range
-						// https://jsben.ch/kM67J
-						for (
-							let check_x_int, check_y_int, check_z_int, block;
-							check_distance < check_distance_min;
-							check_x += step_x,
-							check_y += step_y,
-							check_z += step_z,
-							check_distance += step_diagonal
+						const check_x_int = check_x_block & world_width_m1;
+						const check_y_int = check_y_block & (CHUNK_HEIGHT - 1);
+						const check_z_int = check_z_block & world_width_m1;
+						let block = blocks[
+							(
+								(check_x_int << world_width_l2) |
+								check_z_int
+							) << CHUNK_HEIGHT_L2 |
+							check_y_int
+						];
+						if (
+							gamemode === GAMEMODE_SPECTATOR &&
+							check_distance < check_distance_start
 						) {
-							if (
-								gamemode === GAMEMODE_SPECTATOR &&
-								check_distance < check_distance_start
-							) continue;
-							if (check_y < COORDINATE_OFFSET) {
-								if (step_y < 0) break;
-								continue;
+							if (block === BLOCK_TYPE_AIR) {
+								check_distance_start = 0;
 							}
-							if (check_y >= COORDINATE_OFFSET + CHUNK_HEIGHT) {
-								if (step_y > 0) break;
-								continue;
+							continue;
+						}
+						if (block === BLOCK_TYPE_AIR) continue;
+
+						if (
+							gamemode !== GAMEMODE_SPECTATOR &&
+							canvas_y === pixel_focus_y &&
+							canvas_x === pixel_focus_x &&
+							check_distance <= focus_distance_min
+						) {
+							// set focus
+							player.block_focus_x = check_x_int;
+							player.block_focus_y = check_y_int;
+							player.block_focus_z = check_z_int;
+							player.block_focus_face = (step_dim < 0) | dim << 1;
+							focus_distance_min = check_distance;
+						}
+
+						// calculate color
+						if (flag_textures) {
+							// shift so that block id 1 => tile 0
+							--block;
+
+							if (dim === 1) {
+								if (block === TILE_LOG_SIDE)
+									block = TILE_LOG_TOP;
+								else if (block === TILE_BOOKSHELF)
+									block = TILE_PLANKS;
+								else if (
+									block === TILE_GRASS_TOP &&
+									step_y > 0
+								) block = TILE_DIRT;
 							}
-							//++check_count;
-							if (
+							else if (block === TILE_GRASS_TOP)
+								block = TILE_GRASS_SIDE;
+
+							// intersected pixel in world coordinates
+							const hit_x = position_x + step_x * check_distance;
+							const hit_z = position_z + step_z * check_distance;
+							// pick pixel from texture
+							const texture_pixel = tiles_data[
+								block << (TILES_RESOLUTION_LOG2 * 2) |
 								(
-									block = blocks[
-										(
-											(
-												check_x_int = check_x & world_width_m1
-											) << world_width_l2 |
-											(
-												check_z_int = check_z & world_width_m1
-											)
-										) << CHUNK_HEIGHT_L2 |
-										(
-											check_y_int = check_y & (CHUNK_HEIGHT - 1)
-										)
-									]
-								) !== BLOCK_TYPE_AIR
-							) {
-								// collision
-
-								if (
-									gamemode !== GAMEMODE_SPECTATOR &&
-									canvas_y === pixel_focus_y &&
-									canvas_x === pixel_focus_x &&
-									check_distance <= focus_distance_min
-								) {
-									// set focus
-									player.block_focus_x = check_x_int;
-									player.block_focus_y = check_y_int;
-									player.block_focus_z = check_z_int;
-									player.block_focus_face = (step_dim < 0) | dim << 1;
-									focus_distance_min = check_distance;
-								}
-
-								// calculate color
-								if (flag_textures) {
-									// shift so that block id 1 => tile 0
-									--block;
-
-									if (dim === 1) {
-										if (block === TILE_LOG_SIDE)
-											block = TILE_LOG_TOP;
-										else if (block === TILE_BOOKSHELF)
-											block = TILE_PLANKS;
-										else if (
-											block === TILE_GRASS_TOP &&
-											step_y > 0
-										) block = TILE_DIRT;
-									}
-									else if (block === TILE_GRASS_TOP)
-										block = TILE_GRASS_SIDE;
-
-									// pick pixel
-									const texture_pixel = tiles_data[
-										block << (TILES_RESOLUTION_LOG2 * 2) |
-										(
-											// y
-											(
-												dim === 1
-												?	check_z
-												:	check_y
-											) * TILES_RESOLUTION & (TILES_RESOLUTION - 1)
-										) << TILES_RESOLUTION_LOG2 |
-										// x
+									// y
+									Math_floor(
 										(
 											dim === 1
-											?	check_x
-											:	(
-												step_dim > 0
-												?	check_x - check_z
-												:	check_z - check_x
-											) + COORDINATE_OFFSET
-										) * TILES_RESOLUTION & (TILES_RESOLUTION - 1)
-									];
-
-									// transparent pixel?
-									if (texture_pixel >>> 24 === 0) continue;
-
-									// solid pixel
-									pixel_color = texture_pixel & 0xffffff;
-								}
-								else pixel_color = BLOCK_COLORS[block];
-
-								check_distance_min = check_distance;
-								pixel_factor = (
-									// fake shadow to see edges
+											?	hit_z
+											:	position_y + step_y * check_distance
+										) * TILES_RESOLUTION
+									) & (TILES_RESOLUTION - 1)
+								) << TILES_RESOLUTION_LOG2 |
+								// x
+								Math_floor(
 									(
-										dim === 0
-										?	.8
-										: dim === 2
-										?	.6
-										: step_dim > 0
-										?	.4
-										:	1
-									) +
-									// highlight if focussed
-									(
-										check_y_int !== block_focus_y ||
-										check_x_int !== block_focus_x ||
-										check_z_int !== block_focus_z
-										?	0
-										:	.2
-									)
-								);
-								dim_next = dim;
-								break;
-							}
-							else if (
-								gamemode === GAMEMODE_SPECTATOR &&
-								check_distance < check_distance_start
-							) check_distance_start = check_distance;
+										dim === 1
+										?	hit_x
+										:	(
+											step_dim > 0
+											?	hit_x - hit_z
+											:	hit_z - hit_x
+										)
+									) * TILES_RESOLUTION
+								) & (TILES_RESOLUTION - 1)
+							];
 
-							// no collision
+							// transparent pixel?
+							if (texture_pixel >>> 24 === 0) continue;
+
+							// solid pixel
+							pixel_color = texture_pixel & 0xffffff;
 						}
+						else pixel_color = BLOCK_COLORS[block];
+
+						pixel_factor = (
+							// fake shadow to see edges
+							(
+								dim === 0
+								?	.8
+								: dim === 2
+								?	.6
+								: step_dim > 0
+								?	.4
+								:	1
+							) +
+							// highlight if focussed
+							(
+								check_y_int !== block_focus_y ||
+								check_x_int !== block_focus_x ||
+								check_z_int !== block_focus_z
+								?	0
+								:	.2
+							)
+						);
+						break;
 					}
 
 					// apply lighting and alpha

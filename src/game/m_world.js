@@ -10,8 +10,8 @@ import {
 	CHUNK_HEIGHT_L2,
 	CHUNK_WIDTH,
 	CHUNK_WIDTH_L2,
-	COORDINATE_OFFSET,
 	FLATMAP_LAYERS_LENGTH,
+	GAMEMODE_SPECTATOR,
 	WORLD_FORMAT,
 } from '../etc/constants.js';
 import {
@@ -269,12 +269,9 @@ const world_offset_update = (model, player, force) => {
 			size_l2,
 		} = model;
 		const world_size = 1 << size_l2;
-		const focus_x = model.focus_x = (
-			COORDINATE_OFFSET + chunk_x_abs
-		) % world_size;
-		const focus_z = model.focus_z = (
-			COORDINATE_OFFSET + chunk_z_abs
-		) % world_size;
+		const world_size_m1 = world_size - 1;
+		const focus_x = model.focus_x = chunk_x_abs & world_size_m1;
+		const focus_z = model.focus_z = chunk_z_abs & world_size_m1;
 		const size_half = world_size >> 1;
 		const max_dist_axis = Math_max(size_half - 2, 8);
 		const chunks_checklist = model.chunks_checklist = [];
@@ -407,7 +404,7 @@ export const world_load = (model, player) => {
 		});
 
 		player.health = p.h;
-		player.gamemode = p.m;
+		player.gamemode = model.flag_frozen ? GAMEMODE_SPECTATOR : p.m;
 
 		player.position_x = p.p[0];
 		player.position_y = p.p[1];

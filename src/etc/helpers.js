@@ -15,6 +15,7 @@ export const Math_abs = Math_.abs;
 export const Math_PI = Math_.PI;
 export const Math_PI_h = Math_PI * .5;
 export const Math_PI_180d = 180 / Math_PI;
+export const Math_PI_d360 = Math_PI / 360;
 export const Math_random = Math_.random;
 export const Math_floor = Math_.floor;
 export const Math_ceil = Math_.ceil;
@@ -24,6 +25,7 @@ export const Math_max = Math_.max;
 export const Math_cos = Math_.cos;
 export const Math_sin = Math_.sin;
 export const Math_sqrt = Math_.sqrt;
+export const Math_tan = Math_.tan;
 export const Math_log2 = Math_.log2;
 export const String_fromCharCode = String.fromCharCode;
 
