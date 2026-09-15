@@ -199,5 +199,7 @@ export const response_parse = response => {
 
 // old safari does not support fill for typed arrays
 if (LEGACY && !Uint32Array_.prototype.fill) {
-	Uint32Array_.prototype.fill = Array_.prototype.fill;
+	Uint32Array_.prototype.fill = /** @type {function(this:Uint32Array, number, number=, number=):!Uint32Array} */ (
+		Array_.prototype.fill
+	);
 }

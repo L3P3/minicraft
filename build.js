@@ -176,10 +176,13 @@ async function build_js(promises_before, lang, legacy, ssr) {
 				`create_source_map ./dist/app-${combo}.js.map`,
 				'language_in ECMASCRIPT6_STRICT',
 				`language_out ECMASCRIPT${legacy ? '3' : '6_STRICT'}`,
+				// needed for fill polyfill
+				legacy ? 'jscomp_off checkTypes' : null,
 				'rewrite_polyfills false',
 				'strict_mode_input',
 				'warning_level VERBOSE',
 			]
+			.filter(Boolean)
 			.join(' --')
 		);
 		await Promise.all([
