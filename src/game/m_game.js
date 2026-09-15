@@ -105,6 +105,7 @@ import {
 	locale_teleported_to,
 	locale_time_set_to,
 	locale_unknown_command,
+	locale_view_distance,
 } from '../etc/locale.js';
 import {
 	actions,
@@ -730,7 +731,7 @@ export const game_message_send = (model, value) => {
 			}
 			break;
 		case 'help':
-			game_message_print(model, locale_commands + ': clear, clearinv, gamemode, give, help, load, me, save, spawn, teleport, time, version');
+			game_message_print(model, locale_commands + ': clear, clearinv, gamemode, give, help, load, me, save, spawn, teleport, time, version, view_distance');
 			break;
 		case 'load':
 			if (world.flag_busy) {
@@ -814,6 +815,19 @@ export const game_message_send = (model, value) => {
 			default:
 				game_message_print(model, locale_unknown_command + ': time ' + args[0]);
 			}
+			break;
+		}
+		case 'view_distance':
+		case 'vd': {
+			const view_distance = Number_(args[0]);
+			if (
+				isNaN(view_distance) ||
+				view_distance < 0
+			) break;
+			actions.config_set({
+				view_distance,
+			});
+			game_message_print(model, `${locale_view_distance}: ` + view_distance, true);
 			break;
 		}
 		case 'version':
