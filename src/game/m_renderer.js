@@ -237,9 +237,9 @@ export const renderer_render = (model, now) => {
 			Math_cos(time_f * Math_PI_d360 * 720)
 		);
 		const sky_color = (
-			Math_round(0x84 * sky_brightness) << 16 |
+			Math_round(0xff * sky_brightness) << 16 |
 			Math_round(0xb1 * sky_brightness) << 8 |
-			Math_round(0xff * sky_brightness)
+			Math_round(0x84 * sky_brightness)
 		);
 
 		let focus_distance_min =
