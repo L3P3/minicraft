@@ -3,6 +3,7 @@ ask_world_delete_1: वास्तव में दुनिया हटान
 ask_world_delete_2: "?
 back_to_game: खेल पर वापस जाएं
 back: वापस
+blocks_dimming: ब्लॉकों को गहरा करें
 chunk_regenerated: चंक पुनः उत्पन्न हुआ।
 chunks_loaded: चंक्स लोड हो गए।
 commands: कमांड्स
@@ -10,6 +11,7 @@ delete_local: (स्थानीय) हटाएं
 delete: हटाएं
 disabled: निष्क्रिय
 download: डाउनलोड
+enabled: सक्रिय
 error_amount_minimum_1: राशि कम से कम 1 होनी चाहिए!
 error_conflict_1: संघर्ष! दुनिया "
 error_conflict_2: " को यहाँ और कहीं और संशोधित किया गया था।\nठीक: सर्वर से वेरिएंट लें (

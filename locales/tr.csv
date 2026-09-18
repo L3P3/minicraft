@@ -3,6 +3,7 @@ ask_world_delete_1: "
 ask_world_delete_2: " isimli dünya gerçekten silinsin mi?
 back_to_game: Oyuna geri dön
 back: Geri
+blocks_dimming: Blokları karart
 chunk_regenerated: Parça yenilendi.
 chunks_loaded: Parçalar yüklendi.
 commands: Komutlar
@@ -10,6 +11,7 @@ delete_local: Sil (yerel)
 delete: Sil
 disabled: Devre dışı
 download: İndir
+enabled: Etkin
 error_amount_minimum_1: Miktar en az 1 olmalıdır!
 error_conflict_1: Çakışma! "
 error_conflict_2: " isimli dünya burada ve başka bir yerde değiştirildi.\nOK: Sunucudaki versiyonu al (

@@ -24,7 +24,9 @@ import {
 import {
 	locale_back,
 	locale_back_to_game,
+	locale_blocks_dimming,
 	locale_disabled,
+	locale_enabled,
 	locale_mouse_sensitivity,
 	locale_pixel_grouping,
 	locale_project_page,
@@ -205,6 +207,20 @@ export default function Settings({
 				]),
 			]),
 			node_dom('tr', null, [
+				node_dom('td', null, [
+					node_dom(`button`, {
+						innerText: `${locale_blocks_dimming}: ${
+							config.flag_blocks_dimming
+							?	locale_enabled
+							:	locale_disabled
+						}`,
+						onclick: () => {
+							actions.config_set({
+								flag_blocks_dimming: !config.flag_blocks_dimming,
+							});
+						},
+					}),
+				]),
 				node_dom('td', null, [
 					node_dom(`button[innerText=${locale_version + VERSION}][title=${locale_project_page}]`, {
 						onclick: () => {

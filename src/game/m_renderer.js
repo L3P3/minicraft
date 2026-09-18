@@ -17,7 +17,6 @@ import {
 	ITEM_HANDLES,
 	PLAYER_FOCUS_DISTANCE_CREATIVE,
 	PLAYER_FOCUS_DISTANCE_NORMAL,
-	SKY_COLOR,
 } from '../etc/constants.js';
 import {
 	API_DATA,
@@ -29,6 +28,7 @@ import {
 	Math_ceil,
 	Math_cos,
 	Math_floor,
+	Math_max,
 	Math_min,
 	Math_PI_180d,
 	Math_PI_d360,
@@ -185,6 +185,7 @@ export const renderer_render = (model, now) => {
 		model.flag_dirty = false;
 
 		const {
+			flag_blocks_dimming,
 			pixel_grouping,
 			view_distance,
 		} = config;
@@ -202,6 +203,7 @@ export const renderer_render = (model, now) => {
 		const {
 			blocks,
 			size_l2,
+			time_f,
 		} = world;
 		const flag_textures = tiles_data !== null;
 		const resolution_x_1d = 1 / resolution_x;
@@ -229,6 +231,16 @@ export const renderer_render = (model, now) => {
 		const world_width_m1 = (1 << world_width_l2) - 1;
 		const group_width = pixel_grouping < resolution_x ? pixel_grouping : 1;
 		const group_last = resolution_x - group_width;
+		// time_f is 0..1, where 0 is midnight and 0.5 is noon
+		const sky_brightness = 1 - .9 * Math_max(
+			0,
+			Math_cos(time_f * Math_PI_d360 * 720)
+		);
+		const sky_color = (
+			Math_round(0x84 * sky_brightness) << 16 |
+			Math_round(0xb1 * sky_brightness) << 8 |
+			Math_round(0xff * sky_brightness)
+		);
 
 		let focus_distance_min =
 			player.gamemode === GAMEMODE_CREATIVE
@@ -331,7 +343,7 @@ export const renderer_render = (model, now) => {
 					const step_x_raw = step_x_center + canvas_x_relative * angle_h_cos;
 					const step_z_raw = step_z_center - canvas_x_relative * angle_h_sin;
 
-					let pixel_color = SKY_COLOR;
+					let pixel_color = sky_color;
 					let pixel_factor = 1.0;
 					let check_distance_start = 0;
 
@@ -534,6 +546,11 @@ export const renderer_render = (model, now) => {
 								:	.2
 							)
 						);
+
+						if (flag_blocks_dimming) {
+							pixel_factor *= sky_brightness;
+						}
+
 						break;
 					}
 

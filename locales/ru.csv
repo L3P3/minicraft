@@ -3,6 +3,7 @@ ask_world_delete_1: Мир "
 ask_world_delete_2: " точно удалить?
 back_to_game: Вернуться в игру
 back: Вернуться
+blocks_dimming: Затемнять блоки
 chunk_regenerated: Чанки перезагружается 
 chunks_loaded: Чанки загружаются.
 commands: Команда
@@ -10,6 +11,7 @@ delete_local: Удалить (локал)
 delete: Удалить
 disabled: Отключено
 download: Скачать
+enabled: Включено
 error_amount_minimum_1: Число должно быт минимум 1!
 error_conflict_1: Конфликт! Мир. "
 error_conflict_2: " было изменено как здесь, так и в других местах.\nОК: принять то, что с сервера (

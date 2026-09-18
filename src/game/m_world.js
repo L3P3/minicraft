@@ -26,8 +26,6 @@ import {
 	Math_max,
 	Math_min,
 	number_square,
-	Promise_,
-	Promise_all,
 	Uint32Array_,
 	Uint8Array_,
 } from '../etc/helpers.js';

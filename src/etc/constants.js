@@ -90,8 +90,6 @@ export const BLOCK_TYPE_FACE_S = 4;
 export const BLOCK_TYPE_FACE_N = 5;
 export const BLOCK_TYPE_FACE_I = 6;
 
-export const SKY_COLOR = 0xffb184;
-
 export const GAMEMODE_SURVIVAL = 0;
 export const GAMEMODE_CREATIVE = 1;
 export const GAMEMODE_SPECTATOR = 2;

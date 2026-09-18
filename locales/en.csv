@@ -3,6 +3,7 @@ ask_world_delete_1: Really delete world "
 ask_world_delete_2: "?
 back_to_game: Back to game
 back: Back
+blocks_dimming: Dim blocks
 chunk_regenerated: Chunk regenerated.
 chunks_loaded: Chunks loaded.
 commands: Commands
@@ -10,6 +11,7 @@ delete_local: Delete (local)
 delete: Delete
 disabled: Disabled
 download: Download
+enabled: Enabled
 error_amount_minimum_1: Amount must be at least 1!
 error_conflict_1: Conflict! The world "
 error_conflict_2: " was modified here and somewhere else.\nOK: Take variant from server (

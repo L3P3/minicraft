@@ -3,6 +3,7 @@ ask_world_delete_1: Voulez-vous vraiment supprimer le monde "
 ask_world_delete_2: " ?
 back_to_game: Retour au jeu
 back: Retour
+blocks_dimming: Assombrir les blocs
 chunk_regenerated: Chunk régénéré.
 chunks_loaded: Chunks chargés.
 commands: Commandes
@@ -10,6 +11,7 @@ delete_local: Supprimer (local)
 delete: Supprimer
 disabled: Désactivé
 download: Télécharger
+enabled: Activé
 error_amount_minimum_1: La quantité doit être d\'au moins 1 !
 error_conflict_1: Conflit ! Le monde "
 error_conflict_2: " a été modifié ici et ailleurs.\nOK : Prendre la variante du serveur (
