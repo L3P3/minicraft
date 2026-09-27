@@ -43,16 +43,18 @@ Heavily inspired by and somewhat based on the work of [@xNotch](https://github.c
 - [x] gamemode
 - [x] multiple worlds
 - [x] download/upload worlds
+- [x] good styled ui
+- [x] support older browsers
+- [x] time of day
+- [ ] dynamic lighting
+- [ ] reflections
 - [ ] world edit
 - [ ] multiplayer
 - [ ] sound
 - [ ] entity models
 - [ ] collision
-- [ ] good styled ui
 - [ ] good mobile view
 - [ ] migrate to typescript?
-- [ ] support older browsers
-- [ ] time of day
 - [ ] sky elements
 - [ ] non-cubic blocks
 - [ ] visible entities
