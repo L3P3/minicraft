@@ -46,8 +46,8 @@ Heavily inspired by and somewhat based on the work of [@xNotch](https://github.c
 - [x] good styled ui
 - [x] support older browsers
 - [x] time of day
+- [x] reflections
 - [ ] dynamic lighting
-- [ ] reflections
 - [ ] world edit
 - [ ] multiplayer
 - [ ] sound
