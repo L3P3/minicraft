@@ -48,6 +48,7 @@ export const locale_error_world_not_uploaded = 'The world is not uploaded!';
 export const locale_error_world_upload = 'Error while uploading world: ';
 export const locale_game_saved = 'Game saved.';
 export const locale_gamemode_set_to = 'Game mode set to';
+export const locale_glass_clear = 'Clear glass';
 export const locale_inventory_cleared = 'Inventory cleared.';
 export const locale_inventory = 'Inventory';
 export const locale_item_labels = '!!!not used in english!!!';

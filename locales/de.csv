@@ -46,9 +46,10 @@ error_world_not_uploaded: Die Welt ist nicht hochgeladen!
 error_world_upload: Fehler beim Hochladen der Welt: 
 game_saved: Spiel gespeichert.
 gamemode_set_to: Spielmodus gesetzt auf
+glass_clear: Klares Glas
 inventory_cleared: Inventar geleert
 inventory: Inventar
-item_labels: Luft,Stein,Grasblock,Erde,Bruchstein,Holzbretter,Grundgestein,Stamm,Laub,Ziegelsteine,Wolle,Sand,Kies,Glas,Bücherregal,Obsidian,Steinziegel,Sandstein,Lapislazuliblock,Eisenblock,Goldblock,Diamantblock,Smaragdblock,Redstoneblock,Quarzblock
+item_labels: Luft,Stein,Grasblock,Erde,Bruchstein,Holzbretter,Grundgestein,Stamm,Laub,Ziegelsteine,Wolle,Sand,Kies,Glas,Bücherregal,Obsidian,Steinziegel,Sandstein,Lapislazuliblock,Eisenblock,Goldblock,Diamantblock,Smaragdblock,Redstoneblock,Quarzblock,Spiegelblock
 items_given: Items gegeben
 locked: Gesperrt
 login: Anmelden

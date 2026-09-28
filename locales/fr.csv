@@ -46,9 +46,10 @@ error_world_not_uploaded: Le monde n\'est pas téléversé !
 error_world_upload: Erreur lors du téléversement du monde : 
 game_saved: Partie sauvegardée.
 gamemode_set_to: Mode de jeu défini
+glass_clear: Verre transparent
 inventory_cleared: Inventaire vidé.
 inventory: Inventaire
-item_labels: Air,Roche,Bloc d\'herbe,Terre,Pierre,Planches,Pierre de fondation,Bûche,Feuilles,Briques,Laine,Sable,Gravier,Verre,Bibliothèque,Obsidienne,Briques de pierre,Grès,Bloc de lapis-lazuli,Bloc de fer,Bloc d\'or,Bloc de diamant,Bloc d\'émeraude,Bloc de redstone,Bloc de quartz
+item_labels: Air,Roche,Bloc d\'herbe,Terre,Pierre,Planches,Pierre de fondation,Bûche,Feuilles,Briques,Laine,Sable,Gravier,Verre,Bibliothèque,Obsidienne,Briques de pierre,Grès,Bloc de lapis-lazuli,Bloc de fer,Bloc d\'or,Bloc de diamant,Bloc d\'émeraude,Bloc de redstone,Bloc de quartz,Bloc miroir
 items_given: Objets donnés
 locked: Verrouillé
 login: Connexion

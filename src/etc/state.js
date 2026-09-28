@@ -64,6 +64,7 @@ const reducers = {
 		let needs_save = false;
 		const config = {
 			flag_blocks_dimming: false,
+			flag_glass_clear: false,
 			flag_touch: false, // not saved
 			pixel_grouping: 1,
 			mouse_sensitivity: 3,
@@ -84,6 +85,11 @@ const reducers = {
 				tmp = config_loaded['flag_blocks_dimming']
 			) != null) {
 				config.flag_blocks_dimming = tmp;
+			}
+			if ((
+				tmp = config_loaded['flag_glass_clear']
+			) != null) {
+				config.flag_glass_clear = tmp;
 			}
 			if ((
 				tmp = config_loaded['mouse_sensitivity']
@@ -169,6 +175,7 @@ const reducers = {
 		localStorage_setItem('minicraft.config', JSON_stringify({
 			'version': VERSION,
 			'flag_blocks_dimming': config.flag_blocks_dimming,
+			'flag_glass_clear': config.flag_glass_clear,
 			'pixel_grouping': config.pixel_grouping,
 			'mouse_sensitivity': config.mouse_sensitivity,
 			'resolution_scaling': config.resolution_scaling,

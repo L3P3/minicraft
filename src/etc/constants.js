@@ -46,9 +46,10 @@ export const BLOCK_TYPE_DIAMOND_BLOCK = 21;
 export const BLOCK_TYPE_EMERALD_BLOCK = 22;
 export const BLOCK_TYPE_REDSTONE_BLOCK = 23;
 export const BLOCK_TYPE_QUARTZ_BLOCK = 24;
-export const BLOCK_TYPE_MAX = 24;
+export const BLOCK_TYPE_MIRROR = 25;
+export const BLOCK_TYPE_MAX = BLOCK_TYPE_MIRROR;
 
-export const ITEM_HANDLES = 'air,stone,grass,dirt,cobble,planks,bedrock,log,leaves,bricks,wool,sand,gravel,glass,bookshelf,obsidian,stone_bricks,sandstone,lapis_block,iron_block,gold_block,diamond_block,emerald_block,redstone_block,quartz_block'.split(',');
+export const ITEM_HANDLES = 'air,stone,grass,dirt,cobble,planks,bedrock,log,leaves,bricks,wool,sand,gravel,glass,bookshelf,obsidian,stone_bricks,sandstone,lapis_block,iron_block,gold_block,diamond_block,emerald_block,redstone_block,quartz_block,mirror_block'.split(',');
 export const ITEM_LABELS = locale_item_labels.split(',');
 export const ITEM_PALETTE_ROWS = 3;
 
@@ -79,6 +80,7 @@ export const BLOCK_COLORS = [
 	0x78db55, // EMERALD_BLOCK
 	0x0a1dac, // REDSTONE_BLOCK
 	0xe3eaed, // QUARTZ_BLOCK
+	0x000000, // MIRROR
 ];
 
 export const BLOCK_TYPE_FACE_LABELS = 'WEBTSNI';

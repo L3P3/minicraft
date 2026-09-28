@@ -46,6 +46,7 @@ error_world_not_uploaded: The world is not uploaded!
 error_world_upload: Error while uploading world: 
 game_saved: Game saved.
 gamemode_set_to: Game mode set to
+glass_clear: Clear glass
 inventory_cleared: Inventory cleared.
 inventory: Inventory
 item_labels: !!!not used in english!!!

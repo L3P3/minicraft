@@ -8,6 +8,8 @@ import {
 	BLOCK_TYPE_AIR,
 	BLOCK_TYPE_FACE_I,
 	BLOCK_TYPE_FACE_LABELS,
+	BLOCK_TYPE_GLASS,
+	BLOCK_TYPE_MIRROR,
 	CHUNK_HEIGHT,
 	CHUNK_HEIGHT_FACTOR,
 	CHUNK_HEIGHT_L2,
@@ -68,6 +70,10 @@ import {
 	world_block_get,
 	world_microtick,
 } from './m_world.js';
+
+const DIM_X = 0;
+const DIM_Y = 1;
+const DIM_Z = 2;
 
 // parse png
 let tiles_data = null;
@@ -186,6 +192,7 @@ export const renderer_render = (model, now) => {
 
 		const {
 			flag_blocks_dimming,
+			flag_glass_clear,
 			pixel_grouping,
 			view_distance,
 		} = config;
@@ -361,13 +368,13 @@ export const renderer_render = (model, now) => {
 						step_y_row * step_y_row +
 						step_z_raw * step_z_raw
 					);
-					const step_x = step_x_raw * step_inverse;
-					const step_y = step_y_row * step_inverse;
-					const step_z = step_z_raw * step_inverse;
+					let step_x = step_x_raw * step_inverse;
+					let step_y = step_y_row * step_inverse;
+					let step_z = step_z_raw * step_inverse;
 					// split signs and amounts
-					const step_x_sign = step_x > 0 ? 1 : step_x < 0 ? -1 : 0;
-					const step_y_sign = step_y > 0 ? 1 : step_y < 0 ? -1 : 0;
-					const step_z_sign = step_z > 0 ? 1 : step_z < 0 ? -1 : 0;
+					let step_x_sign = step_x > 0 ? 1 : step_x < 0 ? -1 : 0;
+					let step_y_sign = step_y > 0 ? 1 : step_y < 0 ? -1 : 0;
+					let step_z_sign = step_z > 0 ? 1 : step_z < 0 ? -1 : 0;
 					const step_x_delta = step_x_sign === 0 ? 1 / 0 : step_x_sign / step_x;
 					const step_y_delta = step_y_sign === 0 ? 1 / 0 : step_y_sign / step_y;
 					const step_z_delta = step_z_sign === 0 ? 1 / 0 : step_z_sign / step_z;
@@ -393,31 +400,34 @@ export const renderer_render = (model, now) => {
 						?	(position_z - check_z_block) * step_z_delta
 						:	(check_z_block - position_z + 1) * step_z_delta
 					);
+					let position_x_ray = position_x;
+					let position_y_ray = position_y;
+					let position_z_ray = position_z;
 
 					// render pixel, using dda raymarching
 					for (;;) {
-						let dim = 0;
+						let dim = DIM_X;
 						let step_dim = step_x;
 						let check_distance = check_distance_x;
 
 						if (check_distance_y < check_distance) {
-							dim = 1;
+							dim = DIM_Y;
 							step_dim = step_y;
 							check_distance = check_distance_y;
 						}
 						if (check_distance_z < check_distance) {
-							dim = 2;
+							dim = DIM_Z;
 							step_dim = step_z;
 							check_distance = check_distance_z;
 						}
 
 						if (check_distance >= view_distance) break;
 
-						if (dim === 0) {
+						if (dim === DIM_X) {
 							check_x_block += step_x_sign;
 							check_distance_x += step_x_delta;
 						}
-						else if (dim === 1) {
+						else if (dim === DIM_Y) {
 							check_y_block += step_y_sign;
 							check_distance_y += step_y_delta;
 						}
@@ -470,12 +480,48 @@ export const renderer_render = (model, now) => {
 							focus_distance_min = check_distance;
 						}
 
+						if (
+							flag_glass_clear &&
+							block === BLOCK_TYPE_GLASS ||
+							block === BLOCK_TYPE_MIRROR
+						) {
+							pixel_factor *= 0.9;
+							// pass through?
+							if (
+								block === BLOCK_TYPE_GLASS &&
+								(canvas_x ^ canvas_y) & 1
+							) {}
+							// reflect, which direction?
+							else if (dim === DIM_X) {
+								position_x_ray += 2 * step_x * check_distance;
+								step_x = -step_x;
+								check_x_block += (
+									step_x_sign = -step_x_sign
+								);
+							}
+							else if (dim === DIM_Y) {
+								position_y_ray += 2 * step_y * check_distance;
+								step_y = -step_y;
+								check_y_block += (
+									step_y_sign = -step_y_sign
+								);
+							}
+							else {
+								position_z_ray += 2 * step_z * check_distance;
+								step_z = -step_z;
+								check_z_block += (
+									step_z_sign = -step_z_sign
+								);
+							}
+							continue;
+						}
+
 						// calculate color
 						if (flag_textures) {
 							// shift so that block id 1 => tile 0
 							--block;
 
-							if (dim === 1) {
+							if (dim === DIM_Y) {
 								if (block === TILE_LOG_SIDE)
 									block = TILE_LOG_TOP;
 								else if (block === TILE_BOOKSHELF)
@@ -489,8 +535,8 @@ export const renderer_render = (model, now) => {
 								block = TILE_GRASS_SIDE;
 
 							// intersected pixel in world coordinates
-							const hit_x = position_x + step_x * check_distance;
-							const hit_z = position_z + step_z * check_distance;
+							const hit_x = position_x_ray + step_x * check_distance;
+							const hit_z = position_z_ray + step_z * check_distance;
 							// pick pixel from texture
 							const texture_pixel = tiles_data[
 								block << (TILES_RESOLUTION_LOG2 * 2) |
@@ -498,16 +544,16 @@ export const renderer_render = (model, now) => {
 									// y
 									Math_floor(
 										(
-											dim === 1
+											dim === DIM_Y
 											?	hit_z
-											:	position_y + step_y * check_distance
+											:	position_y_ray + step_y * check_distance
 										) * TILES_RESOLUTION
 									) & (TILES_RESOLUTION - 1)
 								) << TILES_RESOLUTION_LOG2 |
 								// x
 								Math_floor(
 									(
-										dim === 1
+										dim === DIM_Y
 										?	hit_x
 										:	(
 											step_dim > 0
@@ -526,12 +572,12 @@ export const renderer_render = (model, now) => {
 						}
 						else pixel_color = BLOCK_COLORS[block];
 
-						pixel_factor = (
+						pixel_factor *= (
 							// fake shadow to see edges
 							(
-								dim === 0
+								dim === DIM_X
 								?	.8
-								: dim === 2
+								: dim === DIM_Z
 								?	.6
 								: step_dim > 0
 								?	.4

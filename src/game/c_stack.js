@@ -5,6 +5,8 @@ import {
 } from '../etc/lui.js';
 
 import {
+	BLOCK_TYPE_GLASS,
+	BLOCK_TYPE_MIRROR,
 	GAMEMODE_CREATIVE,
 	ITEM_HANDLES,
 	ITEM_LABELS,
@@ -21,7 +23,18 @@ const Bitmap = ({
 	hook_dom('div[className=bitmap]', {
 		S: {
 			backgroundImage: `url(${API_DATA}textures/${textures_id}.png)`,
-			backgroundPositionY: 100 - id * 100 + '%',
+			// TODO placeholder until we have new surfaces
+			backgroundColor: (
+				id === BLOCK_TYPE_MIRROR
+				?	'#84b1ff'
+				:	''
+			),
+			backgroundPositionY: 100 - (
+				// TODO placeholder until we have new surfaces
+				id === BLOCK_TYPE_MIRROR
+				?	BLOCK_TYPE_GLASS
+				:	id
+			) * 100 + '%',
 		},
 	}),
 	null

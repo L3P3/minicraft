@@ -46,9 +46,10 @@ error_world_not_uploaded: Dünya henüz yüklenmedi!
 error_world_upload: Dünyayı yüklerken hata oluştu: 
 game_saved: Oyun kaydedildi.
 gamemode_set_to: Oyun modu ayarlandı
+glass_clear: Şeffaf cam
 inventory_cleared: Envanter temizlendi.
 inventory: Envanter
-item_labels: Hava,Taş,Çimen,Toprak,Parke Taşı,Kalas,Katman Kayası,Kütük,Yapraklar,Tuğlalar,Yün,Kum,Çakıl,Cam,Kitaplık,Obsidyen,Lapis Lazuli,Taş Tuğlalar,Kumtaşı,Lapis Lazuli Bloğu,Demir Blok,Altın Blok,Elmas Blok,Zümrüt Blok,Kızıltaş Blok,Kuvars Blok
+item_labels: Hava,Taş,Çimen,Toprak,Parke Taşı,Kalas,Katman Kayası,Kütük,Yapraklar,Tuğlalar,Yün,Kum,Çakıl,Cam,Kitaplık,Obsidyen,Lapis Lazuli,Taş Tuğlalar,Kumtaşı,Lapis Lazuli Bloğu,Demir Blok,Altın Blok,Elmas Blok,Zümrüt Blok,Kızıltaş Blok,Kuvars Blok,Ayna bloğu
 items_given: Verilen eşyalar: 
 locked: Kilitli
 login: Giriş yap

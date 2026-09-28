@@ -46,9 +46,10 @@ error_world_not_uploaded: ¡El mundo no se ha subido!
 error_world_upload: Error al subir el mundo: 
 game_saved: Juego guardado.
 gamemode_set_to: Modo de juego establecido
+glass_clear: Cristal transparente
 inventory_cleared: Inventario vaciado.
 inventory: Inventario
-item_labels: Aire,Piedra,Bloque de hierba,Tierra,Adoquín,Tablones,Piedra base,Tronco,Hojas,Ladrillos,Lana,Arena,Grava,Cristal,Estantería,Obsidiana,Ladrillos de piedra,Arenisca,Bloque de lapislázuli,Bloque de hierro,Bloque de oro,Bloque de diamante,Bloque de esmeralda,Bloque de redstone,Bloque de cuarzo
+item_labels: Aire,Piedra,Bloque de hierba,Tierra,Adoquín,Tablones,Piedra base,Tronco,Hojas,Ladrillos,Lana,Arena,Grava,Cristal,Estantería,Obsidiana,Ladrillos de piedra,Arenisca,Bloque de lapislázuli,Bloque de hierro,Bloque de oro,Bloque de diamante,Bloque de esmeralda,Bloque de redstone,Bloque de cuarzo,Bloque espejo
 items_given: Se han dado
 locked: Bloqueado
 login: Iniciar sesión
