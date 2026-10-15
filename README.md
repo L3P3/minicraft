@@ -94,6 +94,12 @@ To bundle the app, run `bun run build.js`. The result will be put into the `/dis
 - [jsDelivr](https://www.jsdelivr.com) for distribution
 - [GitHub](https://github.com) for everything else
 
+## Paradigms
+
+- m_* files are [modular](https://en.wikipedia.org/wiki/Modular_programming), containing functions that work with their "structs" (objects) &ndash; none of that class rubbish
+- c_* files contain declarative lui components &ndash; also none of that class rubbish
+- files in etc contain other stuff
+
 ## Contribution
 
 I am really happy to answer any questions or getting any kind of feedback. Feel free to open issues or suggest changes by opening a pull request!
