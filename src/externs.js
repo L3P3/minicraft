@@ -344,47 +344,26 @@ function close(){}
 function focus(){}
 
 // Window event handlers
-/** @type {function(!Event):*} */
-function onbeforeinstallprompt(){}
-
-/** @type {function(!Event):*} */
+/** @type {function():*} */
 function onbeforeunload(){}
 
-/** @type {function(!Event):*} */
+/** @type {function():*} */
 function onblur(){}
 
-/** @type {function(!Event):*} */
+/** @type {function():*} */
 function onfocus(){}
 
-/** @type {function(!Event):*} */
+/** @type {function():*} */
 function onpagehide(){}
 
-/** @type {function(!Event):*} */
+/** @type {function():*} */
 function onpageshow(){}
 
-/** @type {function(!Event):*} */
+/** @type {function():*} */
 function onunload(){}
 
 /** @type {function(!Event):*} */
 function onerror(error){}
-
-/** @type {function(!KeyboardEvent):*} */
-function onkeydown(event){}
-
-/** @type {function(!Event):*} */
-function oncontextmenu(){}
-
-/** @type {function(!Event):*} */
-function ondragstart(){}
-
-/** @type {function(!MouseEvent):*} */
-var onmousemove;
-
-/** @type {function(!MouseEvent):*} */
-var onmousedown;
-
-/** @type {function(!MouseEvent):*} */
-var onmouseup;
 
 /** @type {function():*} */
 var onresize;

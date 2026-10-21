@@ -51,6 +51,9 @@ import {
 	tiles_set,
 } from './game/m_renderer.js';
 import {
+	worlds,
+} from './game/m_world.js';
+import {
 	world_store_init,
 	world_store_sync_check,
 } from './game/m_world_store.js';
@@ -95,12 +98,24 @@ function Root() {
 
 		let unloaded = false;
 
-		// shotgun method
-		window_.onunload = onbeforeunload = onpagehide = onblur = () => {
-			if (unloaded) return;
-			unloaded = true;
-			for (const game of games) game_save(game, true);
-			actions.config_save();
+		// shotgun method; try to save as much as possible on page unload
+		window_.onunload = onpagehide = onblur = () => {
+			if (!unloaded) {
+				unloaded = true;
+				for (const game of games) game_save(game, true);
+				actions.config_save();
+			}
+		};
+		onbeforeunload = () => {
+			onblur();
+			for (const world of worlds.values()) {
+				if (
+					world.saves_pending > 0 ||
+					world.flag_dirty && !world.flag_frozen
+				) {
+					return true;
+				}
+			}
 		};
 		onpageshow = onfocus = () => (
 			unloaded = false,
