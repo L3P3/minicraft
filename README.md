@@ -8,6 +8,10 @@ Minecraft, but based on ray tracing and written in JavaScript, following my own 
 
 [User manual](https://github.com/L3P3/minicraft/wiki)
 
+## Developer documentation
+
+Technical guides for contributors and curious readers are available in [`docs/`](docs/README.md), including the [architecture](docs/architecture.md), [raycaster](docs/raycaster.md), [surface images](docs/surfaces.md), [storage](docs/storage.md), and [build process](docs/build.md).
+
 Heavily inspired by and somewhat based on the work of [@xNotch](https://github.com/xNotch).
 
 ## TODOs
@@ -32,7 +36,7 @@ Heavily inspired by and somewhat based on the work of [@xNotch](https://github.c
 - [x] production build
 - [x] build/destroy
 - [x] persistent user configuration
-- [x] texturing
+- [x] surface support
 - [x] multiple chunks
 - [x] load/save chunks
 - [x] basic mobile view
@@ -108,4 +112,4 @@ I am really happy to answer any questions or getting any kind of feedback. Feel 
 
 Just ZLib license, I do not care too much about it.
 
-This game uses slightly modified textures from Minecraft, which is of course owned by Microsoft. Since this is a purely educational project, I deem this fair use.
+This game uses slightly modified surface artwork from Minecraft, which is of course owned by Microsoft. Since this is a purely educational project, I deem this fair use.
