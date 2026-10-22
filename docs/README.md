@@ -8,5 +8,6 @@ These guides describe the implementation in this repository. The GitHub wiki was
 - [Storage](storage.md) — local configuration, world metadata, chunk data, and save timing.
 - [Terminal commands](commands.md) — in-game commands and parser details.
 - [Build and run](build.md) — local preview, build commands, and generated variants.
-- [Raycaster](raycaster.md) — CPU pixel renderer, voxel traversal, texturing, and tradeoffs.
+- [Raycaster](raycaster.md) — CPU pixel renderer, voxel traversal, surface sampling, and tradeoffs.
+- [Surfaces](surfaces.md) — surface atlas dimensions, tile order, and where to browse or submit surface sets.
 - [Design](design.md) — source layout, coding patterns, legacy support, and project limitations.

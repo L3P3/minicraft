@@ -38,9 +38,9 @@ The graph shows the main route, not every import. The top-level app is a windowe
 | `src/game/m_game.js` | Coordinates player, world, and renderer; maps input to actions; handles terminal commands and chat polling. |
 | `src/game/m_player.js` | Plain-object player model and movement/rotation math. |
 | `src/game/m_world.js` | Block indexing, chunk-window movement/loading, world time, chunk serialization, and player/world metadata. |
-| `src/game/m_renderer.js` | Reads world blocks, ray-marches each output pixel, applies texture/shading/reflection rules, and paints a 2D canvas. |
+| `src/game/m_renderer.js` | Reads world blocks, ray-marches each output pixel, applies surface/shading/reflection rules, and paints a 2D canvas. |
 | `src/game/c_bar.js`, `c_inventory.js`, `c_messages.js`, `c_settings.js`, `c_terminal.js`, `c_touch.js` | Declarative HUD, inventory, message, settings, terminal, and touch-control components. |
-| `src/etc/constants.js`, `helpers.js`, `locale.js`, `textures.js`, `lz.js`, `env.js` | Shared constants, browser compatibility wrappers, generated translations, texture IDs, compression, and build-time environment values. |
+| `src/etc/constants.js`, `helpers.js`, `locale.js`, `textures.js`, `lz.js`, `env.js` | Shared constants, browser compatibility wrappers, generated translations, surface tile IDs, compression, and build-time environment values. |
 | `build.js` | Generates language/environment variants and compiles JavaScript and CSS for distribution. |
 
 ## Runtime loop
@@ -57,4 +57,4 @@ The player and world are ordinary objects manipulated by functions in `m_*` modu
 - [`src/game/m_world.js`](../src/game/m_world.js): in-memory voxel and chunk layout.
 - [`src/etc/state.js`](../src/etc/state.js), [`src/etc/storage.js`](../src/etc/storage.js), and [`src/game/m_world_store.js`](../src/game/m_world_store.js): app state, local persistence, and remote sync respectively.
 
-Remote API details are in [api.md](api.md); the local data model is in [storage.md](storage.md).
+Remote API details are in [api.md](api.md); the local data model is in [storage.md](storage.md); surface atlas layout and management are in [surfaces.md](surfaces.md).

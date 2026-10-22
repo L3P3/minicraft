@@ -8,15 +8,15 @@ The renderer is in [`src/game/m_renderer.js`](../src/game/m_renderer.js). It use
 2. For each output row and pixel (or pixel group), the code derives a view direction from pixel coordinates and field of view, then normalizes it.
 3. A 3D grid traversal tracks the distance to the next x, y, and z block boundary. It advances along whichever boundary is nearest, checks that voxel, and stops at a solid hit, vertical world boundary, or configured view distance. This is a DDA-style ray march.
 4. A hit can update the player's center-screen block focus, which is how input knows which block to mine or place.
-5. The renderer selects a color from a texture atlas or fallback block-color table, applies face-dependent shading and optional dimming, then writes the packed pixel value into the image buffer.
+5. The renderer selects a color from a surface atlas or fallback block-color table, applies face-dependent shading and optional dimming, then writes the packed pixel value into the image buffer.
 
 The block data is read directly from `m_world.js`'s typed-array-backed voxel buffer. Horizontal coordinates wrap with a bit mask; vertical coordinates stop at the configured world height.
 
-## Textures, glass, and mirrors
+## Surfaces, glass, and mirrors
 
-Texture images are loaded from the configured static-data endpoint. The renderer copies the atlas into a `Uint32Array`; face orientation selects the appropriate block tile, and transparent texels allow the ray to continue. If “clear glass” is enabled, glass can be passed through using a checkerboard pixel pattern. Mirror blocks reflect the ray by reversing its component along the hit face's axis; this is a compact single-ray approximation, not a general reflection or lighting system.
+Surface images are loaded from the configured static-data endpoint. The renderer copies the atlas into a `Uint32Array`; face orientation selects the appropriate block tile, and transparent texels allow the ray to continue. If “clear glass” is enabled, glass can be passed through using a checkerboard pixel pattern. Mirror blocks reflect the ray by reversing its component along the hit face's axis; this is a compact single-ray approximation, not a general reflection or lighting system. See [surfaces.md](surfaces.md) for image dimensions and tile ordering.
 
-If textures are unavailable/disabled, `BLOCK_COLORS` supplies a flat color per block type. Shading is inexpensive: different faces receive fixed factors, the focused block is highlighted, and optional block dimming scales by the world-time sky brightness. Dynamic lighting is listed as unfinished in the README.
+If surfaces are unavailable/disabled, `BLOCK_COLORS` supplies a flat color per block type. Shading is inexpensive: different faces receive fixed factors, the focused block is highlighted, and optional block dimming scales by the world-time sky brightness. Dynamic lighting is listed as unfinished in the README.
 
 ## Performance tradeoffs
 

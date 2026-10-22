@@ -22,8 +22,8 @@ The server implementation is not in this repository. This guide documents the cl
 | Upload world data | `POST API + world`, JSON `{what: "data", world, data}` | Sends all locally stored world metadata/chunks; updates the local/remote modification timestamps from the response. |
 | Edit world metadata | `POST API + world`, JSON `{what: "meta", world, ...}` | Used for label, lock, and public/private changes. |
 | Delete remote world | `DELETE API + world`, JSON `{what: "world", world}` | Deletes the selected remote world and refreshes the listing. |
-| Get texture catalog | `GET API_DATA + textures.json` | Used by settings to list available texture sets. |
-| Download a texture image | `GET API_DATA + textures/{id}.png` | Loaded by the renderer; image pixels are copied into a typed array. |
+| Get surface catalog | `GET API_DATA + textures.json` | Used by settings to list available surface sets. The legacy endpoint path is still named `textures.json`. |
+| Download a surface image | `GET API_DATA + textures/{id}.png` | Loaded by the renderer; image pixels are copied into a typed array. The legacy endpoint path is still named `textures/{id}.png`. |
 | Chat poll/send | `GET API_CHAT`; `POST API_CHAT`, JSON `{msg}` | Polls roughly every five seconds; successful returned lines beginning with `<` are displayed. |
 
 The exact URL assembly and response parsing are in [`src/game/m_world_store.js`](../src/game/m_world_store.js), [`src/game/c_menu_start.js`](../src/game/c_menu_start.js), [`src/game/c_settings.js`](../src/game/c_settings.js), and [`src/game/m_renderer.js`](../src/game/m_renderer.js). Chat URL selection is in [`src/etc/constants.js`](../src/etc/constants.js); polling is in [`src/game/m_game.js`](../src/game/m_game.js).

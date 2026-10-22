@@ -4,7 +4,7 @@ Local persistence has two layers: app configuration/world-list metadata in `loca
 
 ## App configuration
 
-`src/etc/state.js` reads the `minicraft.config` key during module initialization. It restores settings such as view distance, texture selection, resolution scaling, and the selected world, plus the local world listing. The `config_save` reducer serializes these fields back under the same key. Touch detection is runtime state and is not persisted.
+`src/etc/state.js` reads the `minicraft.config` key during module initialization. It restores settings such as view distance, surface selection, resolution scaling, and the selected world, plus the local world listing. The `config_save` reducer serializes these fields back under the same key. Touch detection is runtime state and is not persisted.
 
 `src/app.js` calls configuration save from its 200 ms interval and on page unload. Configuration saves are skipped when the config object has not changed.
 
