@@ -49,6 +49,8 @@ From the same surface picker, choose **Add surface**. The app opens the hosted s
 
 [`https://l3p3.de/svr/minicraft/textures.html`](https://l3p3.de/svr/minicraft/textures.html)
 
-The actual upload/editor implementation is hosted remotely and is not part of this repository, so its account requirements and submission validation cannot be documented from these sources. In the client, the catalog is requested from `API_DATA + textures.json`, and an image for a selected ID is loaded from `API_DATA + textures/{id}.png`. These endpoint names remain `textures` in the implementation.
+The manager is implemented in the companion `rtjscomp` server project at `public/svr/minicraft/textures.html`. It requires a signed-in account to submit. Creating a pack requires an image; editing an existing pack requires the account to own it or have administrator permission, and the image can be omitted to keep the current one. The submitted PNG must be valid and exactly **16 × 416 pixels**. The label is limited to 30 characters. Accepted images appear in the public catalog and are available at the static image URL. See [api.md](api.md#surface-catalog-and-uploads) for details.
+
+In the client, the catalog is requested from `API_DATA + textures.json`, and an image for a selected ID is loaded from `API_DATA + textures/{id}.png`. These endpoint names remain `textures` in the implementation.
 
 Relevant code: [`src/game/c_settings.js`](../src/game/c_settings.js) loads the catalog and exposes the Add surface link; [`src/game/m_renderer.js`](../src/game/m_renderer.js) loads and slices the image; [`src/etc/textures.js`](../src/etc/textures.js) defines tile order; and [`src/game/c_stack.js`](../src/game/c_stack.js) uses the image for inventory icons.

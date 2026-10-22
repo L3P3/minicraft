@@ -4,7 +4,7 @@ These guides describe the implementation in this repository. The GitHub wiki was
 
 - [Architecture](architecture.md) — runtime graph and responsibilities of its major nodes.
 - [lui](lui.md) — the UI component, node, and hook model used by the app.
-- [Remote API](api.md) — observed HTTP endpoints, synchronization, and known server-side unknowns.
+- [Remote API](api.md) — verified world, chat, account, and surface behavior from the client and companion server implementation.
 - [Storage](storage.md) — local configuration, world metadata, chunk data, and save timing.
 - [Terminal commands](commands.md) — in-game commands and parser details.
 - [Build and run](build.md) — local preview, build commands, and generated variants.

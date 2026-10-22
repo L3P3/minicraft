@@ -1,5 +1,5 @@
 /**
-	@type {typeof import('lui/index')}
+	@type {typeof import('lui')}
 */
 export const lui_ = lui;
 

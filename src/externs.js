@@ -1,5 +1,5 @@
 /** @externs */
-// lui types from lui/index.d.ts
+// lui types from the lui package's index.d.ts
 /* eslint-disable no-unused-vars */
 
 /**

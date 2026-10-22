@@ -242,7 +242,7 @@ while (true) {
 		if (js_changed) {
 			const promise_lui_replace = file_replace(
 				'./src/etc/lui.js',
-				[["@type {typeof import('lui/index')}", "@type {Object}"]]
+				[["@type {typeof import('lui')}", "@type {Object}"]]
 			);
 			for (const lang of languages) {
 				const promises_before = Promise.all([
@@ -278,7 +278,7 @@ while (true) {
 				),
 				file_replace(
 					'./src/etc/lui.js',
-					[["@type {Object}", "@type {typeof import('lui/index')}"]]
+					[["@type {Object}", "@type {typeof import('lui')}"]]
 				),
 				lang_last === 'en' ? null : lang_generate('en'),
 			]);

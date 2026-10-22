@@ -1,14 +1,14 @@
 {
 	"compilerOptions": {
-		"baseUrl": "./src",
 		"lib": ["ESNext", "DOM"],
-		"moduleResolution": "classic",
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
 		"target": "ESNext"
 	},
 	"include": [
 		"src/**/*"
 	],
 	"exclude": [
-		"src/externs.js",
+		"src/externs.js"
 	],
 }
