@@ -9,6 +9,17 @@ export const APP_VIEW_GAME = 0;
 export const APP_VIEW_SETTINGS = 1;
 export const APP_VIEW_WORLDS = 2;
 
+export const GAMEMODE_SURVIVAL = 0;
+export const GAMEMODE_CREATIVE = 1;
+export const GAMEMODE_SPECTATOR = 2;
+
+export const PLAYER_FOCUS_DISTANCE_CREATIVE = 6;
+export const PLAYER_FOCUS_DISTANCE_NORMAL = 4;
+export const PLAYER_SLOTS = 9;
+export const PLAYER_INVENTORY = PLAYER_SLOTS * 4;
+
+export const STACK_SIZE = 64;
+
 export const CHUNK_WIDTH_L2 = 4;
 export const CHUNK_WIDTH = 1 << CHUNK_WIDTH_L2;
 export const CHUNK_HEIGHT_FACTOR_L2 = 2;
@@ -51,7 +62,7 @@ export const BLOCK_TYPE_MAX = BLOCK_TYPE_MIRROR;
 
 export const ITEM_HANDLES = 'air,stone,grass,dirt,cobble,planks,bedrock,log,leaves,bricks,wool,sand,gravel,glass,bookshelf,obsidian,stone_bricks,sandstone,lapis_block,iron_block,gold_block,diamond_block,emerald_block,redstone_block,quartz_block,mirror_block'.split(',');
 export const ITEM_LABELS = locale_item_labels.split(',');
-export const ITEM_PALETTE_ROWS = 3;
+export const ITEM_PALETTE_ROWS = 3; // = Math.ceil(BLOCK_TYPE_MAX / PLAYER_SLOTS);
 
 // B G R
 export const BLOCK_COLORS = [
@@ -91,17 +102,6 @@ export const BLOCK_TYPE_FACE_T = 3;
 export const BLOCK_TYPE_FACE_S = 4;
 export const BLOCK_TYPE_FACE_N = 5;
 export const BLOCK_TYPE_FACE_I = 6;
-
-export const GAMEMODE_SURVIVAL = 0;
-export const GAMEMODE_CREATIVE = 1;
-export const GAMEMODE_SPECTATOR = 2;
-
-export const PLAYER_FOCUS_DISTANCE_CREATIVE = 6;
-export const PLAYER_FOCUS_DISTANCE_NORMAL = 4;
-export const PLAYER_SLOTS = 9;
-export const PLAYER_INVENTORY = PLAYER_SLOTS * 4;
-
-export const STACK_SIZE = 64;
 
 export const FLATMAP_LAYERS_LENGTH = 7;
 

@@ -1,5 +1,11 @@
 # Architecture
 
+## Paradigms
+
+- m_* files are [modular](https://en.wikipedia.org/wiki/Modular_programming), containing functions that work with their "structs" (objects) &ndash; none of that class rubbish
+- c_* files contain declarative lui components &ndash; also none of that class rubbish
+- files in etc contain other stuff
+
 ## Runtime graph
 
 ```text

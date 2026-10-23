@@ -2,88 +2,21 @@
 
 ![Screenshot](https://l3p3.de/media/minicraft1.png)
 
-Minecraft, but based on ray tracing and written in JavaScript, following my own rules.
+Minecraft, but in JavaScript, with raymarching, without GPU.
 
 [>>> START MINICRAFT <<<](https://l3p3.de/minicraft)
 
-[User manual](https://github.com/L3P3/minicraft/wiki)
+[How to use](https://github.com/L3P3/minicraft/wiki)
 
-## Developer documentation
-
-Technical guides for contributors and curious readers are available in [`docs/`](docs/README.md), including the [architecture](docs/architecture.md), [raycaster](docs/raycaster.md), [surface images](docs/surfaces.md), [storage](docs/storage.md), and [build process](docs/build.md).
-
-Heavily inspired by and somewhat based on the work of [@xNotch](https://github.com/xNotch).
-
-## TODOs
-
-- [x] study computer science and math
-- [x] steal idea from [@xNotch](https://github.com/xNotch)
-- [x] proof of concept
-- [x] tell everybody about this project
-- [x] get rich
-- [x] annoy everybody with this project
-- [x] new file structure
-- [x] basic component tree
-- [x] basic models
-- [x] basic rasterization
-- [x] key handling
-- [x] settings menu
-- [x] comprehensive readme
-- [x] solve wrong-fps issue
-- [x] world/chunk/player model
-- [x] actual raytracing
-- [x] correct raytracing
-- [x] production build
-- [x] build/destroy
-- [x] persistent user configuration
-- [x] surface support
-- [x] multiple chunks
-- [x] load/save chunks
-- [x] basic mobile view
-- [x] chat/terminal
-- [x] more blocks
-- [x] higher world
-- [x] inventory
-- [x] gamemode
-- [x] multiple worlds
-- [x] download/upload worlds
-- [x] good styled ui
-- [x] support older browsers
-- [x] time of day
-- [x] reflections
-- [ ] dynamic lighting
-- [ ] world edit
-- [ ] multiplayer
-- [ ] sound
-- [ ] entity models
-- [ ] collision
-- [ ] good mobile view
-- [ ] migrate to typescript?
-- [ ] sky elements
-- [ ] non-cubic blocks
-- [ ] visible entities
-- [ ] particles
-- [ ] multi-threading?
-- [ ] use gpu?
-- [ ] get a lawyer?
+[How it works](docs/README.md)
 
 ## How to run locally
 
 I highly recommend using Visual Studio Code and the extension "Live Server". Start it via "Go Live" and open "http://localhost:5500/app-dev.html" to see the result.
 
-If you use another IDE that does not have a similar feature, you may once do `sudo apt install esbuild`, then run `npm start` and click the link and open `app-dev.html`. But I do not recommend this approach.
+If that does not work, you may also once do `sudo apt install esbuild`, then run `npm start` and click the link and open `app-dev.html`.
 
-> [!TIP]
-> An http server is only needed when using `app-dev.html`, since `import` statements are not supported in `file://` protocol.
-
-## Build instructions
-
-> [!IMPORTANT]
-> Building is **not needed** unless my server is down and you want to mirror https://l3p3.de/minicraft!
-
-After cloning, you need to run `bun install` once to install the build tools. The build script is designed to run under Linux with [bun](https://bun.sh), see [the GitHub actions file](.github/workflows/build.yml) and [the build script itself](build.js) to learn more about the build environment.
-
-To bundle the app, run `bun run build.js`. The result will be put into the `/dist` directory and can be tested at "http://localhost:5500/app-prod.html".
+A temporary http server is only needed because `import` statements are not allowed in `file://` protocol.
 
 ## My tools
 
@@ -96,13 +29,8 @@ To bundle the app, run `bun run build.js`. The result will be put into the `/dis
 - [bun](https://bun.sh) for packing CSS
 - [GitHub Actions](https://github.com/features/actions) for automatic building
 - [jsDelivr](https://www.jsdelivr.com) for distribution
+- [GitHub Copilot](https://code.visualstudio.com/docs/agents/overview) sometimes
 - [GitHub](https://github.com) for everything else
-
-## Paradigms
-
-- m_* files are [modular](https://en.wikipedia.org/wiki/Modular_programming), containing functions that work with their "structs" (objects) &ndash; none of that class rubbish
-- c_* files contain declarative lui components &ndash; also none of that class rubbish
-- files in etc contain other stuff
 
 ## Contribution
 
@@ -111,5 +39,7 @@ I am really happy to answer any questions or getting any kind of feedback. Feel 
 ## License
 
 Just ZLib license, I do not care too much about it.
+
+Heavily inspired by and somewhat based on the work of [@xNotch](https://github.com/xNotch).
 
 This game uses slightly modified surface artwork from Minecraft, which is of course owned by Microsoft. Since this is a purely educational project, I deem this fair use.

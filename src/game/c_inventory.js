@@ -35,16 +35,20 @@ import {
 
 import Stack from './c_stack.js';
 
+const template_slots = Array_(PLAYER_SLOTS).fill(null);
+
 /**
 	maps rows/columns to inventory index
 */
-const template = Array_(4).fill(null).map((_, row) =>
-	Array_(PLAYER_SLOTS).fill(null).map((_, column) =>
+const template_inventory = Array_(4).fill(null).map((_, row) =>
+	template_slots.map((_, column) =>
 		row * PLAYER_SLOTS + column
 	)
 );
 // move first row to the end
-template.push(template.shift());
+template_inventory.push(template_inventory.shift());
+
+const template_palette_rows = Array_(ITEM_PALETTE_ROWS).fill(null);
 
 function Palette({
 	slot_hand,
@@ -52,26 +56,24 @@ function Palette({
 	td_style,
 }) {
 	hook_dom('table', {
-		onclick: ({
-			target,
-		}) => {
-			if (target.className === 'bitmap') {
+		onclick: event => {
+			if (event.target.className === 'bitmap') {
 				slot_transfer(
 					slot_create(
 						stack_create(
-							Number_(target.parentElement.parentElement.dataset.id)
+							Number_(event.target.parentElement.parentElement.dataset.id)
 						)
 					),
 					slot_hand
 				);
 			}
-			return false;
+			event.stopPropagation();
 		},
 	});
 
 	let id = 0;
-	return Array_(ITEM_PALETTE_ROWS).fill(null).map(() =>
-		node_dom('tr', null, Array_(PLAYER_SLOTS).fill(null).map(() =>
+	return template_palette_rows.map(() =>
+		node_dom('tr', null, template_slots.map(() =>
 			++id < BLOCK_TYPE_MAX + 1 &&
 			node_dom('td', {
 				D: {
@@ -112,11 +114,11 @@ export default function Inventory({
 
 	const {gamemode} = game.player;
 
-	hook_dom('div[className=menu]', hook_memo(() => ({
+	const menu_element = hook_dom('div[className=menu][style=overflow:hidden]', hook_memo(() => ({
 		onclick: ({
 			target,
 		}) => {
-			if (target.className === 'menu') {
+			if (target === menu_element) {
 				if (slot_hand.content) {
 					slot_hand.content = null;
 				}
@@ -125,18 +127,13 @@ export default function Inventory({
 				}
 			}
 			else if (
-				target.parentElement.className === 'stack' &&
-					target.parentElement.parentElement.dataset.slot ||
-				target.tagName === 'TD'
+				target.tagName === 'TD' ||
+				target.parentElement.className === 'stack' && (
+					target = target.parentElement.parentElement
+				)
 			) {
 				const slot = game.player.inventory[
-					Number_(
-						(
-							target.tagName === 'TD'
-							?	target
-							:	target.parentElement.parentElement
-						).dataset.slot
-					)
+					Number_(target.dataset.slot)
 				];
 				if (slot_hand.content) {
 					slot_transfer(slot_hand, slot);
@@ -149,7 +146,7 @@ export default function Inventory({
 		oncontextmenu: ({
 			target,
 		}) => {
-			if (target.className === 'menu') {
+			if (target === menu_element) {
 				if (!slot_hand.content) {
 					game_menu_close(game);
 				}
@@ -158,18 +155,13 @@ export default function Inventory({
 				}
 			}
 			else if (
-				target.parentElement.className === 'stack' &&
-					target.parentElement.parentElement.dataset.slot ||
-				target.tagName === 'TD'
+				target.tagName === 'TD' ||
+				target.parentElement.className === 'stack' && (
+					target = target.parentElement.parentElement
+				)
 			) {
 				const slot = game.player.inventory[
-					Number_(
-						(
-							target.tagName === 'TD'
-							?	target
-							:	target.parentElement.parentElement
-						).dataset.slot
-					)
+					Number_(target.dataset.slot)
 				];
 				if (slot_hand.content) {
 					slot_transfer(slot_hand, slot, 1);
@@ -212,7 +204,7 @@ export default function Inventory({
 				textures_id,
 				td_style,
 			}),
-			node_dom('table', null, template.map((columns, row_num) =>
+			node_dom('table', null, template_inventory.map((columns, row_num) =>
 				node_dom((
 					row_num < 3 ? 'tr' : 'tr[className=last]'
 				), null, columns.map(slot =>

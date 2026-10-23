@@ -1,18 +1,17 @@
 # Remote API and network behavior
 
-This guide describes the Minicraft client and the companion server routes in `rtjscomp`. The route mappings are in `rtjscomp.json`; the world and chat handlers are in `public/svr/minicraft/storage.json` and `public/svr/chat/api.txt`. This describes the current implementation, not a separately versioned API contract.
+This guide describes the minicraft client and its companion server routes. It describes the current implementation, not a separately versioned API contract.
 
 ## URLs and routing
 
-`src/etc/env.js` defines the client base URLs. The checked-in development values are protocol-relative `//l3p3.de/api/minicraft/` and `//l3p3.de/static/minicraft/`; production builds use same-origin `/api/minicraft/` and `/static/minicraft/` paths (see [build.md](build.md)). The backend configuration maps:
+`src/etc/env.js` defines the client base URLs. The checked-in development values are protocol-relative `//l3p3.de/api/minicraft/` and `//l3p3.de/static/minicraft/`; production builds use same-origin `/api/minicraft/` and `/static/minicraft/` paths (see [build.md](build.md)). The server exposes these public routes:
 
-| Public path | rtjscomp target | Purpose |
-| --- | --- | --- |
-| `/api/minicraft/world` | `public/svr/minicraft/storage.json` | World metadata and data API |
-| `/api/chat` | `public/svr/chat/api.txt` | HTTP chat poll/send |
-| `/account` | `public/svr/account/account.html` | HTML registration, login, and account page |
-| `/login` | `public/svr/account/login.html` | 301 redirect to `/account` |
-| `/static/minicraft/...` | static files | Client builds, texture catalog/images, and world snapshots |
+| Public path | Purpose |
+| --- | --- |
+| `/api/minicraft/world` | World metadata and data API |
+| `/api/chat` | HTTP chat poll/send |
+| `/account` | HTML registration, login, and account page |
+| `/static/minicraft/...` | Client builds, texture catalog/images, and world snapshots |
 
 API requests use the browser's `fetch`; JSON POSTs set `Content-Type: application/json`. Successful world API responses are JSON. The client helper parses successful responses as JSON and rejects non-2xx responses.
 
@@ -56,7 +55,7 @@ The snapshot is a JSON object of string-keyed entries, including `meta` and chun
 
 ## Chat API
 
-`/api/chat` maps to `public/svr/chat/api.txt`. The client polls about every five seconds with `GET /api/chat` and sends `POST /api/chat` with JSON `{ "msg": "..." }`.
+The client polls about every five seconds with `GET /api/chat` and sends `POST /api/chat` with JSON `{ "msg": "..." }`.
 
 - Optional `since` is a numeric timestamp in milliseconds. Invalid numeric input returns 400. Without it, the server starts after that user's previous poll.
 - `msg` is truncated to 300 characters and displayed as `<name> message`. Repeating an identical message longer than 10 characters when it matches one of the last five messages adds `error: spam` instead of posting it.
@@ -65,7 +64,7 @@ The snapshot is a JSON object of string-keyed entries, including `meta` and chun
 
 ## Surface catalog and uploads
 
-The client fetches `GET /static/minicraft/textures.json`, a JSON array of enabled packs with `{ id, label, owner }`, and loads images from `/static/minicraft/textures/{id}.png`. These historical filenames say `textures`; the UI calls them surfaces. The texture manager is `/svr/minicraft/textures.html` (linked from the settings view), not a JSON API.
+The client fetches `GET /static/minicraft/textures.json`, a JSON array of enabled packs with `{ id, label, owner }`, and loads images from `/static/minicraft/textures/{id}.png`. These historical filenames say `textures`; the UI calls them surfaces. The texture manager is linked from the settings view and is an HTML form, not a JSON API.
 
 The manager uses a multipart form with `detail`, `label`, optional `owner`, and optional `file`. A signed-in account is required to submit. Creating a pack requires a PNG file; editing requires the pack owner or a server administrator, and the image can be omitted to retain the current one. Labels are limited to 30 characters. Uploaded images must be valid PNG files with dimensions exactly 16×416 pixels. Successful uploads are made available through the static image path and catalog. See [surfaces.md](surfaces.md) for the required atlas layout.
 
@@ -80,4 +79,3 @@ The server keeps world metadata separately from each world's JSON snapshot. Snap
 ## Source pointers
 
 - Client URL construction/sync: [`src/game/m_world_store.js`](../src/game/m_world_store.js), [`src/game/c_menu_start.js`](../src/game/c_menu_start.js), [`src/game/m_game.js`](../src/game/m_game.js), [`src/game/c_settings.js`](../src/game/c_settings.js), [`src/game/m_renderer.js`](../src/game/m_renderer.js), [`src/etc/env.js`](../src/etc/env.js).
-- Backend routing and implementation: companion `rtjscomp/rtjscomp.json`, `public/svr/minicraft/storage.json`, `public/svr/minicraft/minicraft.service.js`, `public/svr/chat/api.txt`, and `public/svr/minicraft/textures.html`.
