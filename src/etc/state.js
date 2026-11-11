@@ -281,19 +281,23 @@ const reducers = {
 	}),
 	world_prop: (state, id, patch) => ({
 		...state,
-		...world_store_lists_merge({
-			...state.config,
-			worlds: state.config.worlds.map(world => (
-				world.id === id
-				?	{
-						...world,
-						...patch,
-					}
-				:	world
-			)),
-		}),
+		...world_store_lists_merge(
+			config_world_patch(state.config, id, patch)
+		),
 	}),
 };
+
+export const config_world_patch = (config, id, patch) => ({
+	...config,
+	worlds: config.worlds.map(world => (
+		world.id === id
+		?	{
+				...world,
+				...patch,
+			}
+		:	world
+	)),
+});
 
 export let app_state;
 export let actions;

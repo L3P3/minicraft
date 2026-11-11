@@ -32,7 +32,6 @@ import {
 	fetch_,
 	prompt_,
 	response_parse,
-	headers_json_post,
 	setTimeout_,
 	scrollIntoView_settings,
 } from '../etc/helpers.js';
@@ -92,6 +91,7 @@ import {
 import {
 	world_list_remote,
 	world_rename_last,
+	world_store_remote_patch,
 	world_store_remote_reload,
 } from './m_world_store.js';
 
@@ -193,15 +193,9 @@ const WorldButtons = ({
 			}
 			if (world.remote) {
 				busy_set(true);
-				fetch_(API + 'world', {
-					...headers_json_post,
-					body: JSON_stringify({
-						what: 'meta',
-						world: world.id,
-						label: name,
-					}),
+				world_store_remote_patch(world.id, {
+					label: name,
 				})
-				.then(response_parse)
 				.catch(error => {
 					alert_(locale_error_world_edit + error.message);
 				})
@@ -231,21 +225,14 @@ const WorldButtons = ({
 		}`,
 		onclick: () => {
 			busy_set(true);
-			fetch_(API + 'world', {
-				...headers_json_post,
-				body: JSON_stringify({
-					what: 'meta',
-					world: world.id,
-					locked: !world.locked,
-				}),
+			world_store_remote_patch(world.id, {
+				locked: !world.locked,
 			})
-			.then(response => (
-				response = response_parse(response),
+			.then(() => (
 				defer(),
 				world_store_remote_reload(),
 				busy_set(false),
-				defer_end(),
-				response
+				defer_end()
 			))
 			.catch(error => {
 				alert_(locale_error_world_edit + error.message);
@@ -275,21 +262,14 @@ const WorldButtons = ({
 		}`,
 		onclick: () => {
 			busy_set(true);
-			fetch_(API + 'world', {
-				...headers_json_post,
-				body: JSON_stringify({
-					what: 'meta',
-					world: world.id,
-					public: !world.public,
-				}),
+			world_store_remote_patch(world.id, {
+				public: !world.public,
 			})
-			.then(response => (
-				response = response_parse(response),
+			.then(() => (
 				defer(),
 				world_store_remote_reload(),
 				busy_set(false),
-				defer_end(),
-				response
+				defer_end()
 			))
 			.catch(error => {
 				alert_(locale_error_world_edit + error.message);
@@ -434,9 +414,11 @@ function WorldItem({
 			},
 		}),
 		node_dom('td', {
-			innerText: I.label,
 			title: I.id,
 		}, [
+			node_dom('span', {
+				innerText: I.label,
+			}),
 			selected &&
 			node(WorldButtons, {
 				account,

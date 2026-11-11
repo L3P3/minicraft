@@ -35,6 +35,7 @@ import {
 import {
 	actions,
 	app_state,
+	config_world_patch,
 } from '../etc/state.js';
 import {
 	world_delete,
@@ -155,20 +156,38 @@ export const world_store_lists_merge = config => {
 					datify(last_change_here, false) +
 					locale_error_conflict_4
 				)) {
-					config = {
-						...config,
-						worlds: config.worlds.map(world => (
-							world.id === world_local.id
-							?	{
-								...world,
-								mod_l: world_list_item.local = last_sync,
-							}
-							:	world
-						)),
-					};
+					config = config_world_patch(config, world_local.id, {
+						mod_l: world_list_item.local = last_sync,
+					});
 				}
 				else {
 					world_list_item.remote = last_sync;
+				}
+			}
+			else {
+				// props differ?
+				if (
+					world_list_item.label !== world_local.label
+					// TODO: other props?
+				) {
+					// locale is newer and remote writable?
+					if (
+						last_change_here > last_change_there &&
+						world_list_item.writable
+					) {
+						world_store_remote_patch(world_local.id, {
+							label: (
+								world_list_item.label = world_local.label
+							),
+						})
+						.catch(() => {});
+					}
+					else {
+						// use remote props
+						config = config_world_patch(config, world_local.id, {
+							label: world_list_item.label,
+						});
+					}
 				}
 			}
 		}
@@ -183,17 +202,9 @@ export const world_store_lists_merge = config => {
 					world_local.label +
 					locale_warn_world_remote_missing_2
 				);
-				config = {
-					...config,
-					worlds: config.worlds.map(world => (
-						world.id === world_local.id
-						?	{
-							...world,
-							mod_r: WORLD_STORED_NOT,
-						}
-						:	world
-					)),
-				};
+				config = config_world_patch(config, world_local.id, {
+					mod_r: WORLD_STORED_NOT,
+				});
 			}
 
 			world_list.push({
@@ -300,15 +311,9 @@ const world_store_sync = async world => {
 
 			// world must be registered first?
 			if (world.remote === WORLD_STORED_SHOULD) {
-				const result_register = await response_parse(
-					await fetch_(API + 'world', {
-						...headers_json_post,
-						body: JSON_stringify({
-							what: 'meta',
-							label: world.label,
-						}),
-					})
-				);
+				const result_register = await world_store_remote_patch(undefined, {
+					label: world.label,
+				});
 				rename_promise = world_rename(
 					id,
 					id_new = result_register.id
@@ -319,16 +324,10 @@ const world_store_sync = async world => {
 				});
 			}
 
-			const result_upload = await response_parse(
-				await fetch_(API + 'world', {
-					...headers_json_post,
-					body: JSON_stringify({
-						what: 'data',
-						world: id_new,
-						data: await data_promise,
-					}),
-				})
-			);
+			const result_upload = await world_store_remote_patch(id_new, {
+				what: 'data',
+				data: await data_promise,
+			});
 			if (world.remote === WORLD_STORED_SHOULD) {
 				world_list_remote.push(result_upload);
 			}
@@ -352,3 +351,15 @@ const world_store_sync = async world => {
 		await rename_promise;
 	}
 }
+
+export const world_store_remote_patch = (world, patch) => (
+	fetch_(API + 'world', {
+		...headers_json_post,
+		body: JSON_stringify({
+			what: 'meta',
+			world,
+			...patch,
+		}),
+	})
+	.then(response_parse)
+)
